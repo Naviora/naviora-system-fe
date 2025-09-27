@@ -2,6 +2,6 @@
 export * from "./button";
 export * from "./sonner";
 
-// State Components  
+// State Components
 export * from "./loading";
 export * from "./error-boundary";
