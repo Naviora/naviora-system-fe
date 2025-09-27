@@ -1,26 +1,420 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* === NAVIORA DESIGN SYSTEM COLORS === */
+
+  /* Primary Color System (Blue) */
+  --color-primary-0: #f1f7ff;
+  --color-primary-25: #cfe0ff;
+  --color-primary-50: #86b2fe;
+  --color-primary-100: #5e99fe;
+  --color-primary-200: #0e66fe;
+  --color-primary-300: #0944a9;
+  --color-primary: #0e66fe;
+  --color-primary-foreground: #ffffff;
+
+  /* Greyscale System */
+  --color-greyscale-0: #ffffff;
+  --color-greyscale-25: #f6f8fa;
+  --color-greyscale-50: #eceff3;
+  --color-greyscale-100: #dfe1e7;
+  --color-greyscale-200: #c1c7d0;
+  --color-greyscale-300: #a4acb9;
+  --color-greyscale-400: #818898;
+  --color-greyscale-500: #666d80;
+  --color-greyscale-600: #354156;
+  --color-greyscale-700: #1b1b1b;
+  --color-greyscale-800: #1a1b25;
+  --color-greyscale-900: #121a26;
+
+  /* Success/Green System */
+  --color-success-0: #ecffee;
+  --color-success-25: #bdebc2;
+  --color-success-50: #7cd785;
+  --color-success-100: #3ac348;
+  --color-success-200: #278231;
+  --color-success-300: #134118;
+  --color-success: #3ac348;
+
+  /* Warning/Yellow System */
+  --color-warning-0: #fff6e0;
+  --color-warning-25: #faedcc;
+  --color-warning-50: #fcda83;
+  --color-warning-100: #ffbe4c;
+  --color-warning-200: #966422;
+  --color-warning-300: #5c3d1f;
+  --color-warning: #ffbe4c;
+
+  /* Error/Red System */
+  --color-error-0: #fff0f3;
+  --color-error-25: #fadbe1;
+  --color-error-50: #ed8296;
+  --color-error-100: #d73e3d;
+  --color-error-200: #8f2929;
+  --color-error-300: #6c1f1f;
+  --color-error: #d73e3d;
+
+  /* Semantic Colors for UI Components */
+  --color-background: #ffffff;
+  --color-foreground: #121a26;
+  --color-card: #ffffff;
+  --color-card-foreground: #121a26;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #121a26;
+  --color-secondary: #f6f8fa;
+  --color-secondary-foreground: #121a26;
+  --color-muted: #f6f8fa;
+  --color-muted-foreground: #666d80;
+  --color-accent: #f6f8fa;
+  --color-accent-foreground: #121a26;
+  --color-destructive: #d73e3d;
+  --color-destructive-foreground: #ffffff;
+  --color-border: #dfe1e7;
+  --color-input: #dfe1e7;
+  --color-ring: #0e66fe;
+
+  /* Charts & Data Visualization */
+  --color-chart-1: #0e66fe;
+  --color-chart-2: #3ac348;
+  --color-chart-3: #ffbe4c;
+  --color-chart-4: #d73e3d;
+  --color-chart-5: #666d80;
+
+  /* Sidebar Components */
+  --color-sidebar: #ffffff;
+  --color-sidebar-foreground: #121a26;
+  --color-sidebar-primary: #0e66fe;
+  --color-sidebar-primary-foreground: #ffffff;
+  --color-sidebar-accent: #f6f8fa;
+  --color-sidebar-accent-foreground: #121a26;
+  --color-sidebar-border: #dfe1e7;
+  --color-sidebar-ring: #0e66fe;
+
+  /* === NAVIORA TYPOGRAPHY SYSTEM === */
+
+  /* Font Families */
+  --font-family-primary: "Inter Tight", "Inter", system-ui, sans-serif;
+  --font-family-display: "Inter Display V", "Inter", system-ui, sans-serif;
+  --font-family-body: "Inter Tight", system-ui, sans-serif;
+  --font-family-sans: "Inter Tight", "Inter", system-ui, sans-serif;
+  --font-family-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco,
+    Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* === NAVIORA DESIGN TOKENS === */
+
+  /* Border Radius */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  --radius: 12px; /* Default radius */
+
+  /* Box Shadows */
+  --shadow-container-small: 0px 2px 4px 0px rgba(0, 0, 0, 0.05);
+  --shadow-container: 0px 4px 8px 0px rgba(0, 0, 0, 0.1);
+  --shadow-container-large: 0px 8px 16px 0px rgba(0, 0, 0, 0.15);
+  --shadow-elevation-1: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+  --shadow-elevation-2: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+  --shadow-elevation-3: 0px 4px 8px 0px rgba(0, 0, 0, 0.15);
+
+  /* Animation Durations */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 350ms;
+  --duration-slower: 500ms;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* === NAVIORA DARK MODE === */
+.dark {
+  /* Primary Colors - Slightly adjusted for dark mode */
+  --color-primary-0: #0944a9;
+  --color-primary-25: #0e66fe;
+  --color-primary-50: #5e99fe;
+  --color-primary-100: #86b2fe;
+  --color-primary-200: #cfe0ff;
+  --color-primary-300: #f1f7ff;
+  --color-primary: #5e99fe;
+  --color-primary-foreground: #0944a9;
+
+  /* Greyscale - Inverted for dark mode */
+  --color-greyscale-0: #121a26;
+  --color-greyscale-25: #1a1b25;
+  --color-greyscale-50: #1b1b1b;
+  --color-greyscale-100: #354156;
+  --color-greyscale-200: #666d80;
+  --color-greyscale-300: #818898;
+  --color-greyscale-400: #a4acb9;
+  --color-greyscale-500: #c1c7d0;
+  --color-greyscale-600: #dfe1e7;
+  --color-greyscale-700: #eceff3;
+  --color-greyscale-800: #f6f8fa;
+  --color-greyscale-900: #ffffff;
+
+  /* Semantic Colors adjusted for dark mode */
+  --color-background: #121a26;
+  --color-foreground: #ffffff;
+  --color-card: #1a1b25;
+  --color-card-foreground: #ffffff;
+  --color-popover: #1a1b25;
+  --color-popover-foreground: #ffffff;
+  --color-secondary: #354156;
+  --color-secondary-foreground: #ffffff;
+  --color-muted: #354156;
+  --color-muted-foreground: #c1c7d0;
+  --color-accent: #354156;
+  --color-accent-foreground: #ffffff;
+  --color-border: #354156;
+  --color-input: #354156;
+  --color-ring: #5e99fe;
+
+  /* Sidebar for dark mode */
+  --color-sidebar: #1a1b25;
+  --color-sidebar-foreground: #ffffff;
+  --color-sidebar-primary: #5e99fe;
+  --color-sidebar-primary-foreground: #121a26;
+  --color-sidebar-accent: #354156;
+  --color-sidebar-accent-foreground: #ffffff;
+  --color-sidebar-border: #354156;
+  --color-sidebar-ring: #5e99fe;
+
+  /* Charts adjusted for dark mode */
+  --color-chart-1: #5e99fe;
+  --color-chart-2: #7cd785;
+  --color-chart-3: #fcda83;
+  --color-chart-4: #ed8296;
+  --color-chart-5: #c1c7d0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* === NAVIORA COMPONENT STYLES === */
+@layer base {
+  * {
+    border-color: var(--color-border);
+    outline-color: color-mix(in srgb, var(--color-ring) 50%, transparent);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-primary);
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Naviora Heading Styles */
+  .heading-1 {
+    font-size: 48px;
+    line-height: 1.2;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    font-family: var(--font-primary);
+  }
+
+  .heading-2 {
+    font-size: 40px;
+    line-height: 1.2;
+    font-weight: 600;
+    font-family: var(--font-primary);
+  }
+
+  .heading-3 {
+    font-size: 32px;
+    line-height: 1.4;
+    font-weight: 600;
+    font-family: var(--font-primary);
+  }
+
+  .heading-4 {
+    font-size: 24px;
+    line-height: 1.2;
+    font-weight: 600;
+    font-family: var(--font-primary);
+  }
+
+  .heading-5 {
+    font-size: 20px;
+    line-height: 1.2;
+    font-weight: 600;
+    font-family: var(--font-primary);
+  }
+
+  .heading-6 {
+    font-size: 18px;
+    line-height: 1.2;
+    font-weight: 600;
+    font-family: var(--font-primary);
+  }
+
+  /* Naviora Body Text Styles */
+  .body-large-semibold {
+    font-size: 18px;
+    line-height: 1.55;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    font-family: var(--font-body);
+  }
+
+  .body-large-medium {
+    font-size: 18px;
+    line-height: 1.55;
+    font-weight: 500;
+    font-family: var(--font-body);
+  }
+
+  .body-large-regular {
+    font-size: 18px;
+    line-height: 1.55;
+    font-weight: 400;
+    font-family: var(--font-body);
+  }
+
+  .body-medium-semibold {
+    font-size: 16px;
+    line-height: 1.2;
+    font-weight: 600;
+    font-family: var(--font-body);
+  }
+
+  .body-medium-medium {
+    font-size: 16px;
+    line-height: 1.2;
+    font-weight: 500;
+    font-family: var(--font-body);
+  }
+
+  .body-medium-regular {
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 400;
+    font-family: var(--font-body);
+  }
+
+  .body-small-semibold {
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: 600;
+    font-family: var(--font-body);
+  }
+
+  .body-small-medium {
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: 500;
+    font-family: var(--font-body);
+  }
+
+  .body-small-regular {
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: 400;
+    font-family: var(--font-body);
+  }
+
+  .body-xsmall-semibold {
+    font-size: 12px;
+    line-height: 1.55;
+    font-weight: 600;
+    font-family: var(--font-body);
+  }
+
+  .body-xsmall-medium {
+    font-size: 12px;
+    line-height: 1.55;
+    font-weight: 500;
+    font-family: var(--font-body);
+  }
+
+  .body-xsmall-regular {
+    font-size: 12px;
+    line-height: 1.5;
+    font-weight: 400;
+    font-family: var(--font-body);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* === NAVIORA UTILITY CLASSES === */
+@layer utilities {
+  /* Container Shadows */
+  .shadow-container-small {
+    box-shadow: var(--shadow-container-small);
+  }
+
+  .shadow-container {
+    box-shadow: var(--shadow-container);
+  }
+
+  .shadow-container-large {
+    box-shadow: var(--shadow-container-large);
+  }
+
+  .shadow-elevation-1 {
+    box-shadow: var(--shadow-elevation-1);
+  }
+
+  .shadow-elevation-2 {
+    box-shadow: var(--shadow-elevation-2);
+  }
+
+  .shadow-elevation-3 {
+    box-shadow: var(--shadow-elevation-3);
+  }
+
+  /* Animation Utilities */
+  .animate-fade-in {
+    animation: fadeIn var(--duration-normal) ease-out;
+  }
+
+  .animate-slide-in {
+    animation: slideIn var(--duration-slow) ease-out;
+  }
+
+  .transition-fast {
+    transition-duration: var(--duration-fast);
+  }
+
+  .transition-normal {
+    transition-duration: var(--duration-normal);
+  }
+
+  .transition-slow {
+    transition-duration: var(--duration-slow);
+  }
+
+  /* Focus States */
+  .focus-ring {
+    outline: none;
+  }
+  .focus-ring:focus {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+
+  .focus-ring-primary {
+    outline: none;
+  }
+  .focus-ring-primary:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+/* === NAVIORA ANIMATIONS === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
