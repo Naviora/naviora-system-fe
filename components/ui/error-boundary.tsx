@@ -37,7 +37,12 @@ export class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
 
-      return <DefaultErrorFallback error={this.state.error} onReset={() => this.setState({ hasError: false })} />;
+      return (
+        <DefaultErrorFallback
+          error={this.state.error}
+          onReset={() => this.setState({ hasError: false })}
+        />
+      );
     }
 
     return this.props.children;
@@ -51,41 +56,41 @@ interface DefaultErrorFallbackProps {
 
 function DefaultErrorFallback({ error, onReset }: DefaultErrorFallbackProps) {
   return (
-    <div className="min-h-[400px] flex items-center justify-center p-6">
+    <div className='min-h-[400px] flex items-center justify-center p-6'>
       <motion.div
-        className="max-w-md w-full text-center space-y-6"
+        className='max-w-md w-full text-center space-y-6'
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
         {/* Error Icon */}
         <motion.div
-          className="flex justify-center"
+          className='flex justify-center'
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
         >
-          <div className="w-16 h-16 bg-error-0 rounded-full flex items-center justify-center shadow-container">
-            <AlertTriangle className="w-8 h-8 text-error" />
+          <div className='w-16 h-16 bg-error-0 rounded-full flex items-center justify-center shadow-container'>
+            <AlertTriangle className='w-8 h-8 text-error' />
           </div>
         </motion.div>
 
         {/* Error Content */}
-        <div className="space-y-3">
-          <h3 className="heading-5 text-foreground">Có lỗi xảy ra</h3>
-          <p className="body-medium-regular text-muted-foreground">
+        <div className='space-y-3'>
+          <h3 className='heading-5 text-foreground'>Có lỗi xảy ra</h3>
+          <p className='body-medium-regular text-muted-foreground'>
             Thành phần này đã gặp phải lỗi bất ngờ. Vui lòng thử lại.
           </p>
-          
+
           {/* Error Message in Development */}
           {process.env.NODE_ENV === "development" && error && (
             <motion.div
-              className="bg-error-0 border border-error-50 rounded-lg p-3 text-left mt-4"
+              className='bg-error-0 border border-error-50 rounded-lg p-3 text-left mt-4'
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
             >
-              <p className="body-xsmall-regular text-error-200 font-mono break-all">
+              <p className='body-xsmall-regular text-error-200 font-mono break-all'>
                 {error.message}
               </p>
             </motion.div>
@@ -94,27 +99,27 @@ function DefaultErrorFallback({ error, onReset }: DefaultErrorFallbackProps) {
 
         {/* Action Buttons */}
         <motion.div
-          className="flex flex-col sm:flex-row gap-3 justify-center"
+          className='flex flex-col sm:flex-row gap-3 justify-center'
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
         >
           <Button
             onClick={onReset}
-            size="sm"
-            className="flex items-center space-x-2"
+            size='sm'
+            className='flex items-center space-x-2'
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className='w-4 h-4' />
             <span>Thử lại</span>
           </Button>
-          
+
           <Button
-            variant="outline"
-            size="sm"
+            variant='outline'
+            size='sm'
             onClick={() => (window.location.href = "/")}
-            className="flex items-center space-x-2"
+            className='flex items-center space-x-2'
           >
-            <Home className="w-4 h-4" />
+            <Home className='w-4 h-4' />
             <span>Về trang chủ</span>
           </Button>
         </motion.div>

@@ -4,17 +4,17 @@ import { motion } from "framer-motion";
 
 export default function Loading() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="flex flex-col items-center space-y-8 p-8">
+    <div className='min-h-screen bg-background flex items-center justify-center'>
+      <div className='flex flex-col items-center space-y-8 p-8'>
         {/* Logo Loading Animation */}
         <motion.div
-          className="relative"
+          className='relative'
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
           <motion.div
-            className="w-20 h-20 rounded-full bg-gradient-to-r from-primary to-primary-200 shadow-container-large"
+            className='w-20 h-20 rounded-full bg-gradient-to-r from-primary to-primary-200 shadow-container-large'
             animate={{
               rotate: 360,
             }}
@@ -24,9 +24,9 @@ export default function Loading() {
               ease: "linear",
             }}
           >
-            <div className="absolute inset-2 rounded-full bg-background shadow-inner flex items-center justify-center">
+            <div className='absolute inset-2 rounded-full bg-background shadow-inner flex items-center justify-center'>
               <motion.div
-                className="w-8 h-8 rounded-full bg-primary"
+                className='w-8 h-8 rounded-full bg-primary'
                 animate={{
                   scale: [1, 1.2, 1],
                 }}
@@ -42,15 +42,15 @@ export default function Loading() {
 
         {/* Brand Name */}
         <motion.div
-          className="text-center space-y-2"
+          className='text-center space-y-2'
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          <h1 className="heading-4 text-foreground font-primary">Naviora</h1>
-          <div className="flex items-center space-x-2">
+          <h1 className='heading-4 text-foreground font-primary'>Naviora</h1>
+          <div className='flex items-center space-x-2'>
             <motion.div
-              className="w-2 h-2 bg-primary rounded-full"
+              className='w-2 h-2 bg-primary rounded-full'
               animate={{
                 opacity: [0.3, 1, 0.3],
               }}
@@ -61,7 +61,7 @@ export default function Loading() {
               }}
             />
             <motion.div
-              className="w-2 h-2 bg-primary rounded-full"
+              className='w-2 h-2 bg-primary rounded-full'
               animate={{
                 opacity: [0.3, 1, 0.3],
               }}
@@ -72,7 +72,7 @@ export default function Loading() {
               }}
             />
             <motion.div
-              className="w-2 h-2 bg-primary rounded-full"
+              className='w-2 h-2 bg-primary rounded-full'
               animate={{
                 opacity: [0.3, 1, 0.3],
               }}
@@ -87,7 +87,7 @@ export default function Loading() {
 
         {/* Loading Text */}
         <motion.p
-          className="body-small-regular text-muted-foreground"
+          className='body-small-regular text-muted-foreground'
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
@@ -97,13 +97,13 @@ export default function Loading() {
 
         {/* Progress Bar */}
         <motion.div
-          className="w-64 h-1 bg-secondary rounded-full overflow-hidden"
+          className='w-64 h-1 bg-secondary rounded-full overflow-hidden'
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.5 }}
         >
           <motion.div
-            className="h-full bg-gradient-to-r from-primary to-primary-200 rounded-full"
+            className='h-full bg-gradient-to-r from-primary to-primary-200 rounded-full'
             animate={{
               x: ["-100%", "100%"],
             }}
