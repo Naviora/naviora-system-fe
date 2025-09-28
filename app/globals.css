@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   /* === NAVIORA DESIGN SYSTEM COLORS === */
@@ -93,12 +93,12 @@
   /* === NAVIORA TYPOGRAPHY SYSTEM === */
 
   /* Font Families */
-  --font-family-primary: "Inter Tight", "Inter", system-ui, sans-serif;
-  --font-family-display: "Inter Display V", "Inter", system-ui, sans-serif;
-  --font-family-body: "Inter Tight", system-ui, sans-serif;
-  --font-family-sans: "Inter Tight", "Inter", system-ui, sans-serif;
-  --font-family-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco,
-    Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-family-primary: 'Inter Tight', 'Inter', system-ui, sans-serif;
+  --font-family-display: 'Inter Display V', 'Inter', system-ui, sans-serif;
+  --font-family-body: 'Inter Tight', system-ui, sans-serif;
+  --font-family-sans: 'Inter Tight', 'Inter', system-ui, sans-serif;
+  --font-family-mono:
+    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 
   /* === NAVIORA DESIGN TOKENS === */
 
@@ -198,7 +198,9 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-primary);
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
   }
 
   /* Naviora Heading Styles */

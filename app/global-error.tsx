@@ -1,21 +1,15 @@
-"use client";
+'use client'
 
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-import { AlertCircle, RefreshCw, Home, Mail } from "lucide-react";
+import { useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { motion } from 'framer-motion'
+import { AlertCircle, RefreshCw, Home, Mail } from 'lucide-react'
 
-export default function GlobalError({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) {
+export default function GlobalError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
     // Log the error to error monitoring service
-    console.error("Global Error:", error);
-  }, [error]);
+    console.error('Global Error:', error)
+  }, [error])
 
   return (
     <html lang='en'>
@@ -32,7 +26,7 @@ export default function GlobalError({
               className='flex justify-center'
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 150 }}
+              transition={{ delay: 0.2, type: 'spring', stiffness: 150 }}
             >
               <div className='relative'>
                 <div className='w-32 h-32 bg-error-0 rounded-full flex items-center justify-center shadow-container-large'>
@@ -54,12 +48,10 @@ export default function GlobalError({
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.5 }}
             >
-              <h1 className='heading-2 text-foreground'>
-                Lỗi hệ thống nghiêm trọng
-              </h1>
+              <h1 className='heading-2 text-foreground'>Lỗi hệ thống nghiêm trọng</h1>
               <p className='body-large-regular text-muted-foreground'>
-                Ứng dụng đã gặp phải lỗi nghiêm trọng và không thể hoạt động
-                bình thường. Chúng tôi đã được thông báo về sự cố này.
+                Ứng dụng đã gặp phải lỗi nghiêm trọng và không thể hoạt động bình thường. Chúng tôi đã được thông báo về
+                sự cố này.
               </p>
             </motion.div>
 
@@ -88,18 +80,14 @@ export default function GlobalError({
               transition={{ delay: 0.8, duration: 0.5 }}
             >
               <div className='flex flex-col sm:flex-row gap-4 justify-center'>
-                <Button
-                  onClick={reset}
-                  size='lg'
-                  className='flex items-center space-x-2 min-w-[160px]'
-                >
+                <Button onClick={reset} size='lg' className='flex items-center space-x-2 min-w-[160px]'>
                   <RefreshCw className='w-4 h-4' />
                   <span>Khởi động lại ứng dụng</span>
                 </Button>
 
                 <Button
                   variant='outline'
-                  onClick={() => (window.location.href = "/")}
+                  onClick={() => (window.location.href = '/')}
                   size='lg'
                   className='flex items-center space-x-2 min-w-[160px]'
                 >
@@ -117,7 +105,7 @@ export default function GlobalError({
                   variant='ghost'
                   size='sm'
                   className='flex items-center space-x-2'
-                  onClick={() => window.open("mailto:support@naviora.com")}
+                  onClick={() => window.open('mailto:support@naviora.com')}
                 >
                   <Mail className='w-4 h-4' />
                   <span>support@naviora.com</span>
@@ -133,13 +121,11 @@ export default function GlobalError({
               transition={{ delay: 1, duration: 0.5 }}
             >
               <div className='w-2 h-2 bg-error rounded-full animate-pulse' />
-              <span className='body-xsmall-regular'>
-                Đội ngũ kỹ thuật đã được thông báo
-              </span>
+              <span className='body-xsmall-regular'>Đội ngũ kỹ thuật đã được thông báo</span>
             </motion.div>
           </motion.div>
         </div>
       </body>
     </html>
-  );
+  )
 }

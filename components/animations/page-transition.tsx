@@ -1,19 +1,19 @@
-"use client";
+'use client'
 
-import { motion, AnimatePresence, type Variants } from "framer-motion";
-import { usePathname } from "next/navigation";
-import { type ReactNode } from "react";
+import { motion, AnimatePresence, type Variants } from 'framer-motion'
+import { usePathname } from 'next/navigation'
+import { type ReactNode } from 'react'
 
 interface PageTransitionProps {
-  children: ReactNode;
-  className?: string;
+  children: ReactNode
+  className?: string
 }
 
 const pageVariants: Variants = {
   initial: {
     opacity: 0,
     x: -20,
-    scale: 0.98,
+    scale: 0.98
   },
   in: {
     opacity: 1,
@@ -21,8 +21,8 @@ const pageVariants: Variants = {
     scale: 1,
     transition: {
       duration: 0.4,
-      ease: "easeOut",
-    },
+      ease: 'easeOut'
+    }
   },
   out: {
     opacity: 0,
@@ -30,16 +30,13 @@ const pageVariants: Variants = {
     scale: 0.98,
     transition: {
       duration: 0.3,
-      ease: "easeIn",
-    },
-  },
-};
+      ease: 'easeIn'
+    }
+  }
+}
 
-export function PageTransition({
-  children,
-  className = "",
-}: PageTransitionProps) {
-  const pathname = usePathname();
+export function PageTransition({ children, className = '' }: PageTransitionProps) {
+  const pathname = usePathname()
 
   return (
     <AnimatePresence mode='wait' initial={false}>
@@ -54,14 +51,14 @@ export function PageTransition({
         {children}
       </motion.div>
     </AnimatePresence>
-  );
+  )
 }
 
 // Modal transition
 interface ModalTransitionProps {
-  children: ReactNode;
-  isOpen: boolean;
-  onClose?: () => void;
+  children: ReactNode
+  isOpen: boolean
+  onClose?: () => void
 }
 
 const modalVariants: Variants = {
@@ -69,33 +66,29 @@ const modalVariants: Variants = {
     opacity: 0,
     scale: 0.95,
     transition: {
-      duration: 0.2,
-    },
+      duration: 0.2
+    }
   },
   open: {
     opacity: 1,
     scale: 1,
     transition: {
       duration: 0.3,
-      ease: "easeOut",
-    },
-  },
-};
+      ease: 'easeOut'
+    }
+  }
+}
 
 const backdropVariants: Variants = {
   closed: {
-    opacity: 0,
+    opacity: 0
   },
   open: {
-    opacity: 1,
-  },
-};
+    opacity: 1
+  }
+}
 
-export function ModalTransition({
-  children,
-  isOpen,
-  onClose,
-}: ModalTransitionProps) {
+export function ModalTransition({ children, isOpen, onClose }: ModalTransitionProps) {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -108,38 +101,30 @@ export function ModalTransition({
             exit='closed'
             onClick={onClose}
           />
-          <motion.div
-            className='relative z-10'
-            variants={modalVariants}
-            initial='closed'
-            animate='open'
-            exit='closed'
-          >
+          <motion.div className='relative z-10' variants={modalVariants} initial='closed' animate='open' exit='closed'>
             {children}
           </motion.div>
         </div>
       )}
     </AnimatePresence>
-  );
+  )
 }
 
 // Drawer transition
 interface DrawerTransitionProps {
-  children: ReactNode;
-  isOpen: boolean;
-  onClose?: () => void;
-  direction?: "left" | "right" | "top" | "bottom";
+  children: ReactNode
+  isOpen: boolean
+  onClose?: () => void
+  direction?: 'left' | 'right' | 'top' | 'bottom'
 }
 
-const getDrawerVariants = (
-  direction: "left" | "right" | "top" | "bottom"
-): Variants => {
+const getDrawerVariants = (direction: 'left' | 'right' | 'top' | 'bottom'): Variants => {
   const variants: Record<string, { x?: string; y?: string }> = {
-    left: { x: "-100%" },
-    right: { x: "100%" },
-    top: { y: "-100%" },
-    bottom: { y: "100%" },
-  };
+    left: { x: '-100%' },
+    right: { x: '100%' },
+    top: { y: '-100%' },
+    bottom: { y: '100%' }
+  }
 
   return {
     closed: variants[direction],
@@ -147,21 +132,16 @@ const getDrawerVariants = (
       x: 0,
       y: 0,
       transition: {
-        type: "spring",
+        type: 'spring',
         damping: 20,
-        stiffness: 300,
-      },
-    },
-  };
-};
+        stiffness: 300
+      }
+    }
+  }
+}
 
-export function DrawerTransition({
-  children,
-  isOpen,
-  onClose,
-  direction = "right",
-}: DrawerTransitionProps) {
-  const drawerVariants = getDrawerVariants(direction);
+export function DrawerTransition({ children, isOpen, onClose, direction = 'right' }: DrawerTransitionProps) {
+  const drawerVariants = getDrawerVariants(direction)
 
   return (
     <AnimatePresence>
@@ -177,13 +157,13 @@ export function DrawerTransition({
           />
           <motion.div
             className={`fixed ${
-              direction === "left"
-                ? "left-0 top-0 h-full"
-                : direction === "right"
-                ? "right-0 top-0 h-full"
-                : direction === "top"
-                ? "top-0 left-0 w-full"
-                : "bottom-0 left-0 w-full"
+              direction === 'left'
+                ? 'left-0 top-0 h-full'
+                : direction === 'right'
+                  ? 'right-0 top-0 h-full'
+                  : direction === 'top'
+                    ? 'top-0 left-0 w-full'
+                    : 'bottom-0 left-0 w-full'
             }`}
             variants={drawerVariants}
             initial='closed'
@@ -195,5 +175,5 @@ export function DrawerTransition({
         </div>
       )}
     </AnimatePresence>
-  );
+  )
 }
