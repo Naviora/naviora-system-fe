@@ -1,3 +1,4 @@
+'use client'
 import { Button } from '@/components/ui/button'
 import { FadeIn } from '@/components/animations/fade-slide-scale'
 import { Search, Home, ArrowLeft, Compass } from 'lucide-react'

@@ -1,3 +1,4 @@
+'use client'
 import { Button } from '@/components/ui/button'
 import { FadeIn, StaggerContainer, StaggerItem } from '@/components/animations/fade-slide-scale'
 import { Zap, Shield, Palette, Code, Database, Smartphone, Github, ExternalLink } from 'lucide-react'

@@ -1,3 +1,4 @@
+'use client'
 import { FadeIn } from '@/components/animations/fade-slide-scale'
 import { ContactForm } from '@/components/forms/contact-form'
 import { Button } from '@/components/ui/button'
@@ -14,12 +15,12 @@ export default function FormsPage() {
               Explore our form components with validation using React Hook Form and Zod
             </p>
             <div className='flex gap-4 justify-center'>
-              <Link href='/'>
-                <Button variant='outline'>← Back to Home</Button>
-              </Link>
-              <Link href='/dashboard'>
-                <Button>Go to Dashboard →</Button>
-              </Link>
+              <Button variant='outline' asChild>
+                <Link href='/'>← Back to Home</Link>
+              </Button>
+              <Button asChild>
+                <Link href='/dashboard'>Go to Dashboard →</Link>
+              </Button>
             </div>
           </div>
         </FadeIn>
@@ -33,9 +34,9 @@ export default function FormsPage() {
             <FadeIn delay={0.2}>
               <h2 className='text-2xl font-bold mb-4'>Login Form</h2>
               <p className='text-muted-foreground mb-6'>Try our authentication form with validation</p>
-              <Link href='/auth/login'>
-                <Button className='w-full'>View Login Form</Button>
-              </Link>
+              <Button className='w-full' asChild>
+                <Link href='/auth/login'>View Login Form</Link>
+              </Button>
             </FadeIn>
           </div>
         </div>

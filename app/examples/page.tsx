@@ -105,7 +105,7 @@ export default function ComponentExamples() {
 
             <div className='p-6 border border-border rounded-lg space-y-4'>
               <h3 className='heading-6'>Full Page Loading</h3>
-              <Button onClick={simulatePageLoading} variant='outline' className='w-full'>
+              <Button onClick={() => simulatePageLoading} variant='outline' className='w-full'>
                 Hiển thị trang loading
               </Button>
             </div>
