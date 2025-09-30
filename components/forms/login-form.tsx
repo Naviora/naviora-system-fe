@@ -14,6 +14,9 @@ import { useLogin } from '@/hooks/api/use-auth'
 import { FadeIn } from '@/components/animations/fade-slide-scale'
 import { ErrorHandler } from '@/lib/utils/error-handler'
 import Link from 'next/link'
+import Image from 'next/image'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Separator } from '@/components/ui/separator'
 
 interface LoginFormProps {
   onSuccess?: () => void
@@ -54,10 +57,11 @@ export function LoginForm({ onSuccess, redirectTo = '/dashboard', className = ''
 
   return (
     <FadeIn className={className}>
-      <div className='mx-auto max-w-sm space-y-6'>
-        <div className='text-center space-y-2'>
-          <h1 className='text-2xl font-bold'>Welcome back</h1>
-          <p className='text-muted-foreground'>Sign in to your account to continue</p>
+      <div className='mx-auto max-w-md space-y-6'>
+        <div className='flex flex-col gap-2 items-center'>
+          <Image width={48} height={48} src='/next.svg' alt='Logo' />
+          <h1 className='text-2xl font-bold'>Welcome back to Naviora</h1>
+          <p className='text-muted-foreground'>Login with your email and password</p>
         </div>
 
         <Form {...form}>
@@ -108,12 +112,12 @@ export function LoginForm({ onSuccess, redirectTo = '/dashboard', className = ''
                 control={form.control}
                 name='rememberMe'
                 render={({ field }) => (
-                  <FormItem className='flex flex-row items-start space-x-3 space-y-0'>
+                  <FormItem className='flex flex-row items-center space-x-0 space-y-0'>
                     <FormControl>
-                      <input type='checkbox' checked={field.value} onChange={field.onChange} className='mt-1' />
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                     <div className='space-y-1 leading-none'>
-                      <FormLabel className='text-sm font-normal'>Remember me</FormLabel>
+                      <FormLabel className='text-sm font-normal'>Keep Sign in</FormLabel>
                     </div>
                   </FormItem>
                 )}
@@ -124,14 +128,24 @@ export function LoginForm({ onSuccess, redirectTo = '/dashboard', className = ''
               </Link>
             </div>
 
+            <div className='flex items-center gap-4'>
+              <Separator className='flex-1' />
+              <span className='text-sm text-muted-foreground'>Or continue with</span>
+              <Separator className='flex-1' />
+            </div>
+
+            <Button variant='outline' className='w-full'>
+              Continue with Google
+            </Button>
+
             <Button type='submit' className='w-full' disabled={loginMutation.isPending}>
               {loginMutation.isPending ? (
                 <>
                   <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                  Signing in...
+                  Logging in...
                 </>
               ) : (
-                'Sign in'
+                'Login'
               )}
             </Button>
           </form>
@@ -140,7 +154,7 @@ export function LoginForm({ onSuccess, redirectTo = '/dashboard', className = ''
         <div className='text-center text-sm'>
           <span className='text-muted-foreground'>Don&apos;t have an account? </span>
           <Link href='/auth/register' className='text-primary hover:underline'>
-            Sign up
+            Register
           </Link>
         </div>
       </div>
