@@ -132,47 +132,47 @@ pnpm dev
 ### Creating a Form
 
 ```tsx
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 
 const schema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
-});
+  password: z.string().min(8)
+})
 
 export function MyForm() {
   const form = useForm({
-    resolver: zodResolver(schema),
-  });
+    resolver: zodResolver(schema)
+  })
 
-  return <Form {...form}>{/* Form fields */}</Form>;
+  return <Form {...form}>{/* Form fields */}</Form>
 }
 ```
 
 ### Using TanStack Query
 
 ```tsx
-import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api/client";
+import { useQuery } from '@tanstack/react-query'
+import { apiClient } from '@/lib/api/client'
 
 export function UserList() {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["users"],
-    queryFn: () => apiClient.get("/users"),
-  });
+    queryKey: ['users'],
+    queryFn: () => apiClient.get('/users')
+  })
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
+  if (isLoading) return <div>Loading...</div>
+  if (error) return <div>Error: {error.message}</div>
 
-  return <div>{/* Render users */}</div>;
+  return <div>{/* Render users */}</div>
 }
 ```
 
 ### Adding Animations
 
 ```tsx
-import { FadeIn, SlideIn } from "@/components/animations/fade-slide-scale";
+import { FadeIn, SlideIn } from '@/components/animations/fade-slide-scale'
 
 export function AnimatedComponent() {
   return (
@@ -181,7 +181,7 @@ export function AnimatedComponent() {
         <div>This content will animate in</div>
       </SlideIn>
     </FadeIn>
-  );
+  )
 }
 ```
 
@@ -244,7 +244,7 @@ The application uses a comprehensive constants system for error codes, messages,
 #### Error Codes (`lib/constants/codes.ts`)
 
 ```typescript
-import { ERROR_CODES, SUCCESS_CODES, HTTP_STATUS } from "@/lib/constants";
+import { ERROR_CODES, SUCCESS_CODES, HTTP_STATUS } from '@/lib/constants'
 
 // Usage example
 if (error.code === ERROR_CODES.INVALID_CREDENTIALS) {
@@ -255,28 +255,28 @@ if (error.code === ERROR_CODES.INVALID_CREDENTIALS) {
 #### Error Messages (`lib/constants/messages.ts`)
 
 ```typescript
-import { ERROR_MESSAGES, getErrorMessage } from "@/lib/constants";
+import { ERROR_MESSAGES, getErrorMessage } from '@/lib/constants'
 
 // Get user-friendly error message
-const message = getErrorMessage("INVALID_CREDENTIALS");
+const message = getErrorMessage('INVALID_CREDENTIALS')
 ```
 
 #### Configuration (`lib/constants/config.ts`)
 
 ```typescript
-import { API_CONFIG, QUERY_KEYS, ROUTES } from "@/lib/constants";
+import { API_CONFIG, QUERY_KEYS, ROUTES } from '@/lib/constants'
 
 // API configuration
-const baseUrl = API_CONFIG.BASE_URL;
+const baseUrl = API_CONFIG.BASE_URL
 
 // Query keys for TanStack Query
 const userQuery = useQuery({
-  queryKey: QUERY_KEYS.CURRENT_USER,
+  queryKey: QUERY_KEYS.CURRENT_USER
   // ...
-});
+})
 
 // Route navigation
-router.push(ROUTES.DASHBOARD);
+router.push(ROUTES.DASHBOARD)
 ```
 
 ### Error Handler Utility
@@ -284,10 +284,10 @@ router.push(ROUTES.DASHBOARD);
 The `ErrorHandler` class provides comprehensive error management:
 
 ```typescript
-import { ErrorHandler } from "@/lib/utils/error-handler";
+import { ErrorHandler } from '@/lib/utils/error-handler'
 
 // Get user-friendly error message
-const message = ErrorHandler.getErrorMessage(error);
+const message = ErrorHandler.getErrorMessage(error)
 
 // Check error types
 if (ErrorHandler.isAuthError(error)) {
@@ -299,7 +299,7 @@ if (ErrorHandler.isValidationError(error)) {
 }
 
 // Log errors in development
-ErrorHandler.logError(error, "User Registration");
+ErrorHandler.logError(error, 'User Registration')
 ```
 
 ### API Error Response Format
@@ -308,15 +308,15 @@ All API responses follow a standardized format:
 
 ```typescript
 interface ApiResponse<T> {
-  data?: T;
+  data?: T
   error?: {
-    code: string;
-    message: string;
-    details?: Record<string, unknown>;
-    timestamp: string;
-  };
-  success: boolean;
-  timestamp: string;
+    code: string
+    message: string
+    details?: Record<string, unknown>
+    timestamp: string
+  }
+  success: boolean
+  timestamp: string
 }
 ```
 

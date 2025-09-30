@@ -1,57 +1,52 @@
-"use client";
+'use client'
 
-import { Component, ReactNode, ErrorInfo } from "react";
-import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-import { AlertTriangle, RefreshCw, Home } from "lucide-react";
+import { Component, ReactNode, ErrorInfo } from 'react'
+import { Button } from '@/components/ui/button'
+import { motion } from 'framer-motion'
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react'
 
 interface Props {
-  children: ReactNode;
-  fallback?: ReactNode;
-  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  children: ReactNode
+  fallback?: ReactNode
+  onError?: (error: Error, errorInfo: ErrorInfo) => void
 }
 
 interface State {
-  hasError: boolean;
-  error?: Error;
+  hasError: boolean
+  error?: Error
 }
 
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false };
+    super(props)
+    this.state = { hasError: false }
   }
 
   static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
+    return { hasError: true, error }
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("Error caught by boundary:", error, errorInfo);
-    this.props.onError?.(error, errorInfo);
+    console.error('Error caught by boundary:', error, errorInfo)
+    this.props.onError?.(error, errorInfo)
   }
 
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
-        return this.props.fallback;
+        return this.props.fallback
       }
 
-      return (
-        <DefaultErrorFallback
-          error={this.state.error}
-          onReset={() => this.setState({ hasError: false })}
-        />
-      );
+      return <DefaultErrorFallback error={this.state.error} onReset={() => this.setState({ hasError: false })} />
     }
 
-    return this.props.children;
+    return this.props.children
   }
 }
 
 interface DefaultErrorFallbackProps {
-  error?: Error;
-  onReset: () => void;
+  error?: Error
+  onReset: () => void
 }
 
 function DefaultErrorFallback({ error, onReset }: DefaultErrorFallbackProps) {
@@ -68,7 +63,7 @@ function DefaultErrorFallback({ error, onReset }: DefaultErrorFallbackProps) {
           className='flex justify-center'
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+          transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
         >
           <div className='w-16 h-16 bg-error-0 rounded-full flex items-center justify-center shadow-container'>
             <AlertTriangle className='w-8 h-8 text-error' />
@@ -83,16 +78,14 @@ function DefaultErrorFallback({ error, onReset }: DefaultErrorFallbackProps) {
           </p>
 
           {/* Error Message in Development */}
-          {process.env.NODE_ENV === "development" && error && (
+          {process.env.NODE_ENV === 'development' && error && (
             <motion.div
               className='bg-error-0 border border-error-50 rounded-lg p-3 text-left mt-4'
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
             >
-              <p className='body-xsmall-regular text-error-200 font-mono break-all'>
-                {error.message}
-              </p>
+              <p className='body-xsmall-regular text-error-200 font-mono break-all'>{error.message}</p>
             </motion.div>
           )}
         </div>
@@ -104,11 +97,7 @@ function DefaultErrorFallback({ error, onReset }: DefaultErrorFallbackProps) {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
         >
-          <Button
-            onClick={onReset}
-            size='sm'
-            className='flex items-center space-x-2'
-          >
+          <Button onClick={onReset} size='sm' className='flex items-center space-x-2'>
             <RefreshCw className='w-4 h-4' />
             <span>Thử lại</span>
           </Button>
@@ -116,7 +105,7 @@ function DefaultErrorFallback({ error, onReset }: DefaultErrorFallbackProps) {
           <Button
             variant='outline'
             size='sm'
-            onClick={() => (window.location.href = "/")}
+            onClick={() => (window.location.href = '/')}
             className='flex items-center space-x-2'
           >
             <Home className='w-4 h-4' />
@@ -125,7 +114,7 @@ function DefaultErrorFallback({ error, onReset }: DefaultErrorFallbackProps) {
         </motion.div>
       </motion.div>
     </div>
-  );
+  )
 }
 
 // Hook-based error boundary for functional components
@@ -139,6 +128,6 @@ export function withErrorBoundary<P extends object>(
       <ErrorBoundary fallback={errorFallback} onError={onError}>
         <Component {...props} />
       </ErrorBoundary>
-    );
-  };
+    )
+  }
 }
