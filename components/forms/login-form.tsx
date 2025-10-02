@@ -17,6 +17,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Separator } from '@/components/ui/separator'
+import LoginGoogleButton from '@/components/forms/login-gg-btn'
 
 interface LoginFormProps {
   onSuccess?: () => void
@@ -59,7 +60,7 @@ export function LoginForm({ onSuccess, redirectTo = '/dashboard', className = ''
     <FadeIn className={className}>
       <div className='mx-auto max-w-md space-y-6'>
         <div className='flex flex-col gap-2 items-center'>
-          <Image width={48} height={48} src='/next.svg' alt='Logo' />
+          <Image width={60} height={60} src='/Naviora.png' alt='Logo' />
           <h1 className='text-2xl font-bold'>Welcome back to Naviora</h1>
           <p className='text-muted-foreground'>Login with your email and password</p>
         </div>
@@ -134,9 +135,7 @@ export function LoginForm({ onSuccess, redirectTo = '/dashboard', className = ''
               <Separator className='flex-1' />
             </div>
 
-            <Button variant='outline' className='w-full'>
-              Continue with Google
-            </Button>
+            <LoginGoogleButton />
 
             <Button type='submit' className='w-full' disabled={loginMutation.isPending}>
               {loginMutation.isPending ? (
