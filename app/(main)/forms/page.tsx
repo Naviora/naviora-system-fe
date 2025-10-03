@@ -6,7 +6,7 @@ import Link from 'next/link'
 
 export default function FormsPage() {
   return (
-    <div className='min-h-screen bg-gradient-to-br from-primary-0 to-secondary py-12 px-4'>
+    <div className='h-full w-full bg-gradient-to-br from-primary-0 to-secondary py-12 px-4 overflow-y-auto'>
       <div className='container mx-auto'>
         <FadeIn>
           <div className='text-center mb-8'>

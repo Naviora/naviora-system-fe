@@ -146,7 +146,7 @@ const newReleaseCourses = [
 
 export default function ModulesPage() {
   return (
-    <div className='flex min-h-screen w-full flex-col gap-12 px-6 py-8 md:px-12 lg:px-16'>
+    <div className='flex h-full w-full flex-col gap-12 px-6 py-8 md:px-12 lg:px-16'>
       {/* Hero Section */}
       <motion.div
         className='flex flex-col gap-3'

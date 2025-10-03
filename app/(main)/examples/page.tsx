@@ -50,7 +50,7 @@ export default function ComponentExamples() {
   }
 
   return (
-    <div className='min-h-screen bg-background p-8'>
+    <div className='h-full w-full p-8 overflow-y-auto'>
       <div className='max-w-4xl mx-auto space-y-12'>
         {/* Header */}
         <div className='text-center space-y-4'>
