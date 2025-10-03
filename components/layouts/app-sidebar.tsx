@@ -36,8 +36,8 @@ export function AppSidebar() {
     <Sidebar collapsible='icon' className='border-none bg-greyscale-25'>
       <div className='flex flex-col px-4 group-data-[collapsible=icon]:px-0 h-full'>
         <SidebarHeader>
-          <div className='flex items-center justify-between  group-data-[collapsible=icon]:justify-end '>
-            <Logo className='group-data-[collapsible=icon]:hidden' />
+          <div className='flex items-center justify-between  group-data-[collapsible=icon]:justify-end group-data-[collapsible=icon]:flex-col-reverse'>
+            <Logo size='sm'/>
             <SidebarTrigger />
           </div>
           <div className='relative group-data-[collapsible=icon]:hidden'>
