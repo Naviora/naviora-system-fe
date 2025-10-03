@@ -12,7 +12,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
   }, [error])
 
   return (
-    <div className='h-full bg-background flex items-center justify-center p-4'>
+    <div className='min-h-screen w-full bg-background flex items-center justify-center p-4'>
       <motion.div
         className='max-w-lg w-full text-center space-y-8'
         initial={{ opacity: 0, y: 20 }}

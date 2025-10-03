@@ -14,7 +14,7 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
   return (
     <html lang='en'>
       <body>
-        <div className='min-h-screen bg-background flex items-center justify-center p-4'>
+        <div className='min-h-screen w-full flex items-center justify-center p-4'>
           <motion.div
             className='max-w-xl w-full text-center space-y-8'
             initial={{ opacity: 0, y: 20 }}

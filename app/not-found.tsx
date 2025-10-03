@@ -6,7 +6,7 @@ import Link from 'next/link'
 
 export default function NotFound() {
   return (
-    <div className='h-full bg-background flex items-center justify-center p-4'>
+    <div className='min-h-screen bg-background flex items-center justify-center p-4'>
       <FadeIn className='max-w-2xl w-full text-center space-y-8'>
         {/* 404 Illustration */}
         <div className='relative'>
