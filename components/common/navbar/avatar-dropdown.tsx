@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { ChevronDown, User, Settings, LogOut, HelpCircle } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,19 +43,16 @@ export function AvatarDropdown() {
           className='flex h-8 items-center gap-1 rounded-lg border border-greyscale-200 px-1 hover:bg-greyscale-25'
           aria-label='User menu'
         >
-          <div className='relative h-6 w-6 overflow-hidden rounded-full'>
-            {user.avatar ? (
-              <Image src={user.avatar} alt={user.name} fill className='object-cover' sizes='24px' />
-            ) : (
-              <div className='flex h-full w-full items-center justify-center bg-primary-100 text-xs font-medium text-primary-foreground'>
-                {user.name
-                  .split(' ')
-                  .map((n) => n[0])
-                  .join('')
-                  .toUpperCase()}
-              </div>
-            )}
-          </div>
+          <Avatar className='h-6 w-6'>
+            <AvatarImage src={user.avatar} alt={user.name} />
+            <AvatarFallback className='bg-primary-100 text-xs font-medium text-primary-foreground'>
+              {user.name
+                .split(' ')
+                .map((n) => n[0])
+                .join('')
+                .toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
           <ChevronDown className='h-4 w-4 text-greyscale-600' />
         </Button>
       </DropdownMenuTrigger>
