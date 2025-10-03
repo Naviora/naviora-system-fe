@@ -18,7 +18,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'Naviora - Next.js Boilerplate',
   description:
-    'A comprehensive Next.js boilerplate with shadcn/ui, react-hook-form, zod, tailwind, framer-motion, axios, and tanstack query'
+    'A comprehensive Next.js boilerplate with shadcn/ui, react-hook-form, zod, tailwind, framer-motion, axios, and tanstack query',
+  icons: {
+    icon: '/Naviora.svg',
+    shortcut: '/Naviora.svg',
+  }
 }
 
 export default function RootLayout({
