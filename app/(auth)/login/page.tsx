@@ -3,7 +3,7 @@ import React from 'react'
 
 export default function LoginPage() {
   return (
-    <div className='flex overflow-hidden min-h-screen'>
+    <div className='flex overflow-hidden w-full min-h-screen'>
       {/* Left Side - Login Form */}
       <div className='relative flex items-center justify-center bg-greyscale-0 w-1/2'>
         <LoginForm className='w-full' />

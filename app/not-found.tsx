@@ -37,7 +37,7 @@ export default function NotFound() {
             <Link href='/'>
               <div className='p-3 bg-background rounded-lg border border-border hover:border-primary transition-colors group cursor-pointer'>
                 <div className='flex items-center space-x-3'>
-                  <div className='w-8 h-8 bg-primary-0 rounded-lg flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors'>
+                  <div className='w-8 h-8 bg-primary-0 rounded-lg flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors'>
                     <Home className='w-4 h-4' />
                   </div>
                   <div className='text-left'>
@@ -51,7 +51,7 @@ export default function NotFound() {
             <Link href='/about'>
               <div className='p-3 bg-background rounded-lg border border-border hover:border-primary transition-colors group cursor-pointer'>
                 <div className='flex items-center space-x-3'>
-                  <div className='w-8 h-8 bg-primary-0 rounded-lg flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors'>
+                  <div className='w-8 h-8 bg-primary-0 rounded-lg flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors'>
                     <Compass className='w-4 h-4' />
                   </div>
                   <div className='text-left'>
