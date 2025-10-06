@@ -10,6 +10,26 @@ export const loginSchema = z.object({
 
 export type LoginFormData = z.infer<typeof loginSchema>
 
+export const loginResponseDataSchema = z.object({
+  access_token: z.string(),
+  refresh_token: z.string(),
+  expires_in: z.number(),
+  role: z.string()
+})
+
+export type LoginResponse = z.infer<typeof loginResponseDataSchema>
+
+// Refresh token schema
+export const refreshTokenSchema = z.object({
+  refresh_token: z.string().min(1, 'Refresh token is required')
+})
+
+export type RefreshTokenFormData = z.infer<typeof refreshTokenSchema>
+
+export type RefreshTokenResponse = z.infer<typeof loginResponseDataSchema>
+
+
+
 // Registration schema
 export const registerSchema = z
   .object({

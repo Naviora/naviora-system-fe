@@ -26,121 +26,109 @@ const itemVariants = {
   }
 }
 
-// Mock data for recommended courses
 const recommendedCourses = [
   {
     id: '1',
-    title: 'Introduction to UI/UX Design',
-    category: 'Design',
-    courseType: 'Course' as const,
-    provider: 'Google',
-    providerLogo: 'https://logo.clearbit.com/google.com',
-    thumbnail: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=300&fit=crop',
-    rating: 4.8,
-    price: 'Free' as const
+    moduleName: 'Introduction to Cell Biology',
+    classType: 'Course',
+    class_name: 'BIOL101',
+    lecturerName: ['Dr. Sarah Johnson', 'Prof. Michael Chen'],
+    progress: 65,
+    thumbnail: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop',
+    className: 'recommended-course'
   },
   {
     id: '2',
-    title: 'Advanced Figma Techniques',
-    category: 'Design Tools',
-    courseType: 'Short Course' as const,
-    provider: 'Figma',
-    providerLogo: 'https://logo.clearbit.com/figma.com',
-    thumbnail: 'https://images.unsplash.com/photo-1626785774625-ddcddc3445e9?w=400&h=300&fit=crop',
-    rating: 4.9,
-    price: 49
+    moduleName: 'Human Anatomy and Physiology',
+    classType: 'Short Course',
+    class_name: 'ANAT202',
+    lecturerName: ['Dr. Emily Rodriguez'],
+    progress: 42,
+    thumbnail: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=400&h=300&fit=crop',
+    className: 'recommended-course'
   },
   {
     id: '3',
-    title: 'Microsoft Azure Fundamentals',
-    category: 'Cloud Computing',
-    courseType: 'Course' as const,
-    provider: 'Microsoft',
-    providerLogo: 'https://logo.clearbit.com/microsoft.com',
-    thumbnail: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=300&fit=crop',
-    rating: 4.7,
-    price: 'Free' as const
+    moduleName: 'Genetics and Heredity',
+    classType: 'Course',
+    class_name: 'GENE301',
+    lecturerName: ['Prof. David Kim', 'Dr. Lisa Wang'],
+    progress: 78,
+    thumbnail: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop',
+    className: 'recommended-course'
   },
   {
     id: '4',
-    title: 'React Development Bootcamp',
-    category: 'Web Development',
-    courseType: 'Course' as const,
-    provider: 'Meta',
-    providerLogo: 'https://logo.clearbit.com/meta.com',
-    thumbnail: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=300&fit=crop',
-    rating: 4.6,
-    price: 79
+    moduleName: 'Molecular Biology Fundamentals',
+    classType: 'Course',
+    class_name: 'MOLB250',
+    lecturerName: ['Dr. Robert Martinez'],
+    progress: 23,
+    thumbnail: 'https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=400&h=300&fit=crop',
+    className: 'recommended-course'
   },
   {
     id: '5',
-    title: 'Productivity with Notion',
-    category: 'Productivity',
-    courseType: 'Short Course' as const,
-    provider: 'Notion',
-    providerLogo: 'https://logo.clearbit.com/notion.so',
-    thumbnail: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=400&h=300&fit=crop',
-    rating: 4.5,
-    price: 29
+    moduleName: 'Ecology and Environmental Science',
+    classType: 'Short Course',
+    class_name: 'ECOL180',
+    lecturerName: ['Prof. Amanda Green', 'Dr. James Wilson'],
+    progress: 89,
+    thumbnail: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop',
+    className: 'recommended-course'
   }
 ]
 
-// Mock data for new release courses
 const newReleaseCourses = [
   {
     id: '6',
-    title: 'Google Cloud Platform Essentials',
-    category: 'Cloud Computing',
-    courseType: 'Course' as const,
-    provider: 'Google Cloud',
-    providerLogo: 'https://logo.clearbit.com/cloud.google.com',
-    thumbnail: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=400&h=300&fit=crop',
-    rating: 4.8,
-    price: 'Free' as const
+    moduleName: 'Microbiology and Immunology',
+    classType: 'Course',
+    class_name: 'MICR320',
+    lecturerName: ['Dr. Patricia Brown'],
+    progress: 0,
+    thumbnail: 'https://images.unsplash.com/photo-1576086213369-97a306d36557?w=400&h=300&fit=crop',
+    className: 'new-release-course'
   },
   {
     id: '7',
-    title: 'WordPress Development from Scratch',
-    category: 'Web Development',
-    courseType: 'Course' as const,
-    provider: 'WordPress',
-    providerLogo: 'https://logo.clearbit.com/wordpress.com',
-    thumbnail: 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=400&h=300&fit=crop',
-    rating: 4.6,
-    price: 39
+    moduleName: 'Biochemistry Basics',
+    classType: 'Course',
+    class_name: 'BIOC210',
+    lecturerName: ['Prof. Thomas Anderson', 'Dr. Maria Garcia'],
+    progress: 15,
+    thumbnail: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=400&h=300&fit=crop',
+    className: 'new-release-course'
   },
   {
     id: '8',
-    title: 'Professional Networking Skills',
-    category: 'Career Development',
-    courseType: 'Short Course' as const,
-    provider: 'LinkedIn',
-    providerLogo: 'https://logo.clearbit.com/linkedin.com',
-    thumbnail: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=400&h=300&fit=crop',
-    rating: 4.7,
-    price: 49
+    moduleName: 'Marine Biology Exploration',
+    classType: 'Short Course',
+    class_name: 'MARB190',
+    lecturerName: ['Dr. Ocean Blue'],
+    progress: 34,
+    thumbnail: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop',
+    className: 'new-release-course'
   },
   {
     id: '9',
-    title: 'Data Analysis with Python',
-    category: 'Data Science',
-    courseType: 'Course' as const,
-    provider: 'Google',
-    providerLogo: 'https://logo.clearbit.com/google.com',
-    thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop',
-    rating: 4.9,
-    price: 59
+    moduleName: 'Plant Biology and Botany',
+    classType: 'Course',
+    class_name: 'BOTM240',
+    lecturerName: ['Prof. Flora Greenwood'],
+    progress: 56,
+    thumbnail: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop',
+    className: 'new-release-course'
   },
   {
     id: '10',
-    title: 'Mobile App Design Principles',
-    category: 'Design',
-    courseType: 'Short Course' as const,
-    provider: 'Figma',
-    providerLogo: 'https://logo.clearbit.com/figma.com',
-    thumbnail: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=300&fit=crop',
-    rating: 4.8,
-    price: 'Free' as const
+    moduleName: 'Evolutionary Biology',
+    classType: 'Short Course',
+    class_name: 'EVOL350',
+    lecturerName: ['Dr. Charles Darwin Jr.', 'Prof. Evolution Smith'],
+    progress: 72,
+    thumbnail: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
+    className: 'new-release-course'
   }
 ]
 
