@@ -62,3 +62,11 @@ export const useRefreshToken = () => {
     }
   })
 }
+
+export const isLoggedIn = () => {
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('auth-token')
+    return !!token
+  }
+  return false
+}

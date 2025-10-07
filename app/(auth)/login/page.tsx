@@ -1,7 +1,27 @@
+'use client'
 import { LoginForm } from '@/components/forms/login-form'
-import React from 'react'
+import { LoadingSpinner } from '@/components/ui'
+import { isLoggedIn } from '@/hooks/api/use-auth'
+import { useRouter } from 'next/navigation'
+import React, { useEffect } from 'react'
 
 export default function LoginPage() {
+  const router = useRouter()
+
+  useEffect(() => {
+    if (isLoggedIn()) {
+      router.push('/dashboard')
+    }
+  }, [router])
+
+  if (isLoggedIn()) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoadingSpinner size='lg' />
+      </div>
+    )
+  }
+
   return (
     <div className='flex overflow-hidden w-full min-h-screen'>
       {/* Left Side - Login Form */}

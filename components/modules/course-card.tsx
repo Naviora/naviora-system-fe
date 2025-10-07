@@ -1,6 +1,6 @@
 'use client'
 
-import { Star, MoreVertical } from 'lucide-react'
+import { MoreVertical } from 'lucide-react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
@@ -72,8 +72,10 @@ export function CourseCard({
       </div>
 
       {/* Footer */}
-      <Progress value={progress} className='h-1.5 w-full rounded-none' />
-      <div className='px-3 pb-3 pt-1 text-sm text-greyscale-500'>{progress}% completed</div>
+      <div className='px-2 pb-3'>
+        <Progress value={progress} className='h-1.5 w-full rounded' />
+        <div className='pt-1 text-sm text-greyscale-500'>{progress}% completed</div>
+      </div>
     </motion.div>
   )
 }
