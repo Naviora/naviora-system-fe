@@ -17,27 +17,19 @@ import { Separator } from '../ui/separator'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { RiHome5Fill, RiBook2Fill, RiSearchLine, RiSettings2Fill, RiHeadphoneFill } from 'react-icons/ri'
-
-const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: RiHome5Fill },
-  { name: 'Modules', href: '/modules', icon: RiBook2Fill }
-]
-
-const bottomNavigation = [
-  { name: 'Settings', href: '/settings', icon: RiSettings2Fill },
-  { name: 'Help', href: '/help', icon: RiHeadphoneFill }
-]
+import { RiSearchLine } from 'react-icons/ri'
+import { useRoleNavigation } from '@/hooks/use-role-navigation'
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const { mainNavigation, bottomNavigation } = useRoleNavigation()
 
   return (
     <Sidebar collapsible='icon' className='border-none bg-greyscale-25'>
       <div className='flex flex-col px-4 group-data-[collapsible=icon]:px-0 h-full'>
         <SidebarHeader>
           <div className='flex items-center justify-between  group-data-[collapsible=icon]:justify-end group-data-[collapsible=icon]:flex-col-reverse'>
-            <Logo size='sm'/>
+            <Logo size='sm' />
             <SidebarTrigger />
           </div>
           <div className='relative group-data-[collapsible=icon]:hidden'>
@@ -57,7 +49,7 @@ export function AppSidebar() {
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu className='gap-2'>
-                {navigation.map((item) => {
+                {mainNavigation.map((item) => {
                   const isActive = pathname === item.href
                   return (
                     <SidebarMenuItem key={item.name}>
