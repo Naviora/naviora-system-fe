@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ChevronDown, User, Settings, LogOut, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -13,6 +14,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { useLogout } from '@/hooks/api/use-auth'
+import { toast } from 'sonner'
 
 interface UserData {
   name: string
@@ -29,10 +32,19 @@ const mockUser: UserData = {
 
 export function AvatarDropdown() {
   const [user] = useState<UserData>(mockUser)
+  const router = useRouter()
+  const logoutMutation = useLogout()
 
-  const handleLogout = () => {
-    // Implement logout logic
-    console.log('Logging out...')
+  const handleLogout = async () => {
+    try {
+      await logoutMutation.mutateAsync()
+      toast.success('Logged out successfully')
+      router.push('/login')
+    } catch (error) {
+      console.error('Logout failed:', error)
+
+      toast.error('Failed to log out. Please try again.')
+    }
   }
 
   return (
@@ -83,9 +95,13 @@ export function AvatarDropdown() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout} className='cursor-pointer text-error-100 focus:text-error-100'>
+        <DropdownMenuItem
+          onClick={handleLogout}
+          className='cursor-pointer text-error-100 focus:text-error-100'
+          disabled={logoutMutation.isPending}
+        >
           <LogOut className='mr-2 h-4 w-4' />
-          <span>Log out</span>
+          <span>{logoutMutation.isPending ? 'Logging out...' : 'Log out'}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

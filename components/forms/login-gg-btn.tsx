@@ -1,26 +1,22 @@
 import { Button } from '@/components/ui'
-import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google'
 import Image from 'next/image'
 import React from 'react'
+import { API_CONFIG } from '@/lib/constants'
 
-function GoogleLoginButton() {
-  const loginGG = useGoogleLogin({
-    onSuccess: (tokenResponse) => console.log(tokenResponse),
-    onError: () => console.log('Login Failed')
-  })
+export default function GoogleLoginButton() {
+  const handleGoogleLogin = () => {
+    window.location.href = `${API_CONFIG.BASE_URL}auth/google`
+  }
 
   return (
-    <Button type='button' className='flex items-center gap-2 w-full' variant={'outline'} onClick={() => loginGG()}>
+    <Button 
+      type='button' 
+      className='flex items-center gap-2 w-full' 
+      variant={'outline'}
+      onClick={handleGoogleLogin}
+    >
       <Image src='/gg-logo.png' alt='Google Icon' width={20} height={20} />
       Login with Google
     </Button>
-  )
-}
-
-export default function LoginGoogleButton() {
-  return (
-    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ''}>
-      <GoogleLoginButton />
-    </GoogleOAuthProvider>
   )
 }

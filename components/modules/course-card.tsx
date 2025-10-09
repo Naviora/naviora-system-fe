@@ -1,33 +1,30 @@
 'use client'
 
-import { Star, MoreVertical } from 'lucide-react'
+import { MoreVertical } from 'lucide-react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { Progress } from '@/components/ui/progress'
 
 export interface CourseCardProps {
   id: string
-  title: string
-  category: string
-  courseType: 'Course' | 'Short Course'
-  provider: string
-  providerLogo: string
+  moduleName: string
+  classType: string
+  class_name: string
+  lecturerName: string[]
+  progress: number
   thumbnail: string
-  rating: number
-  price: number | 'Free'
   className?: string
 }
 
 export function CourseCard({
-  title,
-  category,
-  courseType,
-  provider,
-  providerLogo,
+  moduleName,
+  classType,
+  class_name,
+  lecturerName,
+  progress,
   thumbnail,
-  rating,
-  price,
   className
 }: CourseCardProps) {
   return (
@@ -44,7 +41,7 @@ export function CourseCard({
         <div className='relative h-full w-full overflow-hidden rounded-lg'>
           <Image
             src={thumbnail}
-            alt={title}
+            alt={moduleName}
             fill
             className='object-cover transition-transform duration-300 hover:scale-105'
             sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
@@ -57,10 +54,7 @@ export function CourseCard({
         {/* Provider and Menu */}
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-1'>
-            <div className='relative h-6 w-6 overflow-hidden rounded'>
-              <Image src={providerLogo} alt={provider} fill className='object-contain' sizes='24px' />
-            </div>
-            <span className='text-sm text-greyscale-500'>{provider}</span>
+            <span className='text-sm text-greyscale-500'>{classType}</span>
           </div>
           <Button variant='ghost' size='icon' className='h-6 w-6 rounded-lg border border-greyscale-200'>
             <MoreVertical className='h-4 w-4 text-greyscale-500' />
@@ -68,25 +62,19 @@ export function CourseCard({
         </div>
 
         {/* Course Type */}
-        <div className='text-sm text-greyscale-900'>{courseType}</div>
+        <div className='text-sm text-greyscale-900'>{class_name}</div>
 
         {/* Title and Category */}
         <div className='flex flex-col gap-1'>
-          <h3 className='line-clamp-1 text-base font-medium leading-tight text-greyscale-800'>{title}</h3>
-          <p className='text-xs text-greyscale-500'>{category}</p>
+          <h3 className='line-clamp-1 text-base font-medium leading-tight text-greyscale-800'>{moduleName}</h3>
+          <p className='text-xs text-greyscale-500'>{lecturerName?.join(', ')}</p>
         </div>
       </div>
 
-      {/* Divider */}
-      <div className='h-px w-full bg-greyscale-200' />
-
       {/* Footer */}
-      <div className='flex items-center justify-between p-3'>
-        <div className='flex items-center gap-1'>
-          <Star className='h-4 w-4 fill-warning-100 text-warning-100' />
-          <span className='text-sm text-greyscale-900'>{rating.toFixed(1)}</span>
-        </div>
-        <span className='text-sm font-medium text-greyscale-900'>{price === 'Free' ? 'Free' : `$${price}`}</span>
+      <div className='px-2 pb-3'>
+        <Progress value={progress} className='h-1.5 w-full rounded' />
+        <div className='pt-1 text-sm text-greyscale-500'>{progress}% completed</div>
       </div>
     </motion.div>
   )
