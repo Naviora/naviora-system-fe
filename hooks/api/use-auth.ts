@@ -1,22 +1,25 @@
-import type { 
-  LoginFormData, 
-  LoginResponse, 
-  RefreshTokenFormData, 
-  RefreshTokenResponse 
-} from '@/lib/validations/auth'
+import type { LoginFormData, LoginResponse, RefreshTokenFormData, RefreshTokenResponse } from '@/lib/validations/auth'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api/client'
+import {
+  AUTH_STORAGE_KEYS,
+  clearStoredAuthTokens,
+  clearStoredUserRole,
+  getStoredAccessToken,
+  setStoredAuthTokens,
+  setStoredUserRole
+} from '@/lib/utils/auth-storage'
+
+export { getStoredUserRole, clearStoredUserRole } from '@/lib/utils/auth-storage'
 
 // Authentication hooks
 export const useLogin = () => {
   return useMutation({
-    mutationFn: (data: LoginFormData) => 
-      apiClient.post<LoginResponse>('/auth/login', data),
+    mutationFn: (data: LoginFormData) => apiClient.post<LoginResponse>('/auth/login', data),
     onSuccess: (response) => {
       if (typeof window !== 'undefined') {
-        localStorage.setItem('auth-token', response.access_token)
-        localStorage.setItem('refresh-token', response.refresh_token)
-        localStorage.setItem('user-role', response.role)
+        setStoredAuthTokens(response.access_token, response.refresh_token)
+        setStoredUserRole(response.role)
       }
     },
     onError: (error) => {
@@ -33,10 +36,9 @@ export const useLogout = () => {
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: ['auth'] })
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('auth-token')
-        localStorage.removeItem('refresh-token')
-        localStorage.removeItem('user-role')
-        localStorage.removeItem('remember-me')
+        clearStoredAuthTokens()
+        clearStoredUserRole()
+        localStorage.removeItem(AUTH_STORAGE_KEYS.rememberMe)
       }
     }
   })
@@ -44,20 +46,17 @@ export const useLogout = () => {
 
 export const useRefreshToken = () => {
   return useMutation({
-    mutationFn: (data: RefreshTokenFormData) => 
-      apiClient.post<RefreshTokenResponse>('/auth/refresh', data),
+    mutationFn: (data: RefreshTokenFormData) => apiClient.post<RefreshTokenResponse>('/auth/refresh', data),
     onSuccess: (response) => {
       if (typeof window !== 'undefined') {
-        localStorage.setItem('auth-token', response.access_token)
-        localStorage.setItem('refresh-token', response.refresh_token)
+        setStoredAuthTokens(response.access_token, response.refresh_token)
       }
     },
     onError: (error) => {
       console.error('Token refresh failed:', error)
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('auth-token')
-        localStorage.removeItem('refresh-token')
-        localStorage.removeItem('user-role')
+        clearStoredAuthTokens()
+        clearStoredUserRole()
       }
     }
   })
@@ -65,7 +64,7 @@ export const useRefreshToken = () => {
 
 export const isLoggedIn = () => {
   if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('auth-token')
+    const token = getStoredAccessToken()
     return !!token
   }
   return false

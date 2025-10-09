@@ -5,7 +5,7 @@ import { API_CONFIG } from '@/lib/constants'
 
 export default function GoogleLoginButton() {
   const handleGoogleLogin = () => {
-    window.location.href = `${API_CONFIG.BASE_URL}auth/google`
+    window.location.href = `${API_CONFIG.BASE_URL}/auth/google`
   }
 
   return (
