@@ -12,20 +12,21 @@ import {
   SidebarTrigger
 } from '@/components/ui/sidebar'
 import Logo from '../common/logo'
-import { Input } from '../ui'
 import { Separator } from '../ui/separator'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { RiSearchLine } from 'react-icons/ri'
 import { useRoleNavigation } from '@/hooks/use-role-navigation'
+import { InputGroup, InputGroupAddon, InputGroupInput } from '../ui/input-group'
+import { SearchIcon } from 'lucide-react'
+import { Kbd } from '../ui/kbd'
 
 export function AppSidebar() {
   const pathname = usePathname()
   const { mainNavigation, bottomNavigation } = useRoleNavigation()
 
   return (
-    <Sidebar collapsible='icon' className='border-none bg-greyscale-25'>
+    <Sidebar collapsible='icon' className='border-none'>
       <div className='flex flex-col px-4 group-data-[collapsible=icon]:px-0 h-full'>
         <SidebarHeader>
           <div className='flex items-center justify-between  group-data-[collapsible=icon]:justify-end group-data-[collapsible=icon]:flex-col-reverse'>
@@ -33,13 +34,16 @@ export function AppSidebar() {
             <SidebarTrigger />
           </div>
           <div className='relative group-data-[collapsible=icon]:hidden'>
-            <Input
-              placeholder='Search anything'
-              className='h-9 w-full border-greyscale-200 bg-background pl-9 body-small-medium placeholder:text-greyscale-400 rounded-sm'
-            />
-            <div className='pointer-events-none absolute left-3 top-1/2 flex -translate-y-1/2 items-center gap-1'>
-              <RiSearchLine className='h-4 w-4 text-greyscale-400' />
-            </div>
+            <InputGroup className='w-full rounded-md'>
+              <InputGroupInput placeholder='Tìm chương' />
+              <InputGroupAddon>
+                <SearchIcon className='text-greyscale-400' />
+              </InputGroupAddon>
+              <InputGroupAddon align='inline-end'>
+                <Kbd>⌘</Kbd>
+                <Kbd>K</Kbd>
+              </InputGroupAddon>
+            </InputGroup>
           </div>
         </SidebarHeader>
         <div className='px-2'>
