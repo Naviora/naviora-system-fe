@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { CourseCard } from '@/components/modules/course-card'
+import { CourseCard } from '@/components/student/modules/course-card'
 import { SectionHeader } from '@/components/common/section-header'
 
 // Animation variants
@@ -134,23 +134,23 @@ const newReleaseCourses = [
 
 export default function ModulesPage() {
   return (
-    <div className='flex h-full w-full flex-col gap-12 px-6 py-8 md:px-12 lg:px-16'>
+    <div className='flex flex-col gap-6 px-4 pb-10 pt-4 sm:px-6 lg:px-8 bg-greyscale-0'>
       {/* Hero Section */}
       <motion.div
-        className='flex flex-col gap-3'
+        className='space-y-1'
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className='text-4xl font-semibold text-greyscale-900 md:text-5xl'>Your Path to Growth Starts Here</h1>
-        <p className='text-lg text-greyscale-600'>
+        <h1 className='text-2xl font-semibold text-greyscale-900'>Your Path to Growth Starts Here</h1>
+        <p className='text-sm text-greyscale-500'>
           Discover curated courses designed to accelerate your learning journey
         </p>
       </motion.div>
 
       {/* Recommended for you Section */}
       <motion.section
-        className='flex flex-col gap-6'
+        className='flex flex-col gap-6 rounded-2xl border border-greyscale-200 bg-greyscale-0 p-4 shadow-sm sm:p-6'
         initial='hidden'
         whileInView='visible'
         viewport={{ once: true, margin: '-100px' }}
@@ -173,7 +173,7 @@ export default function ModulesPage() {
 
       {/* New Release Section */}
       <motion.section
-        className='flex flex-col gap-6'
+        className='flex flex-col gap-6 rounded-2xl border border-greyscale-200 bg-greyscale-0 p-4 shadow-sm sm:p-6'
         initial='hidden'
         whileInView='visible'
         viewport={{ once: true, margin: '-100px' }}
