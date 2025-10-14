@@ -1,5 +1,8 @@
 import { z } from 'zod'
 import { emailSchema, passwordSchema, phoneSchema, nonEmptyStringSchema } from './common'
+import { USER_ROLE_VALUES } from '@/lib/constants/roles'
+
+export const userRoleSchema = z.enum(USER_ROLE_VALUES)
 
 // Login schema
 export const loginSchema = z.object({
@@ -14,7 +17,7 @@ export const loginResponseDataSchema = z.object({
   access_token: z.string(),
   refresh_token: z.string(),
   expires_in: z.number(),
-  role: z.string()
+  role: userRoleSchema
 })
 
 export type LoginResponse = z.infer<typeof loginResponseDataSchema>
@@ -27,8 +30,6 @@ export const refreshTokenSchema = z.object({
 export type RefreshTokenFormData = z.infer<typeof refreshTokenSchema>
 
 export type RefreshTokenResponse = z.infer<typeof loginResponseDataSchema>
-
-
 
 // Registration schema
 export const registerSchema = z
@@ -110,7 +111,7 @@ export const userSchema = z.object({
   avatar: z.string().url().optional(),
   emailVerified: z.boolean(),
   phoneVerified: z.boolean(),
-  role: z.enum(['user', 'admin', 'moderator']),
+  role: userRoleSchema,
   createdAt: z.date(),
   updatedAt: z.date()
 })

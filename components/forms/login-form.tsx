@@ -13,6 +13,7 @@ import { loginSchema, type LoginFormData } from '@/lib/validations/auth'
 import { useLogin } from '@/hooks/api/use-auth'
 import { FadeIn } from '@/components/animations/fade-slide-scale'
 import { ErrorHandler } from '@/lib/utils/error-handler'
+import { getDefaultRouteForRole } from '@/lib/constants/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -25,7 +26,7 @@ interface LoginFormProps {
   className?: string
 }
 
-export function LoginForm({ onSuccess, redirectTo = '/dashboard', className = '' }: LoginFormProps) {
+export function LoginForm({ onSuccess, redirectTo, className = '' }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
   const loginMutation = useLogin()
@@ -41,12 +42,13 @@ export function LoginForm({ onSuccess, redirectTo = '/dashboard', className = ''
 
   const handleSubmit = async (data: LoginFormData) => {
     try {
-      await loginMutation.mutateAsync(data)
-      toast.success("Login successful!")
+      const response = await loginMutation.mutateAsync(data)
+      toast.success('Login successful!')
       if (onSuccess) {
         onSuccess()
       } else {
-        router.push(redirectTo)
+        const targetRoute = redirectTo ?? getDefaultRouteForRole(response.role)
+        router.push(targetRoute)
       }
     } catch (error) {
       const errorMessage = ErrorHandler.getErrorMessage(error)

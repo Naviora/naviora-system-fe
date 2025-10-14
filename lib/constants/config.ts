@@ -13,6 +13,9 @@ export const QUERY_KEYS = {
   CURRENT_USER: ['auth', 'currentUser'] as const,
   USER_PREFERENCES: ['auth', 'preferences'] as const,
 
+  // Roles
+  ROLES: ['roles'] as const,
+
   // Users
   USERS: ['users'] as const,
   USER_LIST: (filters?: Record<string, unknown>) => ['users', 'list', filters] as const,

@@ -2,6 +2,7 @@
 export * from './codes'
 export * from './messages'
 export * from './config'
+export * from './roles'
 
 // Create a centralized error handler type
 export interface ApiError {

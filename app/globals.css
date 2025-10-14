@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import "tw-animate-css";
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -84,7 +84,7 @@
   --color-chart-5: #666d80;
 
   /* Sidebar Components */
-  --color-sidebar: #ffffff;
+  --color-sidebar: #f6f8fa;
   --color-sidebar-foreground: #121a26;
   --color-sidebar-primary: #0e66fe;
   --color-sidebar-primary-foreground: #ffffff;
@@ -449,5 +449,9 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  button,
+  [role='button'] {
+    cursor: pointer;
   }
 }

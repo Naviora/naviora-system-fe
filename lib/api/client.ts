@@ -7,6 +7,13 @@ import axios, {
 } from 'axios'
 import { API_CONFIG, HTTP_STATUS, ERROR_CODES, ERROR_MESSAGES, type ApiResponse, type ApiError } from '@/lib/constants'
 import { log } from '@/lib/utils/logger'
+import {
+  clearStoredAuthTokens,
+  clearStoredUserRole,
+  getStoredAccessToken,
+  getStoredRefreshToken,
+  setStoredAuthTokens
+} from '@/lib/utils/auth-storage'
 
 class ApiClient {
   private client: AxiosInstance
@@ -41,8 +48,8 @@ class ApiClient {
   }
 
   private async refreshToken(): Promise<string> {
-    const refreshToken = localStorage.getItem('refresh-token')
-    
+    const refreshToken = getStoredRefreshToken()
+
     if (!refreshToken) {
       throw new Error('No refresh token available')
     }
@@ -54,14 +61,12 @@ class ApiClient {
 
       const { access_token, refresh_token: newRefreshToken } = response.data.data
 
-      localStorage.setItem('auth-token', access_token)
-      localStorage.setItem('refresh-token', newRefreshToken)
+      setStoredAuthTokens(access_token, newRefreshToken)
 
       return access_token
     } catch (error) {
-      localStorage.removeItem('auth-token')
-      localStorage.removeItem('refresh-token')
-      localStorage.removeItem('user-role')
+      clearStoredAuthTokens()
+      clearStoredUserRole()
       throw error
     }
   }
@@ -72,7 +77,7 @@ class ApiClient {
       (config: InternalAxiosRequestConfig) => {
         // Add auth token if available
         if (typeof window !== 'undefined') {
-          const token = localStorage.getItem('auth-token')
+          const token = getStoredAccessToken()
           if (token && config.headers) {
             config.headers.Authorization = `Bearer ${token}`
           }
@@ -118,21 +123,24 @@ class ApiClient {
           error.response?.data
         )
 
-        if (error.response?.status === HTTP_STATUS.UNAUTHORIZED && 
-            !originalRequest._retry && 
-            originalRequest.url !== '/auth/refresh' &&
-            originalRequest.url !== '/auth/login') {
-          
+        if (
+          error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
+          !originalRequest._retry &&
+          originalRequest.url !== '/auth/refresh' &&
+          originalRequest.url !== '/auth/login'
+        ) {
           if (this.isRefreshing) {
             // If already refreshing, queue the request
             return new Promise((resolve, reject) => {
               this.failedQueue.push({ resolve, reject })
-            }).then((token) => {
-              originalRequest.headers.Authorization = `Bearer ${token}`
-              return this.client(originalRequest)
-            }).catch((err) => {
-              return Promise.reject(err)
             })
+              .then((token) => {
+                originalRequest.headers.Authorization = `Bearer ${token}`
+                return this.client(originalRequest)
+              })
+              .catch((err) => {
+                return Promise.reject(err)
+              })
           }
 
           originalRequest._retry = true
@@ -145,12 +153,12 @@ class ApiClient {
             return this.client(originalRequest)
           } catch (refreshError) {
             this.processQueue(refreshError, null)
-            
+
             // Redirect to login if refresh fails
             if (typeof window !== 'undefined') {
               window.location.href = '/login'
             }
-            
+
             return Promise.reject(refreshError)
           } finally {
             this.isRefreshing = false
@@ -159,9 +167,8 @@ class ApiClient {
 
         if (error.response?.status === HTTP_STATUS.UNAUTHORIZED) {
           if (typeof window !== 'undefined') {
-            localStorage.removeItem('auth-token')
-            localStorage.removeItem('refresh-token')
-            localStorage.removeItem('user-role')
+            clearStoredAuthTokens()
+            clearStoredUserRole()
             window.location.href = '/auth/login'
           }
         }
