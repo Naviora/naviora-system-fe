@@ -13,7 +13,7 @@ export default function MainLayout({
       <SidebarProvider defaultOpen={false}>
         <AppSidebar />
         <div className='w-full py-2 pr-2 bg-greyscale-25'>
-          <div className='flex flex-col h-full rounded-lg border-1'>
+          <div className='flex flex-col h-full rounded-md border-1 bg-greyscale-0'>
             <Navbar />
             {children}
           </div>
