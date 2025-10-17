@@ -1,12 +1,10 @@
 import Link from 'next/link'
 
-import type { LecturerModuleSummary } from '@/types/lecturer/modules'
-
-import { LecturerModuleCard } from './module-card'
+import { LecturerModuleCard, type ModuleListItem } from './module-card'
 
 interface LecturerModuleGridProps {
-  modules: LecturerModuleSummary[]
-  hrefBuilder?: (module: LecturerModuleSummary) => string | undefined
+  modules: ModuleListItem[]
+  hrefBuilder?: (module: ModuleListItem) => string | undefined
 }
 
 export function LecturerModuleGrid({ modules, hrefBuilder }: LecturerModuleGridProps) {
@@ -15,7 +13,9 @@ export function LecturerModuleGrid({ modules, hrefBuilder }: LecturerModuleGridP
       {modules.map((module) => {
         const href = hrefBuilder?.(module) ?? `/lecturer/modules/${module.id}`
 
-        const card = <LecturerModuleCard {...module} className='h-full transition-transform hover:-translate-y-0.5' />
+        const card = (
+          <LecturerModuleCard module={module} className='h-full transition-transform hover:-translate-y-0.5' />
+        )
 
         if (!href) {
           return (

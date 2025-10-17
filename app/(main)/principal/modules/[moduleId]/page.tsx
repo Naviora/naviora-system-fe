@@ -11,11 +11,11 @@ export const dynamic = 'force-dynamic'
 export function generateMetadata({ params }: ModuleDetailPageProps): Metadata {
   const { moduleId } = params
   return {
-    title: `Chi tiết chuyên đề ${moduleId} | Giảng viên`
+    title: `Chi tiết chuyên đề ${moduleId} | Ban giám hiệu`
   }
 }
 
-export default function LecturerModuleDetailPage({ params }: ModuleDetailPageProps) {
+export default function PrincipalModuleDetailPage({ params }: ModuleDetailPageProps) {
   const { moduleId } = params
   return <ModuleDetailPageClient moduleId={moduleId} />
 }
