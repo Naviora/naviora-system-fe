@@ -3,26 +3,33 @@
 import { Button } from '@/components/ui/button'
 import { IoIosSearch, IoMdAdd } from 'react-icons/io'
 import React, { useState } from 'react'
-import ManageQuestion from '@/components/lecturer/exams/manage-question'
-import { QuestionDialog } from './question-modal'
+import ManageQuestion from '@/components/lecturer/exams/questions/manage-question'
+import { QuestionDialog } from './questions/question-modal'
+import ManageQuestionSet from '@/components/lecturer/exams/question-sets/manage-question-set'
+import { QuestionSetModal } from '@/components/lecturer/exams/question-sets/question-set-modal'
 
 export default function ManageLayout() {
-  const [activeTab, setActiveTab] = React.useState<'question' | 'exam'>('question')
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [editData, setEditData] = useState<any>(null)
+  const [activeTab, setActiveTab] = React.useState<'question' | 'exam' | 'question-set'>('question')
+  const [questionDialogOpen, setQuestionDialogOpen] = useState(false)
+  const [editQuestionData, setEditQuestionData] = useState<any>(null)
+  const [questionSetDialogOpen, setQuestionSetDialogOpen] = useState(false)
 
   const handleBtnAdd = () => {
     if (activeTab === 'question') {
-      setEditData(null)
-      setDialogOpen(true)
-    } else {
+      setEditQuestionData(null)
+      setQuestionDialogOpen(true)
+    }
+    if (activeTab === "question-set"){
+      setQuestionSetDialogOpen(true)
+    } 
+    else {
       // Handle adding a new exam
     }
   }
 
   const handleSubmitQuestion = (data: any) => {
     // ...
-    setDialogOpen(false)
+    setQuestionDialogOpen(false)
   }
 
   return (
@@ -34,6 +41,12 @@ export default function ManageLayout() {
             onClick={() => setActiveTab('question')}
           >
             Câu hỏi
+          </Button>
+          <Button
+            className={`rounded-2xl h-[36px] w-[100px] flex justify-center text-sm ${activeTab === 'question-set' ? 'bg-primary-25 hover:bg-primary-25 text-primary font-semibold' : 'bg-greyscale-100 hover:bg-greyscale-200 text-greyscale-500'}`}
+            onClick={() => setActiveTab('question-set')}
+          >
+            Bộ câu hỏi
           </Button>
           <Button
             className={`rounded-2xl h-[36px] w-[100px] flex justify-center text-sm ${activeTab === 'exam' ? 'bg-primary-25 hover:bg-primary-25 text-primary font-semibold' : 'bg-greyscale-100 hover:bg-greyscale-200 text-greyscale-500'}`}
@@ -54,29 +67,40 @@ export default function ManageLayout() {
             onClick={handleBtnAdd}
           >
             <IoMdAdd className='size-4 text-greyscale-0' />
-            {activeTab === 'question' ? 'Thêm câu hỏi' : 'Thêm bài thi'}
+            {activeTab === 'question' && 'Thêm câu hỏi'}
+            {activeTab === 'exam' && 'Thêm bài thi'}
+            {activeTab === 'question-set' && 'Thêm bộ câu hỏi'}
           </Button>
         </div>
       </div>
 
-      {activeTab === 'question' ? (
+      {activeTab === 'question' && (
         <>
           <ManageQuestion
-            onEdit={data => {
-              setEditData(data)
-              setDialogOpen(true)
+            onEdit={(data) => {
+              setEditQuestionData(data)
+              setQuestionDialogOpen(true)
             }}
           />
           <QuestionDialog
-            open={dialogOpen}
-            onOpenChange={setDialogOpen}
-            initialData={editData}
+            open={questionDialogOpen}
+            onOpenChange={setQuestionDialogOpen}
+            initialData={editQuestionData}
             onSubmit={handleSubmitQuestion}
           />
         </>
-      ) : (
-        <div>Exam Management Coming Soon...</div>
       )}
+      {activeTab === 'question-set' && (
+        <>
+          <ManageQuestionSet />
+          <QuestionSetModal
+            open={questionSetDialogOpen}
+            onOpenChange={setQuestionSetDialogOpen}
+            onSubmit={data => {/* handle submit */}}
+          />
+        </>
+      )}
+      {activeTab === 'exam' && <div>Exam Management Coming Soon...</div>}
     </div>
   )
 }
