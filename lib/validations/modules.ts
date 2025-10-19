@@ -1,5 +1,69 @@
 import { z } from 'zod'
 
+import { API_CONFIG } from '@/lib/constants/config'
+
+const BANNER_URL_BASES = (() => {
+  const bases = new Set<string>()
+
+  try {
+    const baseFromConfig = new URL(API_CONFIG.BASE_URL)
+    bases.add(baseFromConfig.toString())
+    bases.add(`${baseFromConfig.origin}/`)
+  } catch {
+    // Ignore invalid config base URLs
+  }
+
+  if (typeof window !== 'undefined') {
+    bases.add(`${window.location.origin}/`)
+  }
+
+  return Array.from(bases).filter(Boolean)
+})()
+
+const isAllowedProtocol = (url: URL) => url.protocol === 'http:' || url.protocol === 'https:'
+
+const normalizeBannerValue = (value: unknown): string | null | undefined => {
+  if (value === undefined) {
+    return undefined
+  }
+
+  if (value === null) {
+    return null
+  }
+
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  const trimmed = value.trim()
+
+  if (!trimmed) {
+    return null
+  }
+
+  try {
+    const absoluteUrl = new URL(trimmed)
+
+    return isAllowedProtocol(absoluteUrl) ? absoluteUrl.toString() : null
+  } catch {
+    for (const base of BANNER_URL_BASES) {
+      try {
+        const resolvedUrl = new URL(trimmed, base)
+
+        if (isAllowedProtocol(resolvedUrl)) {
+          return resolvedUrl.toString()
+        }
+      } catch {
+        continue
+      }
+    }
+
+    return null
+  }
+}
+
+const bannerSchema = z.preprocess(normalizeBannerValue, z.string().url().nullable().optional())
+
 export const paginationSchema = z.object({
   limit: z.number().int().nonnegative(),
   current_page: z.number().int().nonnegative(),
@@ -12,7 +76,7 @@ export const moduleSchema = z.object({
   module_code: z.string().min(1),
   module_name: z.string().min(1),
   module_description: z.string().nullable().optional(),
-  banner: z.string().url().nullable().optional(),
+  banner: bannerSchema,
   class_id: z.string().nullable().optional(),
   created_at: z.string().min(1),
   updated_at: z.string().min(1)
