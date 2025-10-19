@@ -35,6 +35,20 @@ const ROLE_SPECIFIC_NAVIGATION = new Map<UserRole, NavigationItem[]>([
       { name: 'Tổng quan', href: '/lecturer/dashboard', icon: RiHome5Fill },
       { name: 'Chuyên đề', href: '/lecturer/modules', icon: RiBook2Fill }
     ]
+  ],
+  [
+    'Principal',
+    [
+      { name: 'Tổng quan', href: '/principal/dashboard', icon: RiHome5Fill },
+      { name: 'Quản lý chuyên đề', href: '/principal/modules', icon: RiBook2Fill }
+    ]
+  ],
+  [
+    'Admin',
+    [
+      { name: 'Tổng quan', href: '/admin/dashboard', icon: RiHome5Fill },
+      { name: 'Quản lý chuyên đề', href: '/admin/modules', icon: RiBook2Fill }
+    ]
   ]
 ])
 
@@ -55,7 +69,7 @@ export const getNavigationConfig = (role?: UserRole | null): NavigationConfig =>
 }
 
 export const getDefaultRouteForRole = (role?: UserRole | null) => {
-  const fallbackRoute = COMMON_MAIN_NAVIGATION[0]?.href ?? '/dashboard'
+  const fallbackRoute = COMMON_MAIN_NAVIGATION[0]?.href ?? '/'
 
   if (!role) {
     return fallbackRoute
