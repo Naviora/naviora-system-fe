@@ -7,29 +7,128 @@ import ManageQuestion from '@/components/lecturer/exams/questions/manage-questio
 import { QuestionDialog } from './questions/question-modal'
 import ManageQuestionSet from '@/components/lecturer/exams/question-sets/manage-question-set'
 import { QuestionSetModal } from '@/components/lecturer/exams/question-sets/question-set-modal'
+import { useCreateQuestion, useUpdateQuestion } from '@/hooks/api/lecturer/exams/use-question'
+import { useCreateQuestionSet } from '@/hooks/api/lecturer/exams/use-question-set'
+import { toast } from 'sonner'
+import { CreateQuestionRequest, Question } from '@/lib/validations/lecturer/exams/question'
 
 export default function ManageLayout() {
   const [activeTab, setActiveTab] = React.useState<'question' | 'exam' | 'question-set'>('question')
   const [questionDialogOpen, setQuestionDialogOpen] = useState(false)
-  const [editQuestionData, setEditQuestionData] = useState<any>(null)
+  const [editQuestionData, setEditQuestionData] = useState<Question | null>(null)
+  const createQuestionMutation = useCreateQuestion()
+  const updateQuestionMutation = useUpdateQuestion()
+  const createQuestionSetMutation = useCreateQuestionSet()
   const [questionSetDialogOpen, setQuestionSetDialogOpen] = useState(false)
 
   const handleBtnAdd = () => {
     if (activeTab === 'question') {
       setEditQuestionData(null)
       setQuestionDialogOpen(true)
-    }
-    if (activeTab === "question-set"){
+    } else if (activeTab === 'question-set') {
       setQuestionSetDialogOpen(true)
-    } 
-    else {
-      // Handle adding a new exam
     }
+    // ...handle exam tab if needed
   }
 
   const handleSubmitQuestion = (data: any) => {
-    // ...
-    setQuestionDialogOpen(false)
+    if (editQuestionData?.question_id) {
+      const payload = {
+        content: data.question,
+        type: data.type,
+        difficulty: data.difficulty,
+        lesson_id: data.lesson_id || '', 
+        additional_image: data.additional_image || null,
+        answers: data.options.map((opt: string, idx: number) => ({
+          answer_id: data.answer_ids?.[idx] || '',
+          content: opt,
+          is_correct: data.correctIndexes?.includes(idx)
+        }))
+      }
+      updateQuestionMutation.mutate(
+        { id: editQuestionData.question_id, data: payload },
+        {
+          onSuccess: () => {
+            toast.success("Cập nhật câu hỏi thành công")
+            setQuestionDialogOpen(false)
+            setEditQuestionData(null)
+          },
+          onError: (err: any) => {
+            toast.error(err?.message || "Có lỗi xảy ra khi cập nhật câu hỏi")
+          }
+        }
+      )
+      return
+    }
+
+    if (!data.question || !data.type || !data.difficulty || !data.options?.length) {
+      toast.error('Vui lòng nhập đầy đủ thông tin câu hỏi!')
+      return
+    }
+    const payload: CreateQuestionRequest = {
+      content: data.question,
+      type: data.type,
+      difficulty: data.difficulty,
+      lesson_id: data.lesson_id || null,
+      additional_image: data.additional_image || null,
+      answers: data.options.map((opt: string, idx: number) => ({
+        content: opt,
+        isCorrect: data.correctIndexes?.includes(idx) ?? false
+      }))
+    }
+    createQuestionMutation.mutate(payload, {
+      onSuccess: () => {
+        toast.success("Thêm câu hỏi mới thành công")
+        setQuestionDialogOpen(false)
+        setEditQuestionData(null)
+      },
+      onError: (err: any) => {
+        toast.error(err?.message || "Có lỗi xảy ra khi thêm câu hỏi")
+      }
+    })
+  }
+
+  const handleSubmitQuestionSet = (data: any) => {
+    const payload = {
+      title: data.title,
+      description: data.description,
+      questions: data.questions.map((q: Question) => q.question_id),
+      config: {
+        general: {
+          duration_minutes: data.duration,
+          total_questions: data.questions.length,
+          allow_review: data.allowReview,
+          shuffle_questions: data.shuffleQuestions,
+          shuffle_answers: data.shuffleAnswers
+        },
+        scoring: {
+          per_question: data.perQuestion,
+          passing_score: data.passingScore
+        },
+        behavior: {
+          show_correct_after_submit: data.showCorrectAfterSubmit,
+          max_attempts: data.maxAttempts
+        },
+        composition: {
+          question_sources: ['question'],
+          topics: []
+        },
+        proctoring: {
+          enable_tab_tracking: data.enableTabTracking,
+          enable_copy_paste_restriction: data.enableCopyPasteRestriction
+        }
+      }
+    }
+
+    createQuestionSetMutation.mutate(payload, {
+      onSuccess: () => {
+        toast.success('Tạo bộ câu hỏi thành công')
+        setQuestionSetDialogOpen(false)
+      },
+      onError: (err: any) => {
+        toast.error(err?.message || 'Có lỗi xảy ra khi tạo bộ câu hỏi')
+      }
+    })
   }
 
   return (
@@ -96,7 +195,7 @@ export default function ManageLayout() {
           <QuestionSetModal
             open={questionSetDialogOpen}
             onOpenChange={setQuestionSetDialogOpen}
-            onSubmit={data => {/* handle submit */}}
+            onSubmit={handleSubmitQuestionSet}
           />
         </>
       )}

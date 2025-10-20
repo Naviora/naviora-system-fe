@@ -14,3 +14,9 @@ export const DIFFICULTY_LEVELS = [
   { value: 'MEDIUM', label: 'Trung bình' },
   { value: 'HARD', label: 'Khó' }
 ]
+
+export const getTypeLabel = (value: string) =>
+  QUESTION_TYPES.find(t => t.value === value)?.label || value
+
+export const getDifficultyLabel = (value: string) =>
+  DIFFICULTY_LEVELS.find(d => d.value === value)?.label || value

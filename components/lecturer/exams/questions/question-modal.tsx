@@ -3,29 +3,44 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogC
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { DIFFICULTY_LEVELS, QUESTION_TYPES } from '@/lib/constants/exams'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Question } from '@/lib/validations/lecturer/exams/question'
 
 interface QuestionDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  initialData?: {
-    type?: string
-    difficulty?: string
-    question?: string
-    options?: string[]
-    answer?: string
-  }
+  initialData?: Question | null
   onSubmit: (data: any) => void
 }
 
 export function QuestionDialog({ open, onOpenChange, initialData, onSubmit }: QuestionDialogProps) {
-  const [type, setType] = useState(initialData?.type || '')
-  const [difficulty, setDifficulty] = useState(initialData?.difficulty || '')
-  const [question, setQuestion] = useState(initialData?.question || '')
-  const [options, setOptions] = useState(initialData?.options || ['', '', '', ''])
+  const [type, setType] = useState('')
+  const [difficulty, setDifficulty] = useState('')
+  const [question, setQuestion] = useState('')
+  const [options, setOptions] = useState(['', '', '', ''])
   const [correctIndexes, setCorrectIndexes] = useState<number[]>([])
+
+  useEffect(() => {
+    if (initialData) {
+      setType(initialData.type || '')
+      setDifficulty(initialData.difficulty || '')
+      setQuestion(initialData.content || '')
+      setOptions(initialData.answers?.map((a: any) => a.content) || ['', '', '', ''])
+      setCorrectIndexes(
+        initialData.answers
+          ? initialData.answers.map((a: any, idx: number) => (a.is_correct ? idx : -1)).filter((idx) => idx !== -1)
+          : []
+      )
+    } else {
+      setType('')
+      setDifficulty('')
+      setQuestion('')
+      setOptions(['', '', '', ''])
+      setCorrectIndexes([])
+    }
+  }, [initialData, open])
 
   const handleChangeOption = (idx: number, value: string) => {
     const newOptions = [...options]
@@ -34,9 +49,7 @@ export function QuestionDialog({ open, onOpenChange, initialData, onSubmit }: Qu
   }
 
   const handleToggleCorrect = (idx: number) => {
-    setCorrectIndexes((prev) =>
-      prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
-    )
+    setCorrectIndexes((prev) => (prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]))
   }
 
   const handleSubmit = () => {
@@ -45,6 +58,8 @@ export function QuestionDialog({ open, onOpenChange, initialData, onSubmit }: Qu
       difficulty,
       question,
       options,
+      lesson_id: initialData?.lesson_id || '',
+      answer_ids: initialData?.answers?.map((a: any) => a.answer_id) || [],
       correctIndexes
     })
     onOpenChange(false)
@@ -52,7 +67,7 @@ export function QuestionDialog({ open, onOpenChange, initialData, onSubmit }: Qu
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className='!max-w-[800px]'>
         <DialogHeader>
           <DialogTitle>{initialData ? 'Chỉnh sửa câu hỏi' : 'Thêm câu hỏi mới'}</DialogTitle>
         </DialogHeader>
@@ -91,7 +106,7 @@ export function QuestionDialog({ open, onOpenChange, initialData, onSubmit }: Qu
           />
           <div className='space-y-1'>
             {options.map((opt, idx) => (
-              <div key={idx} className="flex items-center gap-2">
+              <div key={idx} className='flex items-center gap-2'>
                 <Checkbox
                   checked={correctIndexes.includes(idx)}
                   onCheckedChange={() => handleToggleCorrect(idx)}

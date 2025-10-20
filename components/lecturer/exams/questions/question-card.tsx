@@ -3,7 +3,7 @@ import { Question } from '@/lib/validations/lecturer/exams/question'
 import React, { useState } from 'react'
 import { FaRegEdit } from "react-icons/fa"
 import { MdDeleteOutline } from "react-icons/md"
-import { QUESTION_TYPES, DIFFICULTY_LEVELS } from '@/lib/constants/exams'
+import { QUESTION_TYPES, DIFFICULTY_LEVELS, getTypeLabel, getDifficultyLabel } from '@/lib/constants/exams'
 import { timeAgo } from '@/lib/utils'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
@@ -15,12 +15,6 @@ interface QuestionCardProps {
   showAnswers: boolean
   onEdit: (data: any) => void
 }
-
-const getTypeLabel = (value: string) =>
-  QUESTION_TYPES.find(t => t.value === value)?.label || value
-
-const getDifficultyLabel = (value: string) =>
-  DIFFICULTY_LEVELS.find(d => d.value === value)?.label || value
 
 export const QuestionCard = ({ question: q, index: idx, showAnswers, onEdit }: QuestionCardProps) => {
   const [open, setOpen] = useState(false)
@@ -34,8 +28,8 @@ export const QuestionCard = ({ question: q, index: idx, showAnswers, onEdit }: Q
   return (
     <div className='bg-gray-50 rounded-lg p-4 border'>
       <div className='flex gap-2 mb-2'>
-        <span className='bg-gray-200 text-xs px-2 py-0.5 rounded'>{getTypeLabel(q.type)}</span>
-        <span className='bg-gray-200 text-xs px-2 py-0.5 rounded'>{getDifficultyLabel(q.difficulty)}</span>
+        <span className='bg-blue-50 text-blue-600 text-xs px-2 py-0.5 rounded'>{getTypeLabel(q.type)}</span>
+        <span className='bg-yellow-50 text-yellow-700 text-xs px-2 py-0.5 rounded'>{getDifficultyLabel(q.difficulty)}</span>
       </div>
       <div className='font-medium mb-2'>
         {idx + 1}. {q.content}

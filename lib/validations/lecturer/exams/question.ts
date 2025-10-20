@@ -42,7 +42,39 @@ export const getQuestionsResponseSchema = z.object({
   pagination: paginationSchema
 })
 
+
+export const createAnswerSchema = z.object({
+  content: z.string(),
+  isCorrect: z.boolean()
+})
+
+export const createQuestionSchema = z.object({
+  lesson_id: z.string().nullable,
+  content: z.string(),
+  type: z.enum(QUESTION_TYPE_VALUES as [string, ...string[]]),
+  difficulty: z.enum(DIFFICULTY_LEVEL_VALUES as [string, ...string[]]),
+  additional_image: z.string().nullable(),
+  answers: z.array(createAnswerSchema).min(1)
+})
+
+export const updateAnswerSchema = z.object({
+  answer_id: z.string(),
+  content: z.string(),
+  is_correct: z.boolean(),
+})
+
+export const updateQuestionSchema = z.object({
+  content: z.string(),
+  type: z.enum(QUESTION_TYPE_VALUES as [string, ...string[]]),
+  difficulty: z.enum(DIFFICULTY_LEVEL_VALUES as [string, ...string[]]),
+  lesson_id: z.string(),
+  additional_image: z.string().nullable(),
+  answers: z.array(updateAnswerSchema).min(1)
+})
+
 export type Answer = z.infer<typeof answerSchema>
 export type Question = z.infer<typeof questionSchema>
 export type Pagination = z.infer<typeof paginationSchema>
 export type GetQuestionsResponse = z.infer<typeof getQuestionsResponseSchema>
+export type CreateQuestionRequest = z.infer<typeof createQuestionSchema>
+export type UpdateQuestionRequest = z.infer<typeof updateQuestionSchema>
