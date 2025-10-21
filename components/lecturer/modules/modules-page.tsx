@@ -89,8 +89,11 @@ export function LecturerModulesPageClient() {
 
   const modulesQuery = useModules(queryParams)
 
-  const moduleCards = useMemo(() => mapModulesToCards(modulesQuery.data?.data ?? []), [modulesQuery.data?.data])
-  const pagination = modulesQuery.data?.pagination
+  const moduleCards = useMemo(() => {
+    const rawModules = modulesQuery.data?.data?.modules ?? []
+    return mapModulesToCards(rawModules)
+  }, [modulesQuery.data?.data?.modules])
+  const pagination = modulesQuery.data?.data?.pagination
   const totalPages = pagination?.total_pages ?? 0
   const totalRecords = pagination?.total_records ?? 0
   const limit = pagination?.limit ?? MODULE_QUERY_DEFAULTS.limit

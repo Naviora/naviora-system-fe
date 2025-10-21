@@ -182,8 +182,11 @@ export function PrincipalModulesPageClient() {
     })
   }
 
-  const modules = useMemo(() => mapModulesToPrincipalRows(modulesQuery.data?.data ?? []), [modulesQuery.data?.data])
-  const modulesPagination = modulesQuery.data?.pagination
+  const modules = useMemo(() => {
+    const rawModules = modulesQuery.data?.data?.modules ?? []
+    return mapModulesToPrincipalRows(rawModules)
+  }, [modulesQuery.data?.data?.modules])
+  const modulesPagination = modulesQuery.data?.data?.pagination
   const totalRecords = modulesPagination?.total_records ?? modules.length
   const derivedPageCount =
     modulesPagination?.total_pages ?? (pagination.pageSize ? Math.ceil(totalRecords / pagination.pageSize) : 0)

@@ -82,11 +82,15 @@ export const moduleSchema = z.object({
   updated_at: z.string().min(1)
 })
 
+const modulesResponseDataSchema = z.object({
+  modules: z.array(moduleSchema),
+  pagination: paginationSchema
+})
+
 export const modulesResponseSchema = z.object({
   status_code: z.number().int(),
   message: z.string(),
-  data: z.array(moduleSchema),
-  pagination: paginationSchema
+  data: modulesResponseDataSchema
 })
 
 export const moduleResponseSchema = z.object({
@@ -189,6 +193,7 @@ export const createModuleFormSchema = z.object({
 
 export type PaginationDto = z.infer<typeof paginationSchema>
 export type ModuleDto = z.infer<typeof moduleSchema>
+export type ModulesResponseDataDto = z.infer<typeof modulesResponseDataSchema>
 export type ModulesResponseDto = z.infer<typeof modulesResponseSchema>
 export type ModuleResponseDto = z.infer<typeof moduleResponseSchema>
 export type ClassDto = z.infer<typeof classSchema>

@@ -25,6 +25,7 @@ import {
   type CreateModuleFormValues,
   type ModuleDto,
   type ModuleResponseDto,
+  type ModulesResponseDataDto,
   type ModulesResponseDto,
   type ModuleDetailDto,
   type ModuleLessonsDto,
@@ -210,4 +211,4 @@ export const useUpdateModule = (
   })
 }
 
-export type { ModuleDto, ModulesResponseDto, ClassDto, ModuleDetailDto, ModuleLessonsDto }
+export type { ModuleDto, ModulesResponseDataDto, ModulesResponseDto, ClassDto, ModuleDetailDto, ModuleLessonsDto }
