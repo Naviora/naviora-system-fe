@@ -10,7 +10,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isLoggedIn()) {
-      router.push('/dashboard')
+      router.back()
     }
   }, [router])
 
