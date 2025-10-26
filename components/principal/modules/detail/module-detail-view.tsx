@@ -3,7 +3,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { BookOpen, CalendarClock, ChevronDown, ClipboardList, Eye, Loader2, Pencil, Plus, Trash2 } from 'lucide-react'
+import {
+  BookOpen,
+  CalendarClock,
+  ChevronDown,
+  ClipboardList,
+  Loader2,
+  Pencil,
+  Plus,
+  Trash2,
+  FileText
+} from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -12,6 +22,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
+import { TinyMCEEditor } from '@/components/ui/editor-tinymce'
 import {
   Dialog,
   DialogContent,
@@ -21,10 +32,12 @@ import {
   DialogTitle
 } from '@/components/ui/dialog'
 import { QUERY_KEYS } from '@/lib/constants/config'
-import { useCreateLesson, useDeleteLesson, useUpdateLesson } from '@/hooks/api/use-lessons'
+import { useCreateLesson, useDeleteLesson, useUpdateLesson, useLessonDetail } from '@/hooks/api/use-lessons'
+import { useCreateTeachingMaterial, useDeleteTeachingMaterial } from '@/hooks/api/use-materials'
+import { MaterialDialog } from './material-dialog'
 import { ErrorHandler } from '@/lib/utils/error-handler'
 import { cn, formatDateTime } from '@/lib/utils'
-import type { LessonDto, ModuleDetailDto } from '@/lib/validations/modules'
+import type { LessonDto, ModuleDetailDto, MaterialDto } from '@/lib/validations/modules'
 
 interface ModuleDetailViewProps {
   module: ModuleDetailDto
@@ -35,11 +48,13 @@ interface ModuleDetailViewProps {
 interface LessonFormState {
   title: string
   description: string
+  content: string
 }
 
 const LESSON_FORM_DEFAULT: LessonFormState = {
   title: '',
-  description: ''
+  description: '',
+  content: ''
 }
 
 export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDetailViewProps) {
@@ -47,12 +62,21 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
   const createLessonMutation = useCreateLesson()
   const updateLessonMutation = useUpdateLesson()
   const deleteLessonMutation = useDeleteLesson()
+  const createTeachingMaterialMutation = useCreateTeachingMaterial()
+  const deleteTeachingMaterialMutation = useDeleteTeachingMaterial()
+
   const [lessonForm, setLessonForm] = useState<LessonFormState>({ ...LESSON_FORM_DEFAULT })
   const [isLessonDialogOpen, setIsLessonDialogOpen] = useState(false)
   const [lessonDialogMode, setLessonDialogMode] = useState<'create' | 'edit'>('create')
   const [selectedLesson, setSelectedLesson] = useState<LessonDto | null>(null)
   const [expandedLessonId, setExpandedLessonId] = useState<string | null>(null)
   const [deletingLessonId, setDeletingLessonId] = useState<string | null>(null)
+  const [deletingMaterialId, setDeletingMaterialId] = useState<string | null>(null)
+  const [isMaterialDialogOpen, setIsMaterialDialogOpen] = useState(false)
+  const [selectedLessonForMaterial, setSelectedLessonForMaterial] = useState<LessonDto | null>(null)
+  const [lessonMaterials, setLessonMaterials] = useState<Record<string, MaterialDto[] | undefined>>({})
+
+  const lessonDetailQuery = useLessonDetail(expandedLessonId)
 
   const stats = useMemo(
     () => [
@@ -83,7 +107,8 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
       setSelectedLesson(lesson)
       setLessonForm({
         title: lesson.lesson_name,
-        description: lesson.lesson_description ?? ''
+        description: lesson.lesson_description ?? '',
+        content: lesson.lesson_content ?? ''
       })
     } else {
       setSelectedLesson(null)
@@ -112,6 +137,7 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
 
     const trimmedTitle = lessonForm.title.trim()
     const trimmedDescription = lessonForm.description.trim()
+    const trimmedContent = lessonForm.content.trim()
 
     if (!trimmedTitle) {
       toast.error('Tiêu đề bài học không được để trống')
@@ -121,7 +147,8 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
     const payload = {
       module_id: module.module_id,
       lesson_name: trimmedTitle,
-      lesson_description: trimmedDescription || undefined
+      lesson_description: trimmedDescription || undefined,
+      lesson_content: trimmedContent || undefined
     }
 
     try {
@@ -169,6 +196,71 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
     }
   }
 
+  const handleAddMaterial = (lesson: LessonDto) => {
+    setSelectedLessonForMaterial(lesson)
+    setIsMaterialDialogOpen(true)
+  }
+
+  const handleMaterialDialogSubmit = async (material: MaterialDto) => {
+    if (!selectedLessonForMaterial) {
+      toast.error('Không thể tìm thấy bài học được chọn')
+      return
+    }
+
+    try {
+      await createTeachingMaterialMutation.mutateAsync({
+        lesson_id: selectedLessonForMaterial.lesson_id,
+        material_id: material.material_id,
+        content: ' '
+      })
+
+      // Update local materials cache
+      setLessonMaterials((prev) => ({
+        ...prev,
+        [selectedLessonForMaterial.lesson_id]: [...(prev[selectedLessonForMaterial.lesson_id] || []), material]
+      }))
+
+      toast.success('Đã thêm tài liệu vào bài học')
+      setIsMaterialDialogOpen(false)
+      setSelectedLessonForMaterial(null)
+    } catch (error) {
+      ErrorHandler.logError(error, 'material-add')
+      toast.error(ErrorHandler.getErrorMessage(error))
+    }
+  }
+
+  const handleDeleteMaterial = async (lessonId: string, material: MaterialDto) => {
+    const shouldDelete = window.confirm(`Bạn có chắc chắn muốn xóa tài liệu "${material.material_name}"?`)
+
+    if (!shouldDelete) {
+      return
+    }
+
+    // Prevent multiple deletions of the same material
+    if (deletingMaterialId === material.material_id) {
+      return
+    }
+
+    setDeletingMaterialId(material.material_id)
+
+    try {
+      await deleteTeachingMaterialMutation.mutateAsync(material.material_id)
+
+      // Update local materials cache
+      setLessonMaterials((prev) => ({
+        ...prev,
+        [lessonId]: (prev[lessonId] || []).filter((m) => m.material_id !== material.material_id)
+      }))
+
+      toast.success('Đã xóa tài liệu')
+    } catch (error) {
+      ErrorHandler.logError(error, 'material-delete')
+      toast.error(ErrorHandler.getErrorMessage(error))
+    } finally {
+      setDeletingMaterialId(null)
+    }
+  }
+
   useEffect(() => {
     if (!lessons.length) {
       setExpandedLessonId(null)
@@ -184,6 +276,29 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
     })
   }, [lessons])
 
+  // Initialize materials from lessons
+  useEffect(() => {
+    const materialsMap: Record<string, MaterialDto[] | undefined> = {}
+    lessons.forEach((lesson) => {
+      if (lesson.materials && lesson.materials.length > 0) {
+        materialsMap[lesson.lesson_id] = lesson.materials
+      }
+    })
+    setLessonMaterials(materialsMap)
+  }, [lessons])
+
+  // Fetch lesson detail with materials when expanded lesson changes
+  useEffect(() => {
+    if (lessonDetailQuery.data && expandedLessonId) {
+      const materials = lessonDetailQuery.data.data?.materials || []
+
+      setLessonMaterials((prev) => ({
+        ...prev,
+        [expandedLessonId]: materials
+      }))
+    }
+  }, [lessonDetailQuery.data, expandedLessonId])
+
   const toggleLesson = (lessonId: string) => {
     setExpandedLessonId((previous) => (previous === lessonId ? null : lessonId))
   }
@@ -194,7 +309,8 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
       minute: '2-digit'
     })
 
-  const isSubmitting = createLessonMutation.isPending || updateLessonMutation.isPending
+  const isSubmitting =
+    createLessonMutation.isPending || updateLessonMutation.isPending || createTeachingMaterialMutation.isPending
 
   return (
     <div className='mx-auto flex w-full max-w-[1144px] flex-col gap-6 px-4 pb-12 pt-6 sm:px-6 lg:px-8'>
@@ -289,22 +405,9 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
                           <div className='flex items-center gap-2 text-sm font-semibold text-greyscale-900'>
                             <span>{lesson.lesson_name}</span>
                           </div>
-                          <div className='flex flex-wrap items-center gap-3 text-xs text-greyscale-500'>
-                            <span>0 tài liệu</span>
-                            <span aria-hidden='true'>•</span>
-                            <span>{formatLessonTime(lesson.updated_at)} phút</span>
-                          </div>
                         </div>
 
                         <div className='flex items-center gap-2'>
-                          <Button
-                            type='button'
-                            size='sm'
-                            className='h-9 rounded-sm bg-primary px-4 text-xs font-semibold text-primary-foreground shadow-xs hover:bg-primary/90'
-                          >
-                            <Plus className='h-4 w-4' aria-hidden='true' />
-                            Thêm tài liệu
-                          </Button>
                           <Button
                             type='button'
                             variant='ghost'
@@ -340,62 +443,79 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
                           isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
                         )}
                       >
-                        <div className='overflow-hidden border-t border-greyscale-200'>
-                          <div className='flex items-center justify-between gap-6 px-5 py-4'>
-                            <div className='flex flex-1 items-center gap-4'>
-                              <span className='grid size-12 place-content-center rounded-xl bg-primary text-primary-foreground shadow-xs'>
-                                <BookOpen className='h-5 w-5' aria-hidden='true' />
-                              </span>
-                              <div className='flex flex-col gap-1'>
-                                <p className='text-sm font-medium text-greyscale-900'>{lesson.lesson_name}</p>
-                                {lesson.lesson_description ? (
-                                  <p className='text-sm text-greyscale-500'>{lesson.lesson_description}</p>
-                                ) : (
-                                  <p className='text-sm text-greyscale-400'>Chưa có mô tả chi tiết.</p>
-                                )}
-                                <div className='flex flex-wrap items-center gap-3 text-xs text-greyscale-400'>
-                                  <span>Tạo {formatDateTime(lesson.created_at)}</span>
-                                  <span aria-hidden='true'>•</span>
-                                  <span>Cập nhật {formatDateTime(lesson.updated_at)}</span>
-                                </div>
+                        <div
+                          className={cn(
+                            'overflow-hidden border-t border-greyscale-200 transition-all duration-300 ease-in-out',
+                            isExpanded ? 'p-5' : 'p-0'
+                          )}
+                        >
+                          <div className='flex flex-col gap-4'>
+                            {/* Material List Header */}
+                            <div className='flex items-center justify-between gap-4'>
+                              <div>
+                                <h3 className='text-sm font-semibold text-greyscale-900'>Tài liệu bài học</h3>
+                                <p className='text-xs text-greyscale-500'>
+                                  {lessonMaterials[lesson.lesson_id]?.length || 0} tài liệu
+                                </p>
                               </div>
-                            </div>
-                            <div className='flex items-center gap-2'>
                               <Button
                                 type='button'
-                                variant='ghost'
-                                size='icon'
-                                className='h-9 w-9 rounded-full text-greyscale-500 hover:bg-greyscale-25 hover:text-greyscale-700'
-                                aria-label={`Xem trước bài học ${lesson.lesson_name}`}
+                                size='sm'
+                                className='h-8 rounded-sm bg-primary px-3 text-xs font-semibold text-primary-foreground shadow-xs hover:bg-primary/90'
+                                onClick={() => handleAddMaterial(lesson)}
                               >
-                                <Eye className='h-4 w-4' aria-hidden='true' />
-                              </Button>
-                              <Button
-                                type='button'
-                                variant='ghost'
-                                size='icon'
-                                className='h-9 w-9 rounded-full text-greyscale-500 hover:bg-greyscale-25 hover:text-greyscale-700'
-                                aria-label={`Chỉnh sửa bài học ${lesson.lesson_name}`}
-                                onClick={() => openLessonDialog('edit', lesson)}
-                              >
-                                <Pencil className='h-4 w-4' aria-hidden='true' />
-                              </Button>
-                              <Button
-                                type='button'
-                                variant='ghost'
-                                size='icon'
-                                className='h-9 w-9 rounded-full text-greyscale-500 hover:bg-greyscale-25 hover:text-greyscale-700'
-                                aria-label={`Xóa bài học ${lesson.lesson_name}`}
-                                onClick={() => handleDeleteLesson(lesson)}
-                                disabled={isDeletingLesson}
-                              >
-                                {isDeletingLesson ? (
-                                  <Loader2 className='h-4 w-4 animate-spin' aria-hidden='true' />
-                                ) : (
-                                  <Trash2 className='h-4 w-4' aria-hidden='true' />
-                                )}
+                                <Plus className='h-3.5 w-3.5 mr-1' aria-hidden='true' />
+                                Thêm tài liệu
                               </Button>
                             </div>
+
+                            {/* Materials List */}
+                            {lessonMaterials[lesson.lesson_id] && lessonMaterials[lesson.lesson_id]!.length > 0 ? (
+                              <ul className='space-y-3'>
+                                {lessonMaterials[lesson.lesson_id]!.map((material) => (
+                                  <li
+                                    key={material.material_id}
+                                    className='flex items-center justify-between gap-3 rounded-md border border-greyscale-100 bg-greyscale-25 p-3'
+                                  >
+                                    <div className='flex items-center gap-3 flex-1 min-w-0'>
+                                      <span className='flex-shrink-0 text-greyscale-400'>
+                                        <FileText className='h-4 w-4' aria-hidden='true' />
+                                      </span>
+                                      <div className='min-w-0 flex-1'>
+                                        <p className='text-sm font-medium text-greyscale-900 truncate'>
+                                          {material.material_name}
+                                        </p>
+                                        <p className='text-xs text-greyscale-500'>{material.material_type}</p>
+                                      </div>
+                                    </div>
+                                    <div className='flex items-center gap-2 flex-shrink-0'>
+                                      <Button
+                                        type='button'
+                                        variant='ghost'
+                                        size='icon'
+                                        className='h-8 w-8 rounded-full text-greyscale-400 hover:bg-greyscale-100 hover:text-greyscale-600'
+                                        aria-label={`Xóa tài liệu ${material.material_name}`}
+                                        onClick={() => handleDeleteMaterial(lesson.lesson_id, material)}
+                                        disabled={deletingMaterialId === material.material_id}
+                                      >
+                                        {deletingMaterialId === material.material_id ? (
+                                          <Loader2 className='h-3.5 w-3.5 animate-spin' aria-hidden='true' />
+                                        ) : (
+                                          <Trash2 className='h-3.5 w-3.5' aria-hidden='true' />
+                                        )}
+                                      </Button>
+                                    </div>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <div className='flex flex-col items-center justify-center gap-2 py-6 text-center'>
+                                <span className='text-greyscale-400'>
+                                  <ClipboardList className='h-5 w-5 mx-auto' aria-hidden='true' />
+                                </span>
+                                <p className='text-xs text-greyscale-500'>Chưa có tài liệu nào cho bài học này</p>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -428,6 +548,12 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
           </section>
         </div>
       </Card>
+      <MaterialDialog
+        isOpen={isMaterialDialogOpen}
+        onOpenChange={setIsMaterialDialogOpen}
+        onSubmit={handleMaterialDialogSubmit}
+        isSubmitting={createTeachingMaterialMutation.isPending}
+      />
       <Dialog open={isLessonDialogOpen} onOpenChange={handleLessonDialogOpenChange}>
         <DialogContent className='w-full max-w-[520px] gap-0 overflow-hidden rounded-md border border-greyscale-200 bg-greyscale-0 p-0 shadow-2xl'>
           <form onSubmit={handleLessonDialogSubmit} className='flex flex-col gap-0'>
@@ -465,6 +591,17 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
                   className='min-h-[140px]'
                   disabled={isSubmitting}
                 />
+              </div>
+              <div className='space-y-2'>
+                <Label htmlFor='lesson-content'>Nội dung bài học</Label>
+                <div className='border border-greyscale-200 rounded-md overflow-hidden'>
+                  <TinyMCEEditor
+                    value={lessonForm.content}
+                    onChange={(content) => setLessonForm((previous) => ({ ...previous, content }))}
+                    placeholder='Nhập nội dung bài học...'
+                    disabled={isSubmitting}
+                  />
+                </div>
               </div>
             </div>
 
