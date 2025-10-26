@@ -27,9 +27,9 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible='icon' className='border-none'>
-      <div className='flex flex-col px-4 group-data-[collapsible=icon]:px-0 h-full'>
+      <div className='flex flex-col px-4 group-data-[collapsible=icon]:px-0 h-full transition-all duration-300 ease-in-out'>
         <SidebarHeader>
-          <div className='flex items-center justify-between  group-data-[collapsible=icon]:justify-end group-data-[collapsible=icon]:flex-col-reverse'>
+          <div className='flex items-center justify-between  group-data-[collapsible=icon]:justify-end group-data-[collapsible=icon]:flex-col-reverse '>
             <Logo size='sm' />
             <SidebarTrigger />
           </div>
