@@ -9,6 +9,7 @@ import { LoadingPage } from '@/components/ui/loading'
 import { Separator } from '@/components/ui/separator'
 import { ErrorHandler } from '@/lib/utils/error-handler'
 import { useModuleDetail, useModuleLessons } from '@/hooks/api/use-modules'
+import { BreadcrumbProvider } from '@/lib/context/breadcrumb-context'
 
 interface ModuleDetailPageClientProps {
   moduleId: string
@@ -75,5 +76,9 @@ export function ModuleDetailPageClient({ moduleId }: ModuleDetailPageClientProps
 
   const lessons = lessonsQuery.data?.lessons ?? []
 
-  return <ModuleDetailView module={moduleDetail} lessons={lessons} isLessonsLoading={isLessonsLoading} />
+  return (
+    <BreadcrumbProvider label={moduleDetail.module_name}>
+      <ModuleDetailView module={moduleDetail} lessons={lessons} isLessonsLoading={isLessonsLoading} />
+    </BreadcrumbProvider>
+  )
 }

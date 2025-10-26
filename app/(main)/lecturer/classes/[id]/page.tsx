@@ -8,6 +8,7 @@ import { Calendar, Users, BookOpen } from 'lucide-react'
 import Link from 'next/link'
 import { CLASS_TYPE_LABELS } from '@/types/api/class'
 import { formatDate } from '@/lib/utils'
+import { BreadcrumbProvider } from '@/lib/context/breadcrumb-context'
 
 export default function ClassDetailPage() {
   const params = useParams()
@@ -28,13 +29,9 @@ export default function ClassDetailPage() {
       <div className='container mx-auto px-4 py-8'>
         <div className='text-center'>
           <h2 className='text-2xl font-bold'>Lớp học không tìm thấy</h2>
-          <p className='text-muted-foreground mt-2'>
-            Lớp học bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
-          </p>
+          <p className='text-muted-foreground mt-2'>Lớp học bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
           <Button asChild className='mt-4'>
-            <Link href='/lecturer/classes'>
-              Quay lại danh sách lớp học
-            </Link>
+            <Link href='/lecturer/classes'>Quay lại danh sách lớp học</Link>
           </Button>
         </div>
       </div>
@@ -42,16 +39,17 @@ export default function ClassDetailPage() {
   }
 
   return (
-    <div className='container mx-auto px-4 py-8'>
-      {/* Header */}
-      <div className='mb-6'>
-        <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
-          <div>
-            <div className='flex items-center gap-3 mb-2'>
-              <h1 className='text-3xl font-bold'>{classDetail.class_name}</h1>
-              <span
-                className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                  classDetail.is_active
+    <BreadcrumbProvider label={classDetail.class_name}>
+      <div className='container mx-auto px-4 py-8'>
+        {/* Header */}
+        <div className='mb-6'>
+          <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
+            <div>
+              <div className='flex items-center gap-3 mb-2'>
+                <h1 className='text-3xl font-bold'>{classDetail.class_name}</h1>
+                <span
+                  className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                    classDetail.is_active
                     ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
                     : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
                 }`}
@@ -139,6 +137,7 @@ export default function ClassDetailPage() {
         </div>
         <p className='text-muted-foreground text-center py-8'>Xem và quản lý học viên đăng ký lớp học này</p>
       </div>
-    </div>
+      </div>
+    </BreadcrumbProvider>
   )
 }
