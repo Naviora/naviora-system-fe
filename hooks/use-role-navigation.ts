@@ -11,16 +11,14 @@ interface RoleNavigationResult {
 }
 
 export const useRoleNavigation = (): RoleNavigationResult => {
-  const { activeRole, activePermissions, query } = useRoleContext()
+  const { role, permissions, isReady } = useRoleContext()
 
-  const navigation = useMemo(() => getNavigationConfig(activeRole?.value), [activeRole])
-
-  const isReady = query.isFetched || query.isSuccess || !!activeRole
+  const navigation = useMemo(() => getNavigationConfig(role), [role])
 
   return {
     mainNavigation: navigation.main,
     bottomNavigation: navigation.bottom,
-    permissions: activePermissions,
+    permissions,
     isReady
   }
 }
