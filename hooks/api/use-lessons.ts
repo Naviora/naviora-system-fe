@@ -1,7 +1,15 @@
-import { useMutation, type UseMutationOptions, type UseMutationResult } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQuery,
+  type UseMutationOptions,
+  type UseMutationResult,
+  type UseQueryOptions,
+  type UseQueryResult
+} from '@tanstack/react-query'
 
 import { axios_instance } from '@/lib/api/client'
 import { LESSONS_API_ENDPOINT } from '@/lib/constants/modules'
+import { QUERY_KEYS } from '@/lib/constants/config'
 import {
   createLessonSchema,
   lessonResponseSchema,
@@ -31,6 +39,11 @@ const deleteLessonRequest = async (lessonId: string): Promise<LessonResponseDto>
   return lessonResponseSchema.parse(response.data)
 }
 
+const getLessonDetailRequest = async (lessonId: string): Promise<LessonResponseDto> => {
+  const response = await axios_instance.get(`${LESSONS_API_ENDPOINT}/${lessonId}`)
+  return lessonResponseSchema.parse(response.data)
+}
+
 export const useCreateLesson = (
   options?: UseMutationOptions<LessonResponseDto, unknown, CreateLessonPayload>
 ): UseMutationResult<LessonResponseDto, unknown, CreateLessonPayload> => {
@@ -54,6 +67,20 @@ export const useDeleteLesson = (
 ): UseMutationResult<LessonResponseDto, unknown, string> => {
   return useMutation({
     mutationFn: deleteLessonRequest,
+    ...options
+  })
+}
+
+export const useLessonDetail = (
+  lessonId: string | null,
+  options?: UseQueryOptions<LessonResponseDto, unknown, LessonResponseDto>
+): UseQueryResult<LessonResponseDto, unknown> => {
+  return useQuery({
+    queryKey: QUERY_KEYS.LESSON_DETAIL(lessonId || 'unknown'),
+    queryFn: () => getLessonDetailRequest(lessonId || ''),
+    enabled: !!lessonId,
+    staleTime: 60 * 1000, // 60 seconds
+    gcTime: 5 * 60 * 1000, // 5 minutes (formerly cacheTime)
     ...options
   })
 }
