@@ -1,6 +1,7 @@
 'use client'
 
 import { useParams } from 'next/navigation'
+import { useEffect } from 'react'
 import { useClassDetail } from '@/hooks/api/use-classes'
 import { LoadingSpinner } from '@/components/ui/loading'
 import { Button } from '@/components/ui/button'
@@ -8,13 +9,21 @@ import { Calendar, Users, BookOpen } from 'lucide-react'
 import Link from 'next/link'
 import { CLASS_TYPE_LABELS } from '@/types/api/class'
 import { formatDate } from '@/lib/utils'
-import { BreadcrumbProvider } from '@/lib/context/breadcrumb-context'
+import { useSetBreadcrumbLabel } from '@/lib/context/breadcrumb-context'
 
 export default function ClassDetailPage() {
   const params = useParams()
   const classId = params.id as string
+  const setBreadcrumbLabel = useSetBreadcrumbLabel()
 
   const { data: classDetail, isLoading } = useClassDetail(classId)
+
+  // Update breadcrumb when class detail loads
+  useEffect(() => {
+    if (classDetail?.class_name) {
+      setBreadcrumbLabel(classDetail.class_name)
+    }
+  }, [classDetail?.class_name, setBreadcrumbLabel])
 
   if (isLoading) {
     return (
@@ -39,8 +48,7 @@ export default function ClassDetailPage() {
   }
 
   return (
-    <BreadcrumbProvider label={classDetail.class_name}>
-      <div className='container mx-auto px-4 py-8'>
+    <div className='container mx-auto px-4 py-8'>
         {/* Header */}
         <div className='mb-6'>
           <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
@@ -137,7 +145,6 @@ export default function ClassDetailPage() {
         </div>
         <p className='text-muted-foreground text-center py-8'>Xem và quản lý học viên đăng ký lớp học này</p>
       </div>
-      </div>
-    </BreadcrumbProvider>
+    </div>
   )
 }

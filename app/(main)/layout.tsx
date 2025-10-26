@@ -2,6 +2,7 @@ import { AppSidebar } from '@/components/layouts/app-sidebar'
 import { Navbar } from '@/components/common/navbar'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { AuthGuard } from '@/components/guard/auth-guard'
+import { BreadcrumbProvider } from '@/lib/context/breadcrumb-context'
 
 export default function MainLayout({
   children
@@ -10,15 +11,17 @@ export default function MainLayout({
 }>) {
   return (
     <AuthGuard>
-      <SidebarProvider defaultOpen={false}>
-        <AppSidebar />
-        <div className='w-full py-2 pr-2 bg-greyscale-25'>
-          <div className='flex flex-col h-full rounded-md border-1 bg-greyscale-0'>
-            <Navbar />
-            {children}
+      <BreadcrumbProvider>
+        <SidebarProvider defaultOpen={false}>
+          <AppSidebar />
+          <div className='w-full py-2 pr-2 bg-greyscale-25'>
+            <div className='flex flex-col h-full rounded-md border-1 bg-greyscale-0'>
+              <Navbar />
+              {children}
+            </div>
           </div>
-        </div>
-      </SidebarProvider>
+        </SidebarProvider>
+      </BreadcrumbProvider>
     </AuthGuard>
   )
 }
