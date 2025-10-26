@@ -54,7 +54,7 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu className='gap-2'>
                 {mainNavigation.map((item) => {
-                  const isActive = pathname === item.href
+                  const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
                   return (
                     <SidebarMenuItem key={item.name}>
                       <Link
@@ -82,7 +82,7 @@ export function AppSidebar() {
           </div>
           <SidebarMenu className='gap-2'>
             {bottomNavigation.map((item) => {
-              const isActive = pathname === item.href
+              const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
               return (
                 <SidebarMenuItem key={item.name}>
                   <Link
