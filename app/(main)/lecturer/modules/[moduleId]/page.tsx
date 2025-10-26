@@ -1,41 +1,21 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
 
-import { ModuleDetailView } from '@/components/lecturer/modules'
-import { getLecturerModuleById, getLecturerModuleSummaries } from '@/lib/data/lecturer-modules'
+import { ModuleDetailPageClient } from '@/components/principal/modules/detail'
 
 interface ModuleDetailPageProps {
   params: { moduleId: string }
 }
 
-export async function generateStaticParams() {
-  const modules = getLecturerModuleSummaries()
+export const dynamic = 'force-dynamic'
 
-  return modules.map((module) => ({ moduleId: module.id }))
-}
-
-export async function generateMetadata({ params }: ModuleDetailPageProps): Promise<Metadata> {
+export function generateMetadata({ params }: ModuleDetailPageProps): Metadata {
   const { moduleId } = params
-  const moduleDetail = getLecturerModuleById(moduleId)
-
-  if (!moduleDetail) {
-    return {
-      title: 'Module không tồn tại'
-    }
-  }
-
   return {
-    title: `${moduleDetail.title} | Giảng viên`
+    title: `Chi tiết chuyên đề ${moduleId} | Giảng viên`
   }
 }
 
-export default async function LecturerModuleDetailPage({ params }: ModuleDetailPageProps) {
+export default function LecturerModuleDetailPage({ params }: ModuleDetailPageProps) {
   const { moduleId } = params
-  const moduleDetail = getLecturerModuleById(moduleId)
-
-  if (!moduleDetail) {
-    notFound()
-  }
-
-  return <ModuleDetailView module={moduleDetail} />
+  return <ModuleDetailPageClient moduleId={moduleId} />
 }

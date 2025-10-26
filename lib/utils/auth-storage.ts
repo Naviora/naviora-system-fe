@@ -1,5 +1,16 @@
 import { isUserRole, type UserRole } from '@/lib/constants/roles'
 
+export const ROLE_CHANGE_EVENT = 'auth:role-change' as const
+
+export interface RoleChangeEventDetail {
+  role: UserRole | null
+}
+
+const dispatchRoleChangeEvent = (role: UserRole | null) => {
+  if (typeof window === 'undefined') return
+  window.dispatchEvent(new CustomEvent<RoleChangeEventDetail>(ROLE_CHANGE_EVENT, { detail: { role } }))
+}
+
 export const AUTH_STORAGE_KEYS = {
   accessToken: 'auth-token',
   refreshToken: 'refresh-token',
@@ -32,6 +43,7 @@ export const getStoredRefreshToken = (): string | null => {
 export const setStoredUserRole = (role: UserRole) => {
   if (typeof window === 'undefined') return
   localStorage.setItem(AUTH_STORAGE_KEYS.userRole, role)
+  dispatchRoleChangeEvent(role)
 }
 
 export const getStoredUserRole = (): UserRole | null => {
@@ -43,6 +55,7 @@ export const getStoredUserRole = (): UserRole | null => {
 export const clearStoredUserRole = () => {
   if (typeof window === 'undefined') return
   localStorage.removeItem(AUTH_STORAGE_KEYS.userRole)
+  dispatchRoleChangeEvent(null)
 }
 
 export const clearAuthStorage = (options?: { clearRememberMe?: boolean; clearRole?: boolean }) => {
