@@ -28,7 +28,7 @@
 ## Auth & role handling
 
 - `useLogin` stores tokens and the current role in `localStorage` (`lib/utils/auth-storage.ts`); logout/refresh helpers clear them.
-- `RoleProvider` fetches `/roles` via `useRoles`, converts each `RoleDto` to a `RoleOption` (permissions parsed from CSV), and exposes `activeRole` based on persisted storage.
+- `RoleProvider` now just reads the stored role, syncs via the custom `auth:role-change` event or `storage` events, and exposes a lightweight context with `role`, `permissions`, and readiness state—no `/roles` fetch needed.
 - Redirect destinations should respect `getDefaultRouteForRole` so users land on the right dashboard after auth.
 
 ## UI & design system
