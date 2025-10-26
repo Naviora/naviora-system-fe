@@ -75,7 +75,6 @@ export function AppSidebar() {
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
-          <SidebarGroup></SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
           <div className='px-2'>

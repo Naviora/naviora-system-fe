@@ -1,11 +1,10 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { isLoggedIn } from '@/hooks/api/use-auth'
 import { LoadingSpinner } from '@/components/ui'
 import { useRoleContext } from '@/providers/role-provider'
-import { getStoredUserRole } from '@/lib/utils/auth-storage'
 import type { UserRole } from '@/lib/constants/roles'
 
 interface AuthGuardProps {
@@ -16,21 +15,14 @@ interface AuthGuardProps {
 
 export function AuthGuard({ children, allowedRoles, fallback }: AuthGuardProps) {
   const router = useRouter()
-  const { roleOptions } = useRoleContext()
+  const { role, isReady: isRoleReady } = useRoleContext()
   const [isReady, setIsReady] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [role, setRole] = useState<UserRole | null>(null)
 
   useEffect(() => {
     setIsAuthenticated(isLoggedIn())
-    setRole(getStoredUserRole())
     setIsReady(true)
   }, [])
-
-  const activeRole = useMemo(
-    () => (role ? (roleOptions.find((option) => option.value === role && option.isActive) ?? null) : null),
-    [role, roleOptions]
-  )
 
   useEffect(() => {
     if (isReady && !isAuthenticated) {
@@ -38,7 +30,9 @@ export function AuthGuard({ children, allowedRoles, fallback }: AuthGuardProps) 
     }
   }, [isAuthenticated, isReady, router])
 
-  if (!isReady) {
+  const effectiveRole = role
+
+  if (!isReady || !isRoleReady) {
     return (
       <div className='flex h-screen items-center justify-center'>
         <LoadingSpinner size='lg' />
@@ -55,7 +49,7 @@ export function AuthGuard({ children, allowedRoles, fallback }: AuthGuardProps) 
   }
 
   const requiresSpecificRole = Array.isArray(allowedRoles) && allowedRoles.length > 0
-  const isAuthorized = requiresSpecificRole ? !!activeRole && allowedRoles.includes(activeRole.value) : true
+  const isAuthorized = requiresSpecificRole ? !!effectiveRole && allowedRoles.includes(effectiveRole) : true
 
   if (!isAuthorized) {
     if (fallback) {

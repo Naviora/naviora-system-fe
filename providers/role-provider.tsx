@@ -1,68 +1,76 @@
 'use client'
 
-import { createContext, useContext, useMemo, type ReactNode } from 'react'
-import { useRoles } from '@/hooks/api/use-roles'
-import { toRoleOption } from '@/lib/mappers/role'
-import type { RoleDto, RoleOption } from '@/types/api/roles'
-import type { ApiError } from '@/types/api/common'
-import type { UseQueryResult } from '@tanstack/react-query'
-import { getStoredUserRole } from '@/lib/utils/auth-storage'
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import {
+  AUTH_STORAGE_KEYS,
+  getStoredUserRole,
+  ROLE_CHANGE_EVENT,
+  type RoleChangeEventDetail
+} from '@/lib/utils/auth-storage'
+import type { UserRole } from '@/lib/constants/roles'
 
 interface RoleContextValue {
-  roles: RoleDto[]
-  roleOptions: RoleOption[]
-  activeRole: RoleOption | null
-  activePermissions: string[]
-  query: UseQueryResult<RoleDto[], ApiError>
+  role: UserRole | null
+  permissions: string[]
+  isReady: boolean
 }
 
 const RoleContext = createContext<RoleContextValue | undefined>(undefined)
-
-const EMPTY_ROLES: RoleDto[] = []
 
 interface RoleProviderProps {
   children: ReactNode
 }
 
+const ROLE_PERMISSIONS_MAP: Partial<Record<UserRole, string[]>> = {}
+
+const getPermissionsForRole = (role: UserRole | null) => {
+  if (!role) return []
+  return ROLE_PERMISSIONS_MAP[role] ?? []
+}
+
 export function RoleProvider({ children }: RoleProviderProps) {
-  const query = useRoles({
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000
-  })
+  const [role, setRole] = useState<UserRole | null>(() => (typeof window === 'undefined' ? null : getStoredUserRole()))
+  const [isReady, setIsReady] = useState(false)
 
-  const roles = query.data ?? EMPTY_ROLES
+  useEffect(() => {
+    if (typeof window === 'undefined') return
 
-  const roleOptions = useMemo<RoleOption[]>(() => {
-    return roles.reduce<RoleOption[]>((accumulator, role) => {
-      const option = toRoleOption(role)
-      if (option) {
-        accumulator.push(option)
+    const syncRoleFromStorage = () => {
+      setRole(getStoredUserRole())
+    }
+
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === AUTH_STORAGE_KEYS.userRole || event.key === null) {
+        syncRoleFromStorage()
       }
-      return accumulator
-    }, [])
-  }, [roles])
+    }
 
-  const activeRole = useMemo<RoleOption | null>(() => {
-    if (typeof window === 'undefined') return null
-    const role = getStoredUserRole()
-    if (!role) return null
-    return roleOptions.find((option) => option.value === role && option.isActive) ?? null
-  }, [roleOptions])
+    const handleRoleChange = (event: Event) => {
+      const detail = (event as CustomEvent<RoleChangeEventDetail>).detail
+      setRole(detail?.role ?? null)
+    }
 
-  const activePermissions = useMemo<string[]>(() => {
-    if (!activeRole) return []
-    return activeRole.permissions
-  }, [activeRole])
+    syncRoleFromStorage()
+    setIsReady(true)
+
+    window.addEventListener('storage', handleStorage)
+    window.addEventListener(ROLE_CHANGE_EVENT, handleRoleChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorage)
+      window.removeEventListener(ROLE_CHANGE_EVENT, handleRoleChange)
+    }
+  }, [])
+
+  const permissions = useMemo(() => getPermissionsForRole(role), [role])
 
   const value = useMemo<RoleContextValue>(
     () => ({
-      roles,
-      activeRole,
-      activePermissions,
-      roleOptions,
-      query
+      role,
+      permissions,
+      isReady
     }),
-    [activePermissions, activeRole, query, roleOptions, roles]
+    [permissions, role, isReady]
   )
 
   return <RoleContext.Provider value={value}>{children}</RoleContext.Provider>
