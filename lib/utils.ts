@@ -5,7 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-//Function tính thời gian đã qua bao lâu
 export function timeAgo(dateString: string) {
   const date = new Date(dateString)
   const now = new Date()
@@ -19,4 +18,18 @@ export function timeAgo(dateString: string) {
   if (diffHour > 0) return `${diffHour} giờ trước`
   if (diffMin > 0) return `${diffMin} phút trước`
   return `Vừa xong`
+}
+
+export function formatDate(dateString: string, withTime = false) {
+  const date = new Date(dateString)
+  const pad = (n: number) => n.toString().padStart(2, '0')
+  const d = pad(date.getDate())
+  const m = pad(date.getMonth() + 1)
+  const y = date.getFullYear()
+  if (withTime) {
+    const h = pad(date.getHours())
+    const min = pad(date.getMinutes())
+    return `${d}/${m}/${y} ${h}:${min}`
+  }
+  return `${d}/${m}/${y}`
 }

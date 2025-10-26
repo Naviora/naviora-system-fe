@@ -11,6 +11,7 @@ import { useCreateQuestion, useUpdateQuestion } from '@/hooks/api/lecturer/exams
 import { useCreateQuestionSet } from '@/hooks/api/lecturer/exams/use-question-set'
 import { toast } from 'sonner'
 import { CreateQuestionRequest, Question } from '@/lib/validations/lecturer/exams/question'
+import ManageAllTest from '@/components/lecturer/exams/all-test/manage-all-test'
 
 export default function ManageLayout() {
   const [activeTab, setActiveTab] = React.useState<'question' | 'exam' | 'question-set'>('question')
@@ -37,7 +38,7 @@ export default function ManageLayout() {
         content: data.question,
         type: data.type,
         difficulty: data.difficulty,
-        lesson_id: data.lesson_id || '', 
+        lesson_id: data.lesson_id || '',
         additional_image: data.additional_image || null,
         answers: data.options.map((opt: string, idx: number) => ({
           answer_id: data.answer_ids?.[idx] || '',
@@ -49,12 +50,12 @@ export default function ManageLayout() {
         { id: editQuestionData.question_id, data: payload },
         {
           onSuccess: () => {
-            toast.success("Cập nhật câu hỏi thành công")
+            toast.success('Cập nhật câu hỏi thành công')
             setQuestionDialogOpen(false)
             setEditQuestionData(null)
           },
           onError: (err: any) => {
-            toast.error(err?.message || "Có lỗi xảy ra khi cập nhật câu hỏi")
+            toast.error(err?.message || 'Có lỗi xảy ra khi cập nhật câu hỏi')
           }
         }
       )
@@ -78,12 +79,12 @@ export default function ManageLayout() {
     }
     createQuestionMutation.mutate(payload, {
       onSuccess: () => {
-        toast.success("Thêm câu hỏi mới thành công")
+        toast.success('Thêm câu hỏi mới thành công')
         setQuestionDialogOpen(false)
         setEditQuestionData(null)
       },
       onError: (err: any) => {
-        toast.error(err?.message || "Có lỗi xảy ra khi thêm câu hỏi")
+        toast.error(err?.message || 'Có lỗi xảy ra khi thêm câu hỏi')
       }
     })
   }
@@ -161,15 +162,16 @@ export default function ManageLayout() {
             <input type='text' placeholder='Tìm kiếm...' className='border-none outline-none text-muted-foreground' />
           </Button>
 
-          <Button
-            className='rounded-2xl h-[36px] flex justify-center items-center text-sm bg-primary hover:bg-primary-300 text-greyscale-0 font-semibold'
-            onClick={handleBtnAdd}
-          >
-            <IoMdAdd className='size-4 text-greyscale-0' />
-            {activeTab === 'question' && 'Thêm câu hỏi'}
-            {activeTab === 'exam' && 'Thêm bài thi'}
-            {activeTab === 'question-set' && 'Thêm bộ câu hỏi'}
-          </Button>
+          {activeTab !== 'exam' && (
+            <Button
+              className='rounded-2xl h-[36px] flex justify-center items-center text-sm bg-primary hover:bg-primary-300 text-greyscale-0 font-semibold'
+              onClick={handleBtnAdd}
+            >
+              <IoMdAdd className='size-4 text-greyscale-0' />
+              {activeTab === 'question' && 'Thêm câu hỏi'}
+              {activeTab === 'question-set' && 'Thêm bộ câu hỏi'}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -199,7 +201,7 @@ export default function ManageLayout() {
           />
         </>
       )}
-      {activeTab === 'exam' && <div>Exam Management Coming Soon...</div>}
+      {activeTab === 'exam' && <ManageAllTest />}
     </div>
   )
 }
