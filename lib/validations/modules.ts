@@ -110,12 +110,73 @@ export const moduleDetailSchema = moduleSchema.extend({
   class: moduleClassSchema.nullable().optional()
 })
 
+// Material Schemas
+export const materialSchema = z.object({
+  material_id: z.string().min(1),
+  lecturer_id: z.string().min(1),
+  material_name: z.string().min(1),
+  material_type: z.enum(['image', 'video', 'pdf', 'document', 'audio', 'other']),
+  material_path: z.string().url(),
+  created_at: z.string().min(1).optional().nullable(),
+  updated_at: z.string().min(1).optional().nullable(),
+  deleted_at: z.string().nullable().optional(),
+  version: z.number().int().optional()
+})
+
+export const teachingMaterialSchema = z.object({
+  teaching_material_id: z.string().min(1),
+  lesson_id: z.string().min(1).optional(),
+  material_id: z.string().min(1).optional(),
+  content: z.string().nullable().optional(),
+  created_at: z.string().min(1).optional().nullable(),
+  updated_at: z.string().min(1).optional().nullable(),
+  deleted_at: z.string().nullable().optional(),
+  version: z.number().int().optional(),
+  material: materialSchema.optional(),
+  lesson: z
+    .object({
+      lesson_id: z.string().min(1),
+      lesson_name: z.string().min(1),
+      lesson_description: z.string().nullable().optional(),
+      lesson_content: z.string().nullable().optional(),
+      module_id: z.string().min(1).optional(),
+      created_at: z.string().min(1).optional().nullable(),
+      updated_at: z.string().min(1).optional().nullable(),
+      deleted_at: z.string().nullable().optional(),
+      version: z.number().int().optional(),
+      materials: z.array(materialSchema).optional()
+    })
+    .optional()
+})
+
+export const createTeachingMaterialSchema = z.object({
+  lesson_id: z.string().min(1),
+  material_id: z.string().min(1),
+  content: z.string().optional()
+})
+
+export const updateTeachingMaterialSchema = createTeachingMaterialSchema.partial()
+
+export const materialResponseSchema = z.object({
+  status_code: z.number().int(),
+  message: z.string(),
+  data: materialSchema
+})
+
+export const teachingMaterialResponseSchema = z.object({
+  status_code: z.number().int(),
+  message: z.string(),
+  data: teachingMaterialSchema
+})
+
 export const lessonSchema = z.object({
   lesson_id: z.string().min(1),
   lesson_name: z.string().min(1),
   lesson_description: z.string().nullable().optional(),
+  lesson_content: z.string().nullable().optional(),
   created_at: z.string().min(1),
-  updated_at: z.string().min(1)
+  updated_at: z.string().min(1),
+  materials: z.array(materialSchema).optional()
 })
 
 export const lessonResponseSchema = z.object({
@@ -127,7 +188,8 @@ export const lessonResponseSchema = z.object({
 export const createLessonSchema = z.object({
   module_id: z.string().min(1),
   lesson_name: z.string().min(1),
-  lesson_description: z.string().optional()
+  lesson_description: z.string().optional(),
+  lesson_content: z.string().optional()
 })
 
 export const updateLessonSchema = createLessonSchema
@@ -160,11 +222,15 @@ export const classSchema = z.object({
   updated_at: z.string().min(1)
 })
 
+const classesResponseDataSchema = z.object({
+  classes: z.array(classSchema),
+  pagination: paginationSchema
+})
+
 export const classesResponseSchema = z.object({
   status_code: z.number().int(),
   message: z.string(),
-  data: z.array(classSchema),
-  pagination: paginationSchema
+  data: classesResponseDataSchema
 })
 
 export const createModuleFormSchema = z.object({
@@ -197,6 +263,7 @@ export type ModulesResponseDataDto = z.infer<typeof modulesResponseDataSchema>
 export type ModulesResponseDto = z.infer<typeof modulesResponseSchema>
 export type ModuleResponseDto = z.infer<typeof moduleResponseSchema>
 export type ClassDto = z.infer<typeof classSchema>
+export type ClassesResponseDataDto = z.infer<typeof classesResponseDataSchema>
 export type ClassesResponseDto = z.infer<typeof classesResponseSchema>
 export type CreateModuleFormValues = z.infer<typeof createModuleFormSchema>
 export type ModuleClassDto = z.infer<typeof moduleClassSchema>
@@ -208,6 +275,12 @@ export type ModuleDetailResponseDto = z.infer<typeof moduleDetailResponseSchema>
 export type ModuleLessonsResponseDto = z.infer<typeof moduleLessonsResponseSchema>
 export type CreateLessonPayload = z.infer<typeof createLessonSchema>
 export type UpdateLessonPayload = z.infer<typeof updateLessonSchema>
+export type MaterialDto = z.infer<typeof materialSchema>
+export type TeachingMaterialDto = z.infer<typeof teachingMaterialSchema>
+export type CreateTeachingMaterialPayload = z.infer<typeof createTeachingMaterialSchema>
+export type UpdateTeachingMaterialPayload = z.infer<typeof updateTeachingMaterialSchema>
+export type MaterialResponseDto = z.infer<typeof materialResponseSchema>
+export type TeachingMaterialResponseDto = z.infer<typeof teachingMaterialResponseSchema>
 
 export interface UpdateModuleFormValues {
   moduleId: string
