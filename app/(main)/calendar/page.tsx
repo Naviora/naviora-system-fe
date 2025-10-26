@@ -19,16 +19,16 @@ export default function CalendarPage() {
         events={[
           {
             id: '1',
-            start: new Date('2024-08-26T09:30:00Z'),
-            end: new Date('2024-08-26T14:30:00Z'),
-            title: 'event A',
+            start: new Date('2025-10-26T09:30:00Z'),
+            end: new Date('2025-10-26T14:30:00Z'),
+            title: 'Cuối kì 1',
             color: 'pink'
           },
           {
             id: '2',
-            start: new Date('2024-08-26T10:00:00Z'),
-            end: new Date('2024-08-26T10:30:00Z'),
-            title: 'event B',
+            start: new Date('2025-10-27T10:00:00Z'),
+            end: new Date('2025-10-27T10:30:00Z'),
+            title: 'Cuối kì 2',
             color: 'blue'
           }
         ]}
