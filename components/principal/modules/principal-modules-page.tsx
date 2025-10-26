@@ -336,7 +336,7 @@ export function PrincipalModulesPageClient() {
             </div>
           ) : (
             <CreateModuleForm
-              classes={classesQuery.data?.data ?? []}
+              classes={classesQuery.data?.data?.classes ?? []}
               isSubmitting={createModuleMutation.isPending}
               onSubmit={handleCreateModule}
               submitLabel='Tạo chuyên đề'
@@ -366,7 +366,7 @@ export function PrincipalModulesPageClient() {
             </div>
           ) : (
             <CreateModuleForm
-              classes={classesQuery.data?.data ?? []}
+              classes={classesQuery.data?.data?.classes ?? []}
               isSubmitting={updateModuleMutation.isPending}
               onSubmit={handleUpdateModule}
               submitLabel='Lưu thay đổi'
