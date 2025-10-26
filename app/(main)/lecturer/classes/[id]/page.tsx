@@ -27,14 +27,14 @@ export default function ClassDetailPage() {
     return (
       <div className='container mx-auto px-4 py-8'>
         <div className='text-center'>
-          <h2 className='text-2xl font-bold'>Class not found</h2>
+          <h2 className='text-2xl font-bold'>Lớp học không tìm thấy</h2>
           <p className='text-muted-foreground mt-2'>
-            The class you&apos;re looking for doesn&apos;t exist or has been removed.
+            Lớp học bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
           </p>
           <Button asChild className='mt-4'>
             <Link href='/lecturer/classes'>
               <ArrowLeft className='mr-2 h-4 w-4' />
-              Back to Classes
+              Quay lại danh sách lớp học
             </Link>
           </Button>
         </div>
@@ -49,7 +49,7 @@ export default function ClassDetailPage() {
         <Button variant='ghost' asChild className='mb-4'>
           <Link href='/lecturer/classes'>
             <ArrowLeft className='mr-2 h-4 w-4' />
-            Back to Classes
+            Quay lại danh sách lớp học
           </Link>
         </Button>
 
@@ -64,7 +64,7 @@ export default function ClassDetailPage() {
                     : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
                 }`}
               >
-                {classDetail.is_active ? 'Active' : 'Inactive'}
+                {classDetail.is_active ? 'Hoạt động' : 'Không hoạt động'}
               </span>
             </div>
             <p className='text-muted-foreground'>
@@ -73,7 +73,7 @@ export default function ClassDetailPage() {
           </div>
           <Button>
             <Edit className='mr-2 h-4 w-4' />
-            Edit Class
+            Chỉnh sửa lớp học
           </Button>
         </div>
       </div>
@@ -83,15 +83,15 @@ export default function ClassDetailPage() {
         <div className='border rounded-lg p-6'>
           <div className='flex items-center gap-3 mb-4'>
             <Calendar className='h-5 w-5 text-primary' />
-            <h3 className='font-semibold'>Duration</h3>
+            <h3 className='font-semibold'>Thời gian học</h3>
           </div>
           <div className='space-y-2 text-sm'>
             <div>
-              <span className='text-muted-foreground'>Start: </span>
+              <span className='text-muted-foreground'>Ngày bắt đầu: </span>
               <span className='font-medium'>{formatDate(classDetail.start_date)}</span>
             </div>
             <div>
-              <span className='text-muted-foreground'>End: </span>
+              <span className='text-muted-foreground'>Ngày kết thúc: </span>
               <span className='font-medium'>{formatDate(classDetail.end_date)}</span>
             </div>
           </div>
@@ -100,25 +100,25 @@ export default function ClassDetailPage() {
         <div className='border rounded-lg p-6'>
           <div className='flex items-center gap-3 mb-4'>
             <Users className='h-5 w-5 text-primary' />
-            <h3 className='font-semibold'>Lecturers</h3>
+            <h3 className='font-semibold'>Giảng viên</h3>
           </div>
           <div className='text-2xl font-bold'>{classDetail.lecturers.length}</div>
-          <p className='text-sm text-muted-foreground mt-1'>Teaching this class</p>
+          <p className='text-sm text-muted-foreground mt-1'>Giảng dạy lớp học này</p>
         </div>
 
         <div className='border rounded-lg p-6'>
           <div className='flex items-center gap-3 mb-4'>
             <BookOpen className='h-5 w-5 text-primary' />
-            <h3 className='font-semibold'>Class Type</h3>
+            <h3 className='font-semibold'>Loại lớp học</h3>
           </div>
           <div className='text-2xl font-bold'>{CLASS_TYPE_LABELS[classDetail.class_type]}</div>
-          <p className='text-sm text-muted-foreground mt-1'>Competition level</p>
+          <p className='text-sm text-muted-foreground mt-1'>Cấp độ cuộc thi</p>
         </div>
       </div>
 
       {/* Lecturers Section */}
       <div className='border rounded-lg p-6 mb-8'>
-        <h2 className='text-xl font-semibold mb-4'>Lecturers</h2>
+        <h2 className='text-xl font-semibold mb-4'>Danh sách giảng viên</h2>
         {classDetail.lecturers.length > 0 ? (
           <div className='space-y-3'>
             {classDetail.lecturers.map((lecturer) => (
@@ -137,19 +137,19 @@ export default function ClassDetailPage() {
             ))}
           </div>
         ) : (
-          <p className='text-muted-foreground text-center py-8'>No lecturers assigned to this class</p>
+          <p className='text-muted-foreground text-center py-8'>Không có giảng viên được gán cho lớp học này</p>
         )}
       </div>
 
       {/* Students Section */}
       <div className='border rounded-lg p-6'>
         <div className='flex items-center justify-between mb-4'>
-          <h2 className='text-xl font-semibold'>Students</h2>
+          <h2 className='text-xl font-semibold'>Học viên</h2>
           <Button asChild>
-            <Link href={`/lecturer/classes/${classId}/students`}>View All Students</Link>
+            <Link href={`/lecturer/classes/${classId}/students`}>Xem tất cả học viên</Link>
           </Button>
         </div>
-        <p className='text-muted-foreground text-center py-8'>View and manage students enrolled in this class</p>
+        <p className='text-muted-foreground text-center py-8'>Xem và quản lý học viên đăng ký lớp học này</p>
       </div>
     </div>
   )
