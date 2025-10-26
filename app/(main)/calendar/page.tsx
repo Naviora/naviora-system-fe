@@ -22,6 +22,10 @@ export default function CalendarPage() {
             start: new Date('2025-10-26T09:30:00Z'),
             end: new Date('2025-10-26T14:30:00Z'),
             title: 'Cuối kì 1',
+            description: 'Thi cuối kỳ môn Toán học cơ bản',
+            host: {
+              name: 'Nguyễn Văn A'
+            },
             color: 'pink'
           },
           {
@@ -29,6 +33,10 @@ export default function CalendarPage() {
             start: new Date('2025-10-27T10:00:00Z'),
             end: new Date('2025-10-27T10:30:00Z'),
             title: 'Cuối kì 2',
+            description: 'Thi cuối kỳ môn Vật lý đại cương',
+            host: {
+              name: 'Trần Thị B'
+            },
             color: 'blue'
           }
         ]}

@@ -1,6 +1,9 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { VariantProps, cva } from 'class-variance-authority'
 import {
@@ -73,6 +76,8 @@ type ContextType = {
   onEventClick?: (event: CalendarEvent) => void
   enableHotkeys?: boolean
   today: Date
+  selectedEvent: CalendarEvent | null
+  setSelectedEvent: (event: CalendarEvent | null) => void
 }
 
 const Context = createContext<ContextType>({} as ContextType)
@@ -82,6 +87,11 @@ export type CalendarEvent = {
   start: Date
   end: Date
   title: string
+  description?: string
+  host?: {
+    name: string
+    avatar?: string | null
+  }
   color?: VariantProps<typeof monthEventVariants>['variant']
 }
 
@@ -109,6 +119,7 @@ const Calendar = ({
   const [view, setView] = useState<View>(_defaultMode)
   const [date, setDate] = useState(defaultDate)
   const [events, setEvents] = useState<CalendarEvent[]>(defaultEvents)
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
 
   const changeView = (view: View) => {
     setView(view)
@@ -144,10 +155,13 @@ const Calendar = ({
         enableHotkeys,
         onEventClick,
         onChangeView,
-        today: new Date()
+        today: new Date(),
+        selectedEvent,
+        setSelectedEvent
       }}
     >
       {children}
+      <EventDetailDialog />
     </Context.Provider>
   )
 }
@@ -180,6 +194,14 @@ const CalendarViewTrigger = forwardRef<
 CalendarViewTrigger.displayName = 'CalendarViewTrigger'
 
 const EventGroup = ({ events, hour }: { events: CalendarEvent[]; hour: Date }) => {
+  const { setSelectedEvent, onEventClick } = useCalendar()
+
+  const handleEventClick = (event: CalendarEvent, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setSelectedEvent(event)
+    onEventClick?.(event)
+  }
+
   return (
     <div className='h-20 border-t last:border-b'>
       {events
@@ -191,13 +213,31 @@ const EventGroup = ({ events, hour }: { events: CalendarEvent[]; hour: Date }) =
           return (
             <div
               key={event.id}
-              className={cn('relative', dayEventVariants({ variant: event.color }))}
+              onClick={(e) => handleEventClick(event, e)}
+              className={cn('relative cursor-pointer', dayEventVariants({ variant: event.color }))}
               style={{
                 top: `${startPosition * 100}%`,
                 height: `${hoursDifference * 100}%`
               }}
             >
-              {event.title}
+              <div className='flex h-full'>
+                <div className='flex-1 truncate pr-2'>{event.title}</div>
+                {event.host && (
+                  <div className='flex-shrink-0 self-end pb-1 pr-1' onClick={(e) => e.stopPropagation()}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Avatar className='size-5 border border-background'>
+                          {event.host.avatar ? <AvatarImage src={event.host.avatar} /> : null}
+                          <AvatarFallback className='text-xs'>{event.host.name.charAt(0).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{event.host.name}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                )}
+              </div>
             </div>
           )
         })}
@@ -302,10 +342,15 @@ const CalendarWeekView = () => {
 }
 
 const CalendarMonthView = () => {
-  const { date, view, events, locale } = useCalendar()
+  const { date, view, events, locale, setSelectedEvent, onEventClick } = useCalendar()
 
   const monthDates = useMemo(() => getDaysInMonth(date), [date])
   const weekDays = useMemo(() => generateWeekdays(locale), [locale])
+
+  const handleEventClick = (event: CalendarEvent) => {
+    setSelectedEvent(event)
+    onEventClick?.(event)
+  }
 
   if (view !== 'month') return null
 
@@ -347,12 +392,33 @@ const CalendarMonthView = () => {
 
               {currentEvents.map((event) => {
                 return (
-                  <div key={event.id} className='px-1 rounded text-sm flex items-center gap-1'>
+                  <div
+                    key={event.id}
+                    onClick={() => handleEventClick(event)}
+                    className='px-1 rounded text-sm flex items-center gap-1 cursor-pointer hover:bg-muted/50 transition-colors'
+                  >
                     <div className={cn('shrink-0', monthEventVariants({ variant: event.color }))}></div>
                     <span className='flex-1 truncate'>{event.title}</span>
                     <time className='tabular-nums text-muted-foreground/50 text-xs'>
                       {format(event.start, 'HH:mm')}
                     </time>
+                    {event.host && (
+                      <div className='shrink-0' onClick={(e) => e.stopPropagation()}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Avatar className='size-4 ml-1'>
+                              {event.host.avatar ? <AvatarImage src={event.host.avatar} /> : null}
+                              <AvatarFallback className='text-[8px]'>
+                                {event.host.name.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{event.host.name}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    )}
                   </div>
                 )
               })}
@@ -361,6 +427,50 @@ const CalendarMonthView = () => {
         })}
       </div>
     </div>
+  )
+}
+
+const EventDetailDialog = () => {
+  const { selectedEvent, setSelectedEvent, locale } = useCalendar()
+
+  if (!selectedEvent) return null
+
+  return (
+    <Dialog open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
+      <DialogContent className='max-w-md'>
+        <DialogHeader>
+          <div className='flex items-center gap-3'>
+            {selectedEvent.color && (
+              <div
+                className={cn('size-4 rounded-full shrink-0', monthEventVariants({ variant: selectedEvent.color }))}
+              />
+            )}
+            <DialogTitle>{selectedEvent.title}</DialogTitle>
+          </div>
+          <DialogDescription>
+            <div className='flex flex-col gap-2 mt-2'>
+              <div className='text-sm'>
+                {format(selectedEvent.start, 'EEEE, d MMMM yyyy', { locale })} •{' '}
+                {format(selectedEvent.start, 'h:mm a', { locale })} – {format(selectedEvent.end, 'h:mm a', { locale })}
+              </div>
+              {selectedEvent.description && (
+                <div className='text-sm text-muted-foreground mt-2'>{selectedEvent.description}</div>
+              )}
+              {selectedEvent.host && (
+                <div className='flex items-center gap-2 mt-3'>
+                  <span className='text-xs text-muted-foreground'>Host:</span>
+                  <Avatar className='size-8'>
+                    {selectedEvent.host.avatar ? <AvatarImage src={selectedEvent.host.avatar} /> : null}
+                    <AvatarFallback>{selectedEvent.host.name.charAt(0).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <span className='text-sm'>{selectedEvent.host.name}</span>
+                </div>
+              )}
+            </div>
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
   )
 }
 
