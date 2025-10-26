@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation'
 import { useClassDetail } from '@/hooks/api/use-classes'
 import { LoadingSpinner } from '@/components/ui/loading'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Calendar, Users, BookOpen, Edit } from 'lucide-react'
+import { Calendar, Users, BookOpen } from 'lucide-react'
 import Link from 'next/link'
 import { CLASS_TYPE_LABELS } from '@/types/api/class'
 import { formatDate } from '@/lib/utils'
@@ -33,7 +33,6 @@ export default function ClassDetailPage() {
           </p>
           <Button asChild className='mt-4'>
             <Link href='/lecturer/classes'>
-              <ArrowLeft className='mr-2 h-4 w-4' />
               Quay lại danh sách lớp học
             </Link>
           </Button>
@@ -46,13 +45,6 @@ export default function ClassDetailPage() {
     <div className='container mx-auto px-4 py-8'>
       {/* Header */}
       <div className='mb-6'>
-        <Button variant='ghost' asChild className='mb-4'>
-          <Link href='/lecturer/classes'>
-            <ArrowLeft className='mr-2 h-4 w-4' />
-            Quay lại danh sách lớp học
-          </Link>
-        </Button>
-
         <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
           <div>
             <div className='flex items-center gap-3 mb-2'>
@@ -71,10 +63,6 @@ export default function ClassDetailPage() {
               {classDetail.class_code} • {CLASS_TYPE_LABELS[classDetail.class_type]}
             </p>
           </div>
-          <Button>
-            <Edit className='mr-2 h-4 w-4' />
-            Chỉnh sửa lớp học
-          </Button>
         </div>
       </div>
 
