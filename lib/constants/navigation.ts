@@ -1,4 +1,4 @@
-import { RiHeadphoneFill, RiHome5Fill, RiBook2Fill, RiSettings2Fill, RiCalendarFill } from 'react-icons/ri'
+import { RiHeadphoneFill, RiHome5Fill, RiBook2Fill, RiSettings2Fill, RiCalendarFill, RiGroupFill } from 'react-icons/ri'
 import { PiExamFill } from 'react-icons/pi'
 import type { IconType } from 'react-icons'
 import type { UserRole } from '@/lib/constants/roles'
@@ -38,6 +38,7 @@ const ROLE_SPECIFIC_NAVIGATION = new Map<UserRole, NavigationItem[]>([
     [
       { name: 'Tổng quan', href: '/lecturer/dashboard', icon: RiHome5Fill },
       { name: 'Chuyên đề', href: '/lecturer/modules', icon: RiBook2Fill },
+      { name: 'Quản lý lớp', href: '/lecturer/classes', icon: RiGroupFill },
       { name: 'Quản lý đề thi', href: '/lecturer/exams', icon: PiExamFill }
     ]
   ],
