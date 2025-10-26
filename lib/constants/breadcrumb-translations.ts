@@ -17,7 +17,7 @@ export const SEGMENT_TRANSLATIONS: Record<string, string> = {
   management: 'Quản lý',
   dashboard: 'Bảng điều khiển',
   list: 'Danh sách',
-  detail: 'Chi tiết',
+  detail: 'Chi tiết'
 }
 
 export function formatSegment(segment: string): string {

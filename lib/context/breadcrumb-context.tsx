@@ -12,11 +12,7 @@ const BreadcrumbContext = createContext<BreadcrumbContextType | undefined>(undef
 export function BreadcrumbProvider({ children, label: initialLabel }: { children: ReactNode; label?: string }) {
   const [label, setLabel] = useState(initialLabel)
 
-  return (
-    <BreadcrumbContext.Provider value={{ label, setLabel }}>
-      {children}
-    </BreadcrumbContext.Provider>
-  )
+  return <BreadcrumbContext.Provider value={{ label, setLabel }}>{children}</BreadcrumbContext.Provider>
 }
 
 export function useBreadcrumbLabel() {

@@ -28,22 +28,22 @@ export function Navbar() {
 
   // Role segments to filter out
   const roleSegments = ['lecturer', 'principal', 'student', 'admin']
-  
+
   // Filter out role segment (first segment if it's a role)
-  const filteredSegments = segments[0] && roleSegments.includes(segments[0]) 
-    ? segments.slice(1) 
-    : segments
+  const filteredSegments = segments[0] && roleSegments.includes(segments[0]) ? segments.slice(1) : segments
 
-  const breadcrumbs = filteredSegments.map((segment, index) => {
-    const isLastSegment = index === filteredSegments.length - 1
-    const isDynamicSegment = /^[a-f0-9\-]+$/i.test(segment) || /^[0-9]+$/.test(segment)
+  const breadcrumbs = filteredSegments
+    .map((segment, index) => {
+      const isLastSegment = index === filteredSegments.length - 1
+      const isDynamicSegment = /^[a-f0-9\-]+$/i.test(segment) || /^[0-9]+$/.test(segment)
 
-    return {
-      href: `/${segments.slice(0, index + 2).join('/')}`, // +2 because we filtered out role
-      label: isLastSegment && isDynamicSegment && breadcrumbLabel ? breadcrumbLabel : formatSegment(segment),
-      isId: isDynamicSegment
-    }
-  }).filter(b => b.label) // Filter out empty labels
+      return {
+        href: `/${segments.slice(0, index + 2).join('/')}`, // +2 because we filtered out role
+        label: isLastSegment && isDynamicSegment && breadcrumbLabel ? breadcrumbLabel : formatSegment(segment),
+        isId: isDynamicSegment
+      }
+    })
+    .filter((b) => b.label) // Filter out empty labels
 
   return (
     <nav className='flex h-16 min-h-16 items-center justify-between rounded-t-lg border-b border-border bg-greyscale-0 px-4'>
