@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { FaRegEdit } from 'react-icons/fa'
 import { MdDeleteOutline } from 'react-icons/md'
-import { formatDate, timeAgo } from '@/lib/utils'
+import { formatDateTime, timeAgo } from '@/lib/utils'
 import { getEntryTestStatus } from '@/lib/constants/exams'
 import { EntryTest } from '@/lib/validations/lecturer/exams/entry-test'
 
@@ -30,7 +30,7 @@ export const EntryTestCard = ({ entryTest: et, index, onEdit, onDelete }: EntryT
             {et.question_sets?.length || 0} bộ câu hỏi
           </span>
           <span className='bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full font-medium'>
-            {formatDate(et.start_time, true)} - {formatDate(et.end_time, true)}
+            {formatDateTime(et.start_time)} - {formatDateTime(et.end_time)}
           </span>
         </div>
       </div>
