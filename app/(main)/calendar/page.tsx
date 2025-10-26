@@ -35,9 +35,6 @@ export default function CalendarPage() {
       >
         <div className='h-dvh py-6 flex flex-col'>
           <div className='flex px-6 items-center gap-2 mb-6'>
-            <CalendarViewTrigger className='aria-[current=true]:bg-accent' view='day'>
-              Day
-            </CalendarViewTrigger>
             <CalendarViewTrigger view='week' className='aria-[current=true]:bg-accent'>
               Week
             </CalendarViewTrigger>

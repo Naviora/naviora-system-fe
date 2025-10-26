@@ -1,5 +1,5 @@
-import { RiHeadphoneFill, RiHome5Fill, RiBook2Fill, RiSettings2Fill } from 'react-icons/ri'
-import { PiExamFill } from "react-icons/pi";
+import { RiHeadphoneFill, RiHome5Fill, RiBook2Fill, RiSettings2Fill, RiCalendarFill } from 'react-icons/ri'
+import { PiExamFill } from 'react-icons/pi'
 import type { IconType } from 'react-icons'
 import type { UserRole } from '@/lib/constants/roles'
 
@@ -20,7 +20,10 @@ const COMMON_BOTTOM_NAVIGATION: NavigationItem[] = [
   { name: 'Help', href: '/help', icon: RiHeadphoneFill }
 ]
 
-const COMMON_MAIN_NAVIGATION: NavigationItem[] = [{ name: 'Dashboard', href: '/dashboard', icon: RiHome5Fill }]
+const COMMON_MAIN_NAVIGATION: NavigationItem[] = [
+  { name: 'Dashboard', href: '/dashboard', icon: RiHome5Fill },
+  { name: 'Calendar', href: '/calendar', icon: RiCalendarFill }
+]
 
 const ROLE_SPECIFIC_NAVIGATION = new Map<UserRole, NavigationItem[]>([
   [
