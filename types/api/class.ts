@@ -24,7 +24,7 @@ export interface ClassesListParams {
   limit?: number
   page?: number
   q?: string
-  order?: 'asc' | 'desc'
+  order?: 'ASC' | 'DESC'
   class_type?: ClassType
   sort_by?: string
 }
@@ -64,9 +64,9 @@ export interface CreateClassResponse {
 }
 
 export const CLASS_TYPE_LABELS: Record<ClassType, string> = {
-  school: 'School',
-  city: 'City',
-  province: 'Province',
-  national: 'National',
-  international: 'International'
+  school: 'Cấp trường',
+  city: 'Cấp thành phố',
+  province: 'Cấp tỉnh',
+  national: 'Cấp quốc gia',
+  international: 'Cấp quốc tế'
 }
