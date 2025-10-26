@@ -38,12 +38,10 @@ export function ClassCard({ classData }: ClassCardProps) {
         <div className='flex items-start justify-between'>
           <div className='flex-1'>
             <div className='flex items-center gap-2 mb-2'>
-              <h3 className='text-lg font-semibold text-greyscale-900 line-clamp-1'>
-                {classData.class_name}
-              </h3>
+              <h3 className='text-lg font-semibold text-greyscale-900 line-clamp-1'>{classData.class_name}</h3>
               {classData.is_active && (
-                <span className='inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green-100 text-green-700 border border-green-200'>
-                  Active
+                <span className='inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green-100 text-green-700 border border-green-200 whitespace-nowrap'>
+                  Hoạt động
                 </span>
               )}
             </div>
@@ -53,7 +51,9 @@ export function ClassCard({ classData }: ClassCardProps) {
 
         {/* Class Type Badge */}
         <div>
-          <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-medium border ${getClassTypeBadgeColor(classData.class_type)}`}>
+          <span
+            className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-medium border ${getClassTypeBadgeColor(classData.class_type)}`}
+          >
             {CLASS_TYPE_LABELS[classData.class_type]}
           </span>
         </div>
@@ -68,25 +68,21 @@ export function ClassCard({ classData }: ClassCardProps) {
           </div>
           <div className='flex items-center gap-2 text-sm text-greyscale-600'>
             <Users className='w-4 h-4' />
-            <span>0 Students</span>
+            <span>0 Học viên</span>
           </div>
           <div className='flex items-center gap-2 text-sm text-greyscale-600'>
             <BookOpen className='w-4 h-4' />
-            <span>0 Modules</span>
+            <span>0 Chuyên đề</span>
           </div>
         </div>
 
         {/* Actions */}
         <div className='flex gap-2 pt-2 border-t border-greyscale-200'>
           <Button asChild variant='default' size='sm' className='flex-1'>
-            <Link href={`/lecturer/classes/${classData.class_id}`}>
-              View Details
-            </Link>
+            <Link href={`/lecturer/classes/${classData.class_id}`}>Xem chi tiết</Link>
           </Button>
           <Button asChild variant='outline' size='sm' className='flex-1'>
-            <Link href={`/lecturer/classes/${classData.class_id}/students`}>
-              Manage Students
-            </Link>
+            <Link href={`/lecturer/classes/${classData.class_id}/students`}>Quản lý học viên</Link>
           </Button>
         </div>
       </div>
