@@ -13,11 +13,12 @@ import { loginSchema, type LoginFormData } from '@/lib/validations/auth'
 import { useLogin } from '@/hooks/api/use-auth'
 import { FadeIn } from '@/components/animations/fade-slide-scale'
 import { ErrorHandler } from '@/lib/utils/error-handler'
+import { getDefaultRouteForRole } from '@/lib/constants/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Separator } from '@/components/ui/separator'
-import LoginGoogleButton from '@/components/forms/login-gg-btn'
+import GoogleLoginButton from '@/components/forms/login-gg-btn'
 
 interface LoginFormProps {
   onSuccess?: () => void
@@ -25,7 +26,7 @@ interface LoginFormProps {
   className?: string
 }
 
-export function LoginForm({ onSuccess, redirectTo = '/dashboard', className = '' }: LoginFormProps) {
+export function LoginForm({ onSuccess, redirectTo, className = '' }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
   const loginMutation = useLogin()
@@ -41,13 +42,13 @@ export function LoginForm({ onSuccess, redirectTo = '/dashboard', className = ''
 
   const handleSubmit = async (data: LoginFormData) => {
     try {
-      await loginMutation.mutateAsync(data)
-      toast.success('Welcome back!')
-
+      const response = await loginMutation.mutateAsync(data)
+      toast.success('Login successful!')
       if (onSuccess) {
         onSuccess()
       } else {
-        router.push(redirectTo)
+        const targetRoute = redirectTo ?? getDefaultRouteForRole(response.role)
+        router.push(targetRoute)
       }
     } catch (error) {
       const errorMessage = ErrorHandler.getErrorMessage(error)
@@ -61,7 +62,7 @@ export function LoginForm({ onSuccess, redirectTo = '/dashboard', className = ''
       <div className='mx-auto max-w-md space-y-6'>
         <div className='flex flex-col gap-2 items-center'>
           <Image width={60} height={60} src='/Naviora.png' alt='Logo' />
-          <h1 className='text-2xl font-bold'>Welcome back to Naviora</h1>
+          <h1 className='text-lg sm:text-xl md:text-2xl font-bold'>Welcome back to Naviora</h1>
           <p className='text-muted-foreground'>Login with your email and password</p>
         </div>
 
@@ -135,7 +136,7 @@ export function LoginForm({ onSuccess, redirectTo = '/dashboard', className = ''
               <Separator className='flex-1' />
             </div>
 
-            <LoginGoogleButton />
+            <GoogleLoginButton />
 
             <Button type='submit' className='w-full' disabled={loginMutation.isPending}>
               {loginMutation.isPending ? (

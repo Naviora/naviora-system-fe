@@ -35,7 +35,7 @@ export function Navbar() {
   }))
 
   return (
-    <nav className='flex h-16 min-h-16 items-center justify-between rounded-t-lg border-b border-border bg-card px-4'>
+    <nav className='flex h-16 min-h-16 items-center justify-between rounded-t-lg border-b border-border bg-greyscale-0 px-4'>
       {/* Left Section: Navigation + Breadcrumb */}
       <div className='flex items-center gap-4'>
         {/* Navigation Buttons */}
