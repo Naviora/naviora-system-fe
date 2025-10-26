@@ -75,6 +75,8 @@ function getPaginationItems(currentPage: number, totalPages: number): Pagination
 export function LecturerModulesPageClient() {
   const [searchTerm, setSearchTerm] = useState('')
   const [page, setPage] = useState(1)
+  const [sortBy, setSortBy] = useState('module_name')
+  const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('ASC')
 
   const debouncedSearch = useDebounce(searchTerm)
 
@@ -82,9 +84,11 @@ export function LecturerModulesPageClient() {
     () => ({
       limit: MODULE_QUERY_DEFAULTS.limit,
       page,
-      q: debouncedSearch || undefined
+      q: debouncedSearch || undefined,
+      sort_by: sortBy,
+      order: sortOrder
     }),
-    [debouncedSearch, page]
+    [debouncedSearch, page, sortBy, sortOrder]
   )
 
   const modulesQuery = useModules(queryParams)
@@ -116,6 +120,16 @@ export function LecturerModulesPageClient() {
     setPage(1)
   }, [])
 
+  const handleSortChange = React.useCallback((newSortBy: string) => {
+    setSortBy(newSortBy)
+    setPage(1)
+  }, [])
+
+  const handleSortOrderChange = React.useCallback((newOrder: 'ASC' | 'DESC') => {
+    setSortOrder(newOrder)
+    setPage(1)
+  }, [])
+
   const handlePageChange = React.useCallback(
     (nextPage: number) => {
       if (nextPage === currentPage || nextPage < 1 || nextPage > safeTotalPages) {
@@ -141,7 +155,10 @@ export function LecturerModulesPageClient() {
         <ModuleToolbar
           searchValue={searchTerm}
           onSearchChange={handleSearchChange}
-          isSearchDisabled={modulesQuery.isFetching}
+          sortBy={sortBy}
+          onSortChange={handleSortChange}
+          sortOrder={sortOrder}
+          onSortOrderChange={handleSortOrderChange}
         />
 
         <div className='mt-6'>
