@@ -1,13 +1,19 @@
+'use client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import Image from 'next/image'
 import { RiVerifiedBadgeLine } from 'react-icons/ri'
 import { MdErrorOutline, MdOutlineAccessTime, MdOutlineOutlinedFlag } from 'react-icons/md'
 import { IoMdInformationCircleOutline } from 'react-icons/io'
-import { FiPlay } from "react-icons/fi";
-
+import { FiPlay } from 'react-icons/fi'
+import { useRouter } from 'next/navigation'
 
 export default function EntryTestPage() {
+  const router = useRouter()
+
+  const handleOnClick = () => {
+    router.push('/entry-test/start-test')
+  }
   return (
     <div className='min-h-screen flex items-center justify-center bg-gray-100 dark:bg-neutral-900 py-8'>
       <Card className='w-full max-w-4xl rounded shadow-lg'>
@@ -61,9 +67,9 @@ export default function EntryTestPage() {
             </div>
           </div>
           <div className='flex justify-end'>
-            <Button className='flex justify-center items-center font-semibold gap-2'>
+            <Button className='flex justify-center items-center font-semibold gap-2' onClick={handleOnClick}>
               Bắt đầu làm bài
-              <FiPlay/>
+              <FiPlay />
             </Button>
           </div>
         </CardContent>
