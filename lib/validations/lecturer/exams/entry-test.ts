@@ -63,6 +63,28 @@ export const getEntryTestsResponseSchema = z.object({
   })
 })
 
+//Start entry test
+
+export const startEntryTestResponseSchema = z.object({
+  student_id: z.string(),
+  entry_test_id: z.string(),
+  question_set_id: z.string(),
+  attempt_status: z.enum(['IN_PROGRESS', 'COMPLETED', 'PENDING', 'CANCELLED']),
+  score: z.number().nullable(),
+  answered: z.any().nullable(),
+  penalty: z.number().nullable(),
+  note: z.string().nullable(),
+  submitted_at: z.string().nullable(),
+  created_at: z.string(),
+  updated_at: z.string(),
+  deleted_at: z.string().nullable(),
+  version: z.number(),
+  entry_test_submission_id: z.string().uuid()
+})
+
+
+
 export type CreateEntryTestRequest = z.infer<typeof createEntryTestSchema>
 export type EntryTest = z.infer<typeof entryTestSchema>
 export type GetEntryTestsResponse = z.infer<typeof getEntryTestsResponseSchema>
+export type StartEntryTestResponse = z.infer<typeof startEntryTestResponseSchema>

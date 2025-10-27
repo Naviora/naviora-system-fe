@@ -1,5 +1,16 @@
-import { Button } from "@/components/ui/button"
-import { IoFlag} from "react-icons/io5"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@/components/ui/alert-dialog'
+import { Button } from '@/components/ui/button'
+import { IoFlag } from 'react-icons/io5'
 
 export function ExamQuestionSidebar({
   totalQuestions,
@@ -26,7 +37,7 @@ export function ExamQuestionSidebar({
           const isCurrent = current === i
           const isAnswered = selected[i + 1] !== undefined
           return (
-            <div key={i} className="relative">
+            <div key={i} className='relative'>
               <Button
                 size='icon'
                 variant='outline'
@@ -39,10 +50,7 @@ export function ExamQuestionSidebar({
                 {i + 1}
               </Button>
               {flagged.includes(i + 1) && (
-                <IoFlag
-                  className="absolute top-1 right-1 text-yellow-500 text-xs"
-                  style={{ pointerEvents: 'none' }}
-                />
+                <IoFlag className='absolute top-1 right-1 text-yellow-500 text-xs' style={{ pointerEvents: 'none' }} />
               )}
             </div>
           )
@@ -51,9 +59,24 @@ export function ExamQuestionSidebar({
       <div className='text-sm text-gray-600 mb-3'>
         Đã trả lời: <span className='font-semibold'>{answeredCount}</span>/{totalQuestions} câu
       </div>
-      <Button className='w-full bg-success-200 hover:bg-green-700 text-white font-semibold' onClick={onSubmit}>
-        Nộp bài
-      </Button>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button className='w-full bg-success-200 hover:bg-green-700 text-white font-semibold'>Nộp bài</Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận nộp bài</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn đã trả lời <b>{answeredCount}</b> trên tổng số <b>{totalQuestions}</b> câu hỏi. Sau khi nộp, bạn sẽ
+              không thể chỉnh sửa câu trả lời.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction onClick={onSubmit}>Xác nhận nộp</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

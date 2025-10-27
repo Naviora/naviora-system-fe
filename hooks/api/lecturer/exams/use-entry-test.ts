@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api/client'
-import type { GetEntryTestsResponse, CreateEntryTestRequest } from '@/lib/validations/lecturer/exams/entry-test'
+import type { GetEntryTestsResponse, CreateEntryTestRequest, StartEntryTestResponse } from '@/lib/validations/lecturer/exams/entry-test'
 import type { SearchRequest } from '@/types/api/common'
 
 export const useGetEntryTests = (params?: SearchRequest) => {
@@ -20,3 +20,15 @@ export const useCreateEntryTest = () => {
     }
   })
 }
+
+export const useStartEntryTest = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) =>
+      apiClient.post<StartEntryTestResponse>('/entry-test/start', { id }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['entry-tests'] })
+    }
+  })
+}
+

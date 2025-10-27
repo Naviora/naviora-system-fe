@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { ExamQuestionCard } from '@/components/exam-test/exam-question-card'
 import { ExamQuestionSidebar } from '@/components/exam-test/exam-question-sidebar'
 import { ExamTestHeader } from '@/components/exam-test/exam-test-header'
 import { useCountdown } from '@/hooks/use-count-down'
+import { clearEXAMTestProgress, loadEXAMTestProgress, saveEXAMTestProgress } from '@/lib/utils/exam-test-indb'
+import { LoadingSpinner } from '@/components/ui'
 
 const questions = [
   {
@@ -65,14 +67,62 @@ export default function ManageEntryTest() {
   const [flagged, setFlagged] = useState<number[]>([])
   const totalQuestions = questions.length
   const answeredCount = Object.keys(selected).length
-
+  const [initialSeconds, setInitialSeconds] = useState<number | null>(null)
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const endTimestampRef = useRef<number | null>(null)
 
   const handleSubmit = () => {
+    setIsSubmitted(true)
+    clearEXAMTestProgress()
     alert('Nộp bài thành công!')
   }
 
+  useEffect(() => {
+    loadEXAMTestProgress().then((data) => {
+      if (data && typeof data.endTimestamp === 'number') {
+        setCurrent(data.current ?? 0)
+        setSelected(data.selected ?? {})
+        setFlagged(data.flagged ?? [])
+        endTimestampRef.current = data.endTimestamp
+        const left = Math.max(0, Math.floor((data.endTimestamp - Date.now()) / 1000))
+        setInitialSeconds(left)
+      } else {
+        const endTimestamp = Date.now() + TOTAL_SECONDS * 1000
+        endTimestampRef.current = endTimestamp
+        setInitialSeconds(TOTAL_SECONDS)
+        saveEXAMTestProgress({
+          current: 0,
+          selected: {},
+          flagged: [],
+          endTimestamp
+        })
+      }
+      setIsLoaded(true)
+    })
+  }, [])
 
-  const { secondsLeft, formatTime } = useCountdown(TOTAL_SECONDS, handleSubmit)
+  const enabledCountdown = isLoaded && initialSeconds !== null
+  const { secondsLeft, formatTime } = useCountdown(initialSeconds ?? 10 * 60, handleSubmit, { enabled: enabledCountdown })
+
+  useEffect(() => {
+    if (isLoaded && !isSubmitted && endTimestampRef.current) {
+      saveEXAMTestProgress({
+        current,
+        selected,
+        flagged,
+        endTimestamp: endTimestampRef.current
+      })
+    }
+  }, [current, selected, flagged, secondsLeft, isLoaded, isSubmitted])
+
+  if (!isLoaded || initialSeconds === null) {
+    return (
+      <div className='flex items-center justify-center min-h-screen'>
+        <LoadingSpinner variant='dots' />
+      </div>
+    )
+  }
 
   return (
     <div className='min-h-screen bg-gray-100 dark:bg-neutral-900'>

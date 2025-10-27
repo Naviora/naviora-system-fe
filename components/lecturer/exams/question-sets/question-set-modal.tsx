@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import React, { useState } from 'react'
 import { QuestionBankDrawer } from '@/components/lecturer/exams/question-sets/question-drawer'
 import { getDifficultyLabel, getTypeLabel } from '@/lib/constants/exams'
+import { MdDeleteOutline } from 'react-icons/md'
 
 interface QuestionSetModalProps {
   open: boolean
@@ -31,6 +32,10 @@ export function QuestionSetModal({ open, onOpenChange, initialData, onSubmit }: 
   )
   const [allowReview, setAllowReview] = useState(initialData?.allowReview || true)
 
+  const handleRemoveQuestion = (id: string) => {
+    setQuestions((prev: any[]) => prev.filter((q) => q.question_id !== id))
+  }
+
   const handleSubmit = () => {
     onSubmit({
       title,
@@ -53,7 +58,7 @@ export function QuestionSetModal({ open, onOpenChange, initialData, onSubmit }: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='!max-w-[1200px] w-full bg-white'>
+      <DialogContent className='!max-w-[1200px] w-full'>
         <DialogHeader>
           <DialogTitle className='pb-2'>Tạo bộ câu hỏi mới</DialogTitle>
         </DialogHeader>
@@ -61,38 +66,50 @@ export function QuestionSetModal({ open, onOpenChange, initialData, onSubmit }: 
           {/* Left panel */}
           <div className='col-span-8 bg-greyscale-25 rounded-lg p-6 border max-h-[70vh] overflow-y-auto'>
             <Input
-              className='mb-3 bg-white'
+              className='mb-3 bg-greyscale-0'
               placeholder='Tên bộ câu hỏi'
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
             <Input
-              className='mb-4 bg-white'
+              className='mb-4 bg-greyscale-0'
               placeholder='Vui lòng nhập mô tả'
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
-            <QuestionBankDrawer onApply={(selected) => setQuestions(selected)} />
-            {/* Danh sách câu hỏi đc chọn */}
+            <QuestionBankDrawer
+              onApply={(selected) => setQuestions(selected)}
+              selectedIds={questions.map((q: any) => q.question_id)}
+            />
             <div className='space-y-3 mt-2'>
               {questions.map((q: any, idx: number) => (
-                <div key={idx} className='bg-white rounded p-4 border mb-2'>
-                  <div className='flex gap-2 mb-1 text-xs'>
-                    <span className='bg-blue-50 text-blue-600 px-2 py-0.5 rounded'>{getTypeLabel(q.type)}</span>
-                    <span className='bg-yellow-50 text-yellow-700 px-2 py-0.5 rounded'>
-                      {getDifficultyLabel(q.difficulty)}
-                    </span>
+                <div key={idx} className='bg-greyscale-0 rounded p-4 border mb-2 flex justify-between items-start'>
+                  <div>
+                    <div className='flex gap-2 mb-1 text-xs'>
+                      <span className='bg-blue-50 text-blue-600 px-2 py-0.5 rounded'>{getTypeLabel(q.type)}</span>
+                      <span className='bg-yellow-50 text-yellow-700 px-2 py-0.5 rounded'>
+                        {getDifficultyLabel(q.difficulty)}
+                      </span>
+                    </div>
+                    <div className='font-medium mb-1'>
+                      {idx + 1}. {q.content}
+                    </div>
+                    <ul>
+                      {q.answers.map((opt: any) => (
+                        <li key={opt.answer_id} className='text-greyscale-700 text-sm'>
+                          {opt.content} {opt.is_correct && <span className='text-green-600 font-semibold'>(Đúng)</span>}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <div className='font-medium mb-1'>
-                    {idx + 1}. {q.content}
-                  </div>
-                  <ul>
-                    {q.answers.map((opt: any) => (
-                      <li key={opt.answer_id} className='text-gray-700 text-sm'>
-                        {opt.content} {opt.is_correct && <span className='text-green-600 font-semibold'>(Đúng)</span>}
-                      </li>
-                    ))}
-                  </ul>
+                  <Button
+                    variant='ghost'
+                    className='text-error hover:text-error-600 !p-0 !h-[20px]'
+                    onClick={() => handleRemoveQuestion(q.question_id)}
+                    title='Xóa câu hỏi này'
+                  >
+                    <MdDeleteOutline />
+                  </Button>
                 </div>
               ))}
             </div>

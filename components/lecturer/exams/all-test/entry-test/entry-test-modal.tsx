@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import React, { useState } from 'react'
 import { DatePicker } from '@/components/ui/date-picker'
 import QuestionSetDrawer from '../question-set-drawer'
+import { MdDeleteOutline } from 'react-icons/md'
 
 export default function EntryTestModal({
   open,
@@ -34,16 +35,20 @@ export default function EntryTestModal({
     onOpenChange(false)
   }
 
+  const handleRemoveQuestionSet = (id: string) => {
+    setSelectedQuestionSets((prev: any[]) => prev.filter(set => set.question_set_id !== id))
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='!max-w-[800px] w-full bg-white'>
+      <DialogContent className='!max-w-[800px] w-full bg-greyscale-0'>
         <DialogHeader>
           <DialogTitle>Tạo bài kiểm tra đầu vào mới</DialogTitle>
         </DialogHeader>
         <div className='space-y-4 bg-greyscale-25 rounded-lg p-6 border min-h-[50vh] max-h-[70vh] overflow-y-auto'>
           <div>
             <Input
-              className='bg-white'
+              className='bg-greyscale-0'
               placeholder='Tên bài kiểm tra'
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -51,7 +56,7 @@ export default function EntryTestModal({
           </div>
           <div>
             <Input
-              className='bg-white'
+              className='bg-greyscale-0'
               placeholder='Mô tả'
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -79,7 +84,10 @@ export default function EntryTestModal({
             </div>
           </div>
 
-          <QuestionSetDrawer onApply={(selected) => setSelectedQuestionSets(selected)} />
+          <QuestionSetDrawer
+            onApply={(selected) => setSelectedQuestionSets(selected)}
+            selectedIds={selectedQuestionSets.map((set: any) => set.question_set_id)}
+          />
 
           {selectedQuestionSets.length > 0 && (
             <div className='mt-4'>
@@ -93,8 +101,18 @@ export default function EntryTestModal({
                       <div className='font-medium'>{set.title}</div>
                       <div className='text-sm text-gray-500'>{set.description}</div>
                     </div>
-                    <div className='text-xs text-gray-400'>
-                      {set.total_questions ? `${set.total_questions} câu` : null}
+                    <div className='flex flex-col items-center gap-2'>
+                      <div className='text-xs text-gray-400'>
+                        {set.total_questions ? `${set.total_questions} câu` : null}
+                      </div>
+                      <Button
+                        variant='ghost'
+                        className='text-error hover:text-error-600 !p-0 !h-[20px]'
+                        onClick={() => handleRemoveQuestionSet(set.question_set_id)}
+                        title='Xóa bộ câu hỏi này'
+                      >
+                        <MdDeleteOutline/>
+                      </Button>
                     </div>
                   </div>
                 ))}

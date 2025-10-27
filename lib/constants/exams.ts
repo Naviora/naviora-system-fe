@@ -19,7 +19,7 @@ export const ENTRY_TEST_STATUS = [
   { value: "ACTIVE", label: "Đang mở"},
   { value: "CLOSED", label: "Đã đóng"},
   { value: "DRAFT", label: "Chưa mở"},
-  { value: "ARCHIVED", label: "Đã nộp"},
+  { value: "ARCHIVED", label: "Đã lưu trữ"},
   { value: "PENDING", label: "Đang dừng"},
   { value: "ENDED", label: "Đã kết thúc"},
 ]

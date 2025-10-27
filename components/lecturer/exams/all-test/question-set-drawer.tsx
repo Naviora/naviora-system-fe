@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,7 +10,13 @@ import { NEmpty } from '@/components/ui/NEmpty'
 import { SearchRequest } from '@/types/api/common'
 import { QuestionSet } from '@/lib/validations/lecturer/exams/question-set'
 
-export default function QuestionSetDrawer({ onApply }: { onApply?: (selected: QuestionSet[]) => void }) {
+export default function QuestionSetDrawer({
+  onApply,
+  selectedIds: externalSelectedIds = []
+}: {
+  onApply?: (selected: QuestionSet[]) => void
+  selectedIds?: string[]
+}) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [searchValue, setSearchValue] = useState<string | null>(null)
@@ -23,7 +29,7 @@ export default function QuestionSetDrawer({ onApply }: { onApply?: (selected: Qu
   const sets = data?.question_sets || data?.question_sets || []
 
   const handleToggle = (id: string) => {
-    setSelectedIds(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]))
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
   }
 
   const handleApply = () => {
@@ -35,6 +41,12 @@ export default function QuestionSetDrawer({ onApply }: { onApply?: (selected: Qu
   const handleSearch = () => {
     setSearchValue(search)
   }
+
+  useEffect(() => {
+    if (open) {
+      setSelectedIds(externalSelectedIds)
+    }
+  }, [open, externalSelectedIds])
 
   return (
     <>
@@ -60,9 +72,13 @@ export default function QuestionSetDrawer({ onApply }: { onApply?: (selected: Qu
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className='w-full'
-              onKeyDown={(e) => { if (e.key === 'Enter') handleSearch() }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSearch()
+              }}
             />
-            <Button variant='outline' onClick={handleSearch}>Tìm</Button>
+            <Button variant='outline' onClick={handleSearch}>
+              Tìm
+            </Button>
           </div>
 
           <div className='p-4 mt-1 overflow-y-auto' style={{ maxHeight: '70vh' }}>
@@ -70,32 +86,39 @@ export default function QuestionSetDrawer({ onApply }: { onApply?: (selected: Qu
             {!isLoading && sets.length === 0 && (
               <NEmpty title='Không có bộ câu hỏi' description='Thử tìm với từ khóa khác hoặc tạo mới bộ câu hỏi.' />
             )}
-            {!isLoading && sets.map((s: QuestionSet) => {
-              const id = s.question_set_id
-              const total = s.total_questions
-              return (
-                <div key={id} className='border rounded p-3 mb-3 flex items-start gap-3'>
-                  <Checkbox
-                    checked={selectedIds.includes(String(id))}
-                    onCheckedChange={() => handleToggle(String(id))}
-                    className='mt-1'
-                  />
-                  <div className='flex-1'>
-                    <div className='flex items-center justify-between'>
-                      <div className='font-medium'>{s.title}</div>
-                      <div className='text-sm text-gray-500'>{total ? `${total} câu` : null}</div>
+            {!isLoading &&
+              sets.map((s: QuestionSet) => {
+                const id = s.question_set_id
+                const total = s.total_questions
+                return (
+                  <div key={id} className='border rounded p-3 mb-3 flex items-start gap-3'>
+                    <Checkbox
+                      checked={selectedIds.includes(String(id))}
+                      onCheckedChange={() => handleToggle(String(id))}
+                      className='mt-1'
+                    />
+                    <div className='flex-1'>
+                      <div className='flex items-center justify-between'>
+                        <div className='font-medium'>{s.title}</div>
+                        <div className='text-sm text-greyscale-500'>{total ? `${total} câu` : null}</div>
+                      </div>
+                      {s.description && <div className='text-sm text-greyscale-600 mt-1'>{s.description}</div>}
+                      <div className='text-xs text-greyscale-400 mt-2'>
+                        {s.created_at ? new Date(s.created_at).toLocaleString() : ''}
+                      </div>
                     </div>
-                    {s.description && <div className='text-sm text-gray-600 mt-1'>{s.description}</div>}
-                    <div className='text-xs text-gray-400 mt-2'>{s.created_at ? new Date(s.created_at).toLocaleString() : ''}</div>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
           </div>
 
-          <div className='flex items-center justify-between px-6 py-4 border-t bg-white'>
-            <span>Đã chọn: <b>{selectedIds.length}</b></span>
-            <Button onClick={handleApply} disabled={selectedIds.length === 0}>Áp dụng</Button>
+          <div className='flex items-center justify-between px-6 py-4 border-t bg-greyscale-0'>
+            <span>
+              Đã chọn: <b>{selectedIds.length}</b>
+            </span>
+            <Button onClick={handleApply} disabled={selectedIds.length === 0}>
+              Áp dụng
+            </Button>
           </div>
         </DrawerContent>
       </Drawer>

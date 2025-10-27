@@ -20,3 +20,25 @@ export const useCreateQuestionSet = () => {
     }
   })
 }
+
+export const useUpdateQuestionSet = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: CreateQuestionSetRequest }) =>
+      apiClient.patch(`/question-set/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['question-sets'] })
+    }
+  })
+}
+
+
+export const useDeleteQuestionSet = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => apiClient.delete(`/question-set/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['question-sets'] })
+    }
+  })
+}

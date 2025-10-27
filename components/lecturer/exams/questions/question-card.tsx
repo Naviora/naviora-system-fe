@@ -35,7 +35,7 @@ export const QuestionCard = ({ question: q, index: idx, showAnswers, onEdit }: Q
   }
 
   return (
-    <div className='bg-gray-50 rounded-lg p-4 border'>
+    <div className='bg-greyscale-25 rounded-lg p-4 border'>
       <div className='flex gap-2 mb-2'>
         <span className='bg-blue-50 text-blue-600 text-xs px-2 py-0.5 rounded'>{getTypeLabel(q.type)}</span>
         <span className='bg-yellow-50 text-yellow-700 text-xs px-2 py-0.5 rounded'>
@@ -47,7 +47,7 @@ export const QuestionCard = ({ question: q, index: idx, showAnswers, onEdit }: Q
       </div>
       <ul className='mb-2'>
         {q.answers.map((opt: any) => (
-          <li key={opt.answer_id} className='text-gray-700 text-sm'>
+          <li key={opt.answer_id} className='text-greyscale-700 text-sm'>
             {opt.content}
           </li>
         ))}
@@ -61,13 +61,13 @@ export const QuestionCard = ({ question: q, index: idx, showAnswers, onEdit }: Q
             .join(', ')}
         </div>
       )}
-      <div className='flex items-center justify-between text-sm text-gray-400'>
+      <div className='flex items-center justify-between text-sm text-greyscale-400'>
         <span>Đã cập nhật: {timeAgo(q.updated_at)}</span>
         <div className='flex gap-1'>
           <Button
             variant='ghost'
             size='sm'
-            className='text-gray-500 hover:text-primary flex items-center gap-1'
+            className='text-greyscale-500 hover:text-primary flex items-center gap-1'
             onClick={() => onEdit(q)}
           >
             <FaRegEdit />

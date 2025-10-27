@@ -41,7 +41,7 @@ export default function EntryTestList() {
   })
 
   return (
-    <div className="bg-white dark:bg-neutral-800 rounded-lg shadow p-4">
+    <div className="bg-greyscale-0 rounded-lg shadow p-4">
       <div className="mb-2 flex items-center justify-between">
         <div className="text-lg font-semibold">Bài thi đầu vào</div>
         <Button
@@ -55,24 +55,24 @@ export default function EntryTestList() {
       <div className="mb-4 flex items-center justify-between">
         <div className="flex gap-2">
           <button
-            className={`text-sm px-2 py-1 rounded border ${sortNewest ? 'bg-green-50 text-green-600 border-green-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}
+            className={`text-sm px-2 py-1 rounded border ${sortNewest ? 'bg-success-0 text-success-200 border-success-200' : 'bg-greyscale-25 text-greyscale-700 border-greyscale-200'}`}
             onClick={() => setSortNewest(true)}
           >
             Mới nhất ↑
           </button>
           <button
-            className={`text-sm px-2 py-1 rounded border ${!sortNewest ? 'bg-green-50 text-green-600 border-green-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}
+            className={`text-sm px-2 py-1 rounded border ${!sortNewest ? 'bg-success-0 text-success-200 border-success-200' : 'bg-greyscale-25 text-greyscale-700 border-greyscale-200'}`}
             onClick={() => setSortNewest(false)}
           >
             Cũ nhất ↓
           </button>
         </div>
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-greyscale-600">
           Tổng cộng <span className="font-semibold">{entryTests.length}</span> bài thi
         </div>
       </div>
       <div className="space-y-6">
-        {isLoading && <div className="text-center text-gray-400 py-8"><LoadingSpinner variant="dots" /></div>}
+        {isLoading && <div className="text-center text-greyscale-400 py-8"><LoadingSpinner variant="dots" /></div>}
         {isError && <div className="text-center text-red-400 py-8">Lỗi tải dữ liệu.</div>}
         {!isLoading && !isError && sortedTests.length === 0 && (
           <NEmpty title="Không có bài thi đầu vào" description="Vui lòng thêm mới bài thi." />
