@@ -18,13 +18,15 @@ import { ThemeToggleSimple } from '@/components/ui/theme-toggle'
 import { NotificationBell } from './notification-bell'
 import { AvatarDropdown } from './avatar-dropdown'
 import { useBreadcrumbLabel } from '@/lib/context/breadcrumb-context'
-import { formatSegment } from '@/lib/constants/breadcrumb-translations'
+import { getSegmentTranslation } from '@/lib/constants/breadcrumb-translations'
+import { useRoleContext } from '@/providers/role-provider'
 
 export function Navbar() {
   const router = useRouter()
   const pathname = usePathname()
   const breadcrumbLabel = useBreadcrumbLabel()
   const segments = pathname.split('/').filter(Boolean)
+  const { role } = useRoleContext()
 
   // Role segments to filter out
   const roleSegments = ['lecturer', 'principal', 'student', 'admin']
@@ -39,7 +41,8 @@ export function Navbar() {
 
       return {
         href: `/${segments.slice(0, index + 2).join('/')}`, // +2 because we filtered out role
-        label: isLastSegment && isDynamicSegment && breadcrumbLabel ? breadcrumbLabel : formatSegment(segment),
+        label:
+          isLastSegment && isDynamicSegment && breadcrumbLabel ? breadcrumbLabel : getSegmentTranslation(segment, role),
         isId: isDynamicSegment
       }
     })
