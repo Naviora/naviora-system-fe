@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { MoreVertical } from 'lucide-react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
@@ -19,6 +20,7 @@ export interface ModuleCardProps {
 }
 
 export function ModuleCard({
+  id,
   moduleName,
   classType,
   class_name,
@@ -27,14 +29,21 @@ export function ModuleCard({
   thumbnail,
   className
 }: ModuleCardProps) {
+  const router = useRouter()
+
+  const handleClick = () => {
+    router.push(`/student/modules/${id}`)
+  }
+
   return (
     <motion.div
       className={cn(
-        'flex w-full min-w-[240px] flex-col overflow-hidden rounded-lg border border-border bg-card transition-all',
+        'cursor-pointer flex w-full min-w-[240px] flex-col overflow-hidden rounded-lg border border-border bg-card transition-all',
         className
       )}
       whileHover={{ y: -4, boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)' }}
       transition={{ duration: 0.2 }}
+      onClick={handleClick}
     >
       {/* Thumbnail */}
       <div className='relative h-40 w-full overflow-hidden p-2'>
