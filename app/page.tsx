@@ -1,14 +1,34 @@
 'use client'
 
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useRoleContext } from '@/providers/role-provider'
+import { getDefaultRouteForRole } from '@/lib/constants/navigation'
+import { isLoggedIn } from '@/hooks/api/use-auth'
+import { LoadingSpinner } from '@/components/ui/loading'
+
 export default function HomePage() {
+  const router = useRouter()
+  const { role, isReady } = useRoleContext()
+
+  useEffect(() => {
+    if (isReady) {
+      // Check if user is logged in
+      if (!isLoggedIn()) {
+        router.replace('/login')
+        return
+      }
+
+      // Redirect to default route based on role
+      const defaultRoute = getDefaultRouteForRole(role)
+      router.replace(defaultRoute)
+    }
+  }, [role, isReady, router])
+
+  // Show loading while checking authentication and role
   return (
-    <div className='min-h-screen w-full'>
-      <div className='container mx-auto px-6 pt-16 pb-24'>
-        <h1 className='text-4xl font-bold text-foreground mb-4'>Welcome to Naviora</h1>
-        <p className='text-lg text-muted-foreground mb-8'>
-          Your gateway to a world of knowledge and growth. Explore our curated courses and start your learning journey today!
-        </p>
-      </div>
+    <div className='min-h-screen w-full flex items-center justify-center'>
+      <LoadingSpinner />
     </div>
   )
 }
