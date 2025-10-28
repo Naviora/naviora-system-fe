@@ -177,73 +177,75 @@ export function LecturerModulesPageClient() {
             </div>
           ) : hasModules ? (
             <>
-              <LecturerModuleGrid modules={moduleCards} />
-
-              {hasModules ? (
-                <div className='mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
-                  <p className='text-sm text-muted-foreground'>
-                    Hiển thị {fromRecord}-{toRecord} trên tổng số {totalRecordCount} chuyên đề
-                  </p>
-                  <nav className='flex items-center justify-center gap-2' aria-label='Pagination'>
-                    <Button
-                      type='button'
-                      variant='outline'
-                      size='sm'
-                      className='h-9 w-9 p-0'
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={!canGoPrevious || modulesQuery.isFetching}
-                      aria-label='Trang trước'
-                    >
-                      <ChevronLeftIcon className='size-4' aria-hidden='true' />
-                    </Button>
-                    {paginationItems.map((item, index) => {
-                      if (item === 'ellipsis') {
-                        return (
-                          <span key={`ellipsis-${index}`} className='px-2 text-sm text-muted-foreground'>
-                            …
-                          </span>
-                        )
-                      }
-
-                      const isActive = item === currentPage
-
-                      return (
-                        <Button
-                          key={item}
-                          type='button'
-                          variant={isActive ? 'default' : 'outline'}
-                          size='sm'
-                          className='h-9 w-9 p-0'
-                          onClick={() => handlePageChange(item)}
-                          disabled={isActive || modulesQuery.isFetching}
-                          aria-current={isActive ? 'page' : undefined}
-                        >
-                          {item}
-                        </Button>
-                      )
-                    })}
-                    <Button
-                      type='button'
-                      variant='outline'
-                      size='sm'
-                      className='h-9 w-9 p-0'
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={!canGoNext || modulesQuery.isFetching}
-                      aria-label='Trang tiếp theo'
-                    >
-                      <ChevronRightIcon className='size-4' aria-hidden='true' />
-                    </Button>
-                  </nav>
-                </div>
-              ) : null}
-
               {isFetchingPage ? (
-                <div className='mt-4 grid gap-4 opacity-60 sm:grid-cols-2 xl:grid-cols-3' aria-hidden='true'>
+                <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3' aria-hidden='true'>
                   {Array.from({ length: skeletonCount }).map((_, index) => (
                     <Skeleton key={`loading-${index}`} className='h-48 w-full rounded-xl bg-greyscale-100' />
                   ))}
                 </div>
-              ) : null}
+              ) : (
+                <>
+                  <LecturerModuleGrid modules={moduleCards} />
+
+                  {hasModules ? (
+                    <div className='mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+                      <p className='text-sm text-muted-foreground'>
+                        Hiển thị {fromRecord}-{toRecord} trên tổng số {totalRecordCount} chuyên đề
+                      </p>
+                      <nav className='flex items-center justify-center gap-2' aria-label='Pagination'>
+                        <Button
+                          type='button'
+                          variant='outline'
+                          size='sm'
+                          className='h-9 w-9 p-0'
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          disabled={!canGoPrevious || modulesQuery.isFetching}
+                          aria-label='Trang trước'
+                        >
+                          <ChevronLeftIcon className='size-4' aria-hidden='true' />
+                        </Button>
+                        {paginationItems.map((item, index) => {
+                          if (item === 'ellipsis') {
+                            return (
+                              <span key={`ellipsis-${index}`} className='px-2 text-sm text-muted-foreground'>
+                                …
+                              </span>
+                            )
+                          }
+
+                          const isActive = item === currentPage
+
+                          return (
+                            <Button
+                              key={item}
+                              type='button'
+                              variant={isActive ? 'default' : 'outline'}
+                              size='sm'
+                              className='h-9 w-9 p-0'
+                              onClick={() => handlePageChange(item)}
+                              disabled={isActive || modulesQuery.isFetching}
+                              aria-current={isActive ? 'page' : undefined}
+                            >
+                              {item}
+                            </Button>
+                          )
+                        })}
+                        <Button
+                          type='button'
+                          variant='outline'
+                          size='sm'
+                          className='h-9 w-9 p-0'
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          disabled={!canGoNext || modulesQuery.isFetching}
+                          aria-label='Trang tiếp theo'
+                        >
+                          <ChevronRightIcon className='size-4' aria-hidden='true' />
+                        </Button>
+                      </nav>
+                    </div>
+                  ) : null}
+                </>
+              )}
             </>
           ) : (
             <div className='flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-greyscale-200 bg-greyscale-50 p-10 text-center'>
