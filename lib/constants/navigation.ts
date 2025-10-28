@@ -37,7 +37,7 @@ const ROLE_SPECIFIC_NAVIGATION = new Map<UserRole, NavigationItem[]>([
     'Lecturer',
     [
       { name: 'Tổng quan', href: '/lecturer/dashboard', icon: RiHome5Fill },
-      { name: 'Chuyên đề', href: '/lecturer/modules', icon: RiBook2Fill },
+      { name: 'Quản lý chuyên đề', href: '/lecturer/modules', icon: RiBook2Fill },
       { name: 'Quản lý lớp', href: '/lecturer/classes', icon: RiGroupFill },
       { name: 'Quản lý đề thi', href: '/lecturer/exams', icon: PiExamFill }
     ]
