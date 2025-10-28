@@ -28,7 +28,7 @@ export default function LoginPage() {
       <div className='relative flex items-center justify-center bg-greyscale-0 md:w-1/2 w-full *:px-8'>
         <LoginForm className='w-full' />
         <div className='absolute bottom-4 text-sm text-muted-foreground'>
-          By proceeding, you agree to our <span className='text-primary hover:underline'>Terms of Service</span> and <span className='text-primary hover:underline'>Privacy Policy</span>.
+          Bằng cách tiếp tục, bạn đồng ý với <span className='text-primary hover:underline'>Điều khoản Dịch vụ</span> và <span className='text-primary hover:underline'>Chính sách Bảo mật</span> của chúng tôi.
         </div>
       </div>
       <div

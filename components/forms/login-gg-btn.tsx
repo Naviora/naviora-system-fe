@@ -16,7 +16,7 @@ export default function GoogleLoginButton() {
       onClick={handleGoogleLogin}
     >
       <Image src='/gg-logo.png' alt='Google Icon' width={20} height={20} />
-      Login with Google
+      Đăng nhập với Google
     </Button>
   )
 }
