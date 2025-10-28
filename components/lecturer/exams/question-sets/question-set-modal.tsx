@@ -3,38 +3,57 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogC
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { QuestionBankDrawer } from '@/components/lecturer/exams/question-sets/question-drawer'
 import { getDifficultyLabel, getTypeLabel } from '@/lib/constants/exams'
 import { MdDeleteOutline } from 'react-icons/md'
+import { QuestionSetDetail } from '@/lib/validations/lecturer/exams/question-set'
 
 interface QuestionSetModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  initialData?: any
+  initialData?: QuestionSetDetail
   onSubmit: (data: any) => void
 }
 
 export function QuestionSetModal({ open, onOpenChange, initialData, onSubmit }: QuestionSetModalProps) {
-  const [title, setTitle] = useState(initialData?.title || '')
-  const [description, setDescription] = useState(initialData?.description || '')
-  const [questions, setQuestions] = useState(initialData?.questions || [])
-  const [duration, setDuration] = useState(initialData?.duration || 45)
-  const [passingScore, setPassingScore] = useState(initialData?.passingScore || 5)
-  const [perQuestion, setPerQuestion] = useState(initialData?.perQuestion || true)
-  const [showCorrectAfterSubmit, setShowCorrectAfterSubmit] = useState(initialData?.showCorrectAfterSubmit || true)
-  const [maxAttempts, setMaxAttempts] = useState(initialData?.maxAttempts || 1)
-  const [shuffleQuestions, setShuffleQuestions] = useState(initialData?.shuffleQuestions || false)
-  const [shuffleAnswers, setShuffleAnswers] = useState(initialData?.shuffleAnswers || false)
-  const [enableTabTracking, setEnableTabTracking] = useState(initialData?.enableTabTracking || false)
-  const [enableCopyPasteRestriction, setEnableCopyPasteRestriction] = useState(
-    initialData?.enableCopyPasteRestriction || false
-  )
-  const [allowReview, setAllowReview] = useState(initialData?.allowReview || true)
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [questions, setQuestions] = useState<any[]>([])
+  const [duration, setDuration] = useState(45)
+  const [passingScore, setPassingScore] = useState(5)
+  const [perQuestion, setPerQuestion] = useState(true)
+  const [showCorrectAfterSubmit, setShowCorrectAfterSubmit] = useState(true)
+  const [maxAttempts, setMaxAttempts] = useState(1)
+  const [shuffleQuestions, setShuffleQuestions] = useState(false)
+  const [shuffleAnswers, setShuffleAnswers] = useState(false)
+  const [enableTabTracking, setEnableTabTracking] = useState(false)
+  const [enableCopyPasteRestriction, setEnableCopyPasteRestriction] = useState(false)
+  const [allowReview, setAllowReview] = useState(true)
+
+  useEffect(() => {
+    if (initialData) {
+      setTitle(initialData.title || '')
+      setDescription(initialData.description || '')
+      setQuestions(initialData.questions || [])
+      setDuration(initialData.config?.general?.duration_minutes ?? 45)
+      setPassingScore(initialData.config?.scoring?.passing_score ?? 5)
+      setPerQuestion(initialData.config?.scoring?.per_question ?? true)
+      setShowCorrectAfterSubmit(initialData.config?.behavior?.show_correct_after_submit ?? true)
+      setMaxAttempts(initialData.config?.behavior?.max_attempts ?? 1)
+      setShuffleQuestions(initialData.config?.general?.shuffle_questions ?? false)
+      setShuffleAnswers(initialData.config?.general?.shuffle_answers ?? false)
+      setEnableTabTracking(initialData.config?.proctoring?.enable_tab_tracking ?? false)
+      setEnableCopyPasteRestriction(initialData.config?.proctoring?.enable_copy_paste_restriction ?? false)
+      setAllowReview(initialData.config?.general?.allow_review ?? true)
+    }
+  }, [initialData])
 
   const handleRemoveQuestion = (id: string) => {
     setQuestions((prev: any[]) => prev.filter((q) => q.question_id !== id))
   }
+
+  console.log("CHECKKK:" , initialData)
 
   const handleSubmit = () => {
     onSubmit({
@@ -150,51 +169,43 @@ export function QuestionSetModal({ open, onOpenChange, initialData, onSubmit }: 
             <div>
               <span className='font-semibold block mb-2'>Cấu hình nâng cao</span>
               <div className='flex items-center gap-2 mb-2'>
-                <Checkbox checked={allowReview} onCheckedChange={setAllowReview} id='allow-review' />
+                <Checkbox checked={allowReview} onCheckedChange={checked => setAllowReview(Boolean(checked))} id='allow-review' />
                 <label htmlFor='allow-review' className='text-sm'>
                   Cho phép xem lại bài sau khi nộp
                 </label>
               </div>
               <div className='flex items-center gap-2 mb-2'>
-                <Checkbox checked={perQuestion} onCheckedChange={setPerQuestion} id='per-question' />
+                <Checkbox checked={perQuestion} onCheckedChange={checked => setPerQuestion(Boolean(checked))} id='per-question' />
                 <label htmlFor='per-question' className='text-sm'>
                   Chấm điểm từng câu hỏi
                 </label>
               </div>
               <div className='flex items-center gap-2 mb-2'>
-                <Checkbox
-                  checked={showCorrectAfterSubmit}
-                  onCheckedChange={setShowCorrectAfterSubmit}
-                  id='show-correct'
-                />
+                <Checkbox checked={showCorrectAfterSubmit} onCheckedChange={checked => setShowCorrectAfterSubmit(Boolean(checked))} id='show-correct' />
                 <label htmlFor='show-correct' className='text-sm'>
                   Hiện đáp án đúng sau khi nộp
                 </label>
               </div>
               <div className='flex items-center gap-2 mb-2'>
-                <Checkbox checked={shuffleQuestions} onCheckedChange={setShuffleQuestions} id='shuffle-questions' />
+                <Checkbox checked={shuffleQuestions} onCheckedChange={checked => setShuffleQuestions(Boolean(checked))} id='shuffle-questions' />
                 <label htmlFor='shuffle-questions' className='text-sm'>
                   Trộn thứ tự câu hỏi
                 </label>
               </div>
               <div className='flex items-center gap-2 mb-2'>
-                <Checkbox checked={shuffleAnswers} onCheckedChange={setShuffleAnswers} id='shuffle-answers' />
+                <Checkbox checked={shuffleAnswers} onCheckedChange={checked => setShuffleAnswers(Boolean(checked))} id='shuffle-answers' />
                 <label htmlFor='shuffle-answers' className='text-sm'>
                   Trộn thứ tự đáp án
                 </label>
               </div>
               <div className='flex items-center gap-2 mb-2'>
-                <Checkbox checked={enableTabTracking} onCheckedChange={setEnableTabTracking} id='tab-tracking' />
+                <Checkbox checked={enableTabTracking} onCheckedChange={checked => setEnableTabTracking(Boolean(checked))} id='tab-tracking' />
                 <label htmlFor='tab-tracking' className='text-sm'>
                   Theo dõi chuyển tab
                 </label>
               </div>
               <div className='flex items-center gap-2 mb-2'>
-                <Checkbox
-                  checked={enableCopyPasteRestriction}
-                  onCheckedChange={setEnableCopyPasteRestriction}
-                  id='copy-paste'
-                />
+                <Checkbox checked={enableCopyPasteRestriction} onCheckedChange={checked => setEnableCopyPasteRestriction(Boolean(checked))} id='copy-paste' />
                 <label htmlFor='copy-paste' className='text-sm'>
                   Chặn copy/paste
                 </label>
@@ -207,7 +218,7 @@ export function QuestionSetModal({ open, onOpenChange, initialData, onSubmit }: 
             <DialogClose asChild>
               <Button variant='outline'>Hủy</Button>
             </DialogClose>
-            <Button onClick={handleSubmit}>Tạo mới</Button>
+            <Button onClick={handleSubmit}>{initialData ? "Cập nhật" :'Tạo mới'}</Button>
           </div>
         </DialogFooter>
       </DialogContent>

@@ -5,7 +5,7 @@ import { NEmpty } from "@/components/ui/NEmpty"
 import { LoadingSpinner } from "@/components/ui"
 import { IoMdAdd } from "react-icons/io"
 import EntryTestModal from "./entry-test-modal"
-import { useGetEntryTests, useCreateEntryTest } from "@/hooks/api/lecturer/exams/use-entry-test"
+import { useGetEntryTests, useCreateEntryTest, useDeleteEntryTest } from "@/hooks/api/lecturer/exams/use-entry-test"
 import { EntryTestCard } from "@/components/lecturer/exams/all-test/entry-test/entry-test-card"
 import { toast } from "sonner"
 
@@ -17,6 +17,7 @@ export default function EntryTestList() {
   const entryTests = data?.entry_tests || []
 
   const createMutation = useCreateEntryTest()
+  const deleteMutation = useDeleteEntryTest()
 
   const handleCreate = (formData: any) => {
     const payload = {
@@ -30,6 +31,17 @@ export default function EntryTestList() {
       },
       onError: (err) => {
         toast.error(err?.message || "Có lỗi xảy ra")
+      }
+    })
+  }
+
+  const handleDelete = (id: string) => {
+    deleteMutation.mutate(id, {
+      onSuccess: () => {
+        toast.success("Xóa bài kiểm tra đầu vào thành công")
+      },
+      onError: (err) => {
+        toast.error(err?.message || "Xóa bài kiểm tra thất bại")
       }
     })
   }
@@ -85,7 +97,7 @@ export default function EntryTestList() {
                 entryTest={test}
                 index={idx}
                 onEdit={() => {/* TODO: handle edit */}}
-                onDelete={() => {/* TODO: handle delete */}}
+                onDelete={handleDelete}
               />
             ))}
           </div>

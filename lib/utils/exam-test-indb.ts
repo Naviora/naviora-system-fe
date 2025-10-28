@@ -14,3 +14,17 @@ export async function loadEXAMTestProgress() {
 export async function clearEXAMTestProgress() {
   await del(EXAM_TEST_KEY)
 }
+
+const QUESTION_SET_KEY = 'question-set'
+
+export async function saveQuestionSet(data: any) {
+  await set(QUESTION_SET_KEY, data)
+}
+
+export async function loadQuestionSet() {
+  return await get(QUESTION_SET_KEY)
+}
+
+export async function clearQuestionSet() {
+  await del(QUESTION_SET_KEY)
+}

@@ -1,122 +1,138 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { ExamQuestionCard } from '@/components/exam-test/exam-question-card'
 import { ExamQuestionSidebar } from '@/components/exam-test/exam-question-sidebar'
 import { ExamTestHeader } from '@/components/exam-test/exam-test-header'
 import { useCountdown } from '@/hooks/use-count-down'
-import { clearEXAMTestProgress, loadEXAMTestProgress, saveEXAMTestProgress } from '@/lib/utils/exam-test-indb'
+import {
+  clearEXAMTestProgress,
+  clearQuestionSet,
+  loadEXAMTestProgress,
+  loadQuestionSet,
+  saveEXAMTestProgress
+} from '@/lib/utils/exam-test-indb'
 import { LoadingSpinner } from '@/components/ui'
+import { useGetQuestionSetDetail } from '@/hooks/api/lecturer/exams/use-question-set'
+import { useSubmitEntryTest } from '@/hooks/api/lecturer/exams/use-entry-test'
+import { toast } from 'sonner'
+import { SubmitEntryTestResponse } from '@/lib/validations/lecturer/exams/entry-test'
 
-const questions = [
-  {
-    id: 1,
-    content: 'Trong quá trình quang hợp ở thực vật, pha sáng diễn ra tại vị trí nào của lục lạp?',
-    answers: ['Chất nền (stroma)', 'Màng ngoài của lục lạp', 'Màng tilacoit', 'Khoang gian màng của lục lạp']
-  },
-  {
-    id: 2,
-    content: 'Nguyên tố nào sau đây là thành phần chính của phân tử ADN?',
-    answers: ['Nitơ', 'Photpho', 'Cacbon', 'Oxi']
-  },
-  {
-    id: 3,
-    content: 'Loài động vật nào sau đây là động vật biến nhiệt?',
-    answers: ['Chim', 'Cá', 'Người', 'Khỉ']
-  },
-  {
-    id: 4,
-    content: 'Quá trình quang hợp ở thực vật tạo ra sản phẩm nào?',
-    answers: ['Oxi và nước', 'Oxi và đường', 'Nước và muối khoáng', 'Đường và muối khoáng']
-  },
-  {
-    id: 5,
-    content: 'Cấu trúc nào sau đây không có ở tế bào thực vật?',
-    answers: ['Thành tế bào', 'Lục lạp', 'Ti thể', 'Lông chuyển']
-  },
-  {
-    id: 6,
-    content: 'Quá trình trao đổi khí ở người diễn ra chủ yếu ở đâu?',
-    answers: ['Phổi', 'Tim', 'Gan', 'Thận']
-  },
-  {
-    id: 7,
-    content: 'Enzyme nào sau đây tham gia vào quá trình tiêu hóa tinh bột?',
-    answers: ['Amylase', 'Lipase', 'Protease', 'Lactase']
-  },
-  {
-    id: 8,
-    content: 'Loại mô nào có chức năng nâng đỡ cơ thể thực vật?',
-    answers: ['Mô mềm', 'Mô cứng', 'Mô dẫn', 'Mô biểu bì']
-  },
-  {
-    id: 9,
-    content: 'Quá trình nào sau đây giúp cây hấp thụ nước từ đất?',
-    answers: ['Thoát hơi nước', 'Quang hợp', 'Hô hấp', 'Thẩm thấu']
-  },
-  {
-    id: 10,
-    content: 'Bộ phận nào của cây thực vật có chức năng sinh sản?',
-    answers: ['Lá', 'Thân', 'Hoa', 'Rễ']
-  }
-]
-
-const TOTAL_SECONDS = 45 * 60
-
-export default function ManageEntryTest() {
+export default function ManageEntryTest({ onShowResult }: { onShowResult?: (result: SubmitEntryTestResponse, duration: number) => void }) {
+  const [questionSetId, setQuestionSetId] = useState<string | null>(null)
+  const [entryTestId, setEntryTestId] = useState<string | null>(null)
   const [current, setCurrent] = useState(0)
   const [selected, setSelected] = useState<{ [key: number]: number }>({})
   const [flagged, setFlagged] = useState<number[]>([])
-  const totalQuestions = questions.length
-  const answeredCount = Object.keys(selected).length
   const [initialSeconds, setInitialSeconds] = useState<number | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const endTimestampRef = useRef<number | null>(null)
+  const submitMutation = useSubmitEntryTest()
 
-  const handleSubmit = () => {
-    setIsSubmitted(true)
-    clearEXAMTestProgress()
-    alert('Nộp bài thành công!')
+  const handleSubmit = async () => {
+    if (!questionSetId || !entryTestId) return
+    const answered = Object.entries(selected).map(([key, idx]) => ({
+      questionId: questions[Number(key) - 1]?.question_id,
+      answerId: questions[Number(key) - 1]?.answers[idx]?.answer_id
+    }))
+    submitMutation.mutate(
+      { entryTestId, questionSetId, data: { answered } },
+      {
+        onSuccess: (response) => {
+          setIsSubmitted(true)
+          clearEXAMTestProgress()
+          clearQuestionSet()
+          toast.success('Nộp bài thành công!')
+          if (onShowResult) {
+            onShowResult(response, Math.round((initialSeconds ?? 0) - secondsLeft))
+          }
+        },
+        onError: (error) => {
+          toast.error(error.message || 'Nộp bài thất bại. Vui lòng thử lại.')
+        }
+      }
+    )
   }
 
   useEffect(() => {
+    loadQuestionSet().then((data) => {
+      if (data?.question_set_id) setQuestionSetId(data.question_set_id)
+      if (data?.entry_test_id) setEntryTestId(data.entry_test_id)
+    })
+  }, [])
+
+  const { data: questionSetDetail, isLoading, isError } = useGetQuestionSetDetail(questionSetId ?? '')
+
+  useEffect(() => {
+    if (!questionSetDetail || !questionSetId) return
     loadEXAMTestProgress().then((data) => {
       if (data && typeof data.endTimestamp === 'number') {
+        // Đã có dữ liệu, chỉ khôi phục lại state
         setCurrent(data.current ?? 0)
         setSelected(data.selected ?? {})
         setFlagged(data.flagged ?? [])
         endTimestampRef.current = data.endTimestamp
-        const left = Math.max(0, Math.floor((data.endTimestamp - Date.now()) / 1000))
-        setInitialSeconds(left)
+        setInitialSeconds(Math.max(0, Math.floor((data.endTimestamp - Date.now()) / 1000)))
+        setIsLoaded(true)
       } else {
-        const endTimestamp = Date.now() + TOTAL_SECONDS * 1000
+        // Chưa có dữ liệu, khởi tạo mới
+        const totalQuestions = questionSetDetail.config.general.total_questions
+        const durationMinutes = questionSetDetail.config.general.duration_minutes
+        const endTimestamp = Date.now() + durationMinutes * 60 * 1000
+
+        setCurrent(0)
+        setSelected({})
+        setFlagged([])
+        setInitialSeconds(durationMinutes * 60)
         endTimestampRef.current = endTimestamp
-        setInitialSeconds(TOTAL_SECONDS)
+
         saveEXAMTestProgress({
+          question_set_id: questionSetId,
           current: 0,
           selected: {},
           flagged: [],
-          endTimestamp
+          endTimestamp,
+          total_questions: totalQuestions,
+          duration_minutes: durationMinutes
         })
+        setIsLoaded(true)
       }
-      setIsLoaded(true)
     })
-  }, [])
-
-  const enabledCountdown = isLoaded && initialSeconds !== null
-  const { secondsLeft, formatTime } = useCountdown(initialSeconds ?? 10 * 60, handleSubmit, { enabled: enabledCountdown })
+  }, [questionSetDetail, questionSetId])
 
   useEffect(() => {
     if (isLoaded && !isSubmitted && endTimestampRef.current) {
       saveEXAMTestProgress({
+        question_set_id: questionSetId,
         current,
         selected,
         flagged,
-        endTimestamp: endTimestampRef.current
+        endTimestamp: endTimestampRef.current,
+        total_questions: questionSetDetail?.config.general.total_questions,
+        duration_minutes: questionSetDetail?.config.general.duration_minutes
       })
     }
-  }, [current, selected, flagged, secondsLeft, isLoaded, isSubmitted])
+  }, [current, selected, flagged, isLoaded, isSubmitted, questionSetId, questionSetDetail])
 
-  if (!isLoaded || initialSeconds === null) {
+  //Xác nhận khi người ta tính tắt tab hoặc reload
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [])
+
+  const questions = questionSetDetail?.questions ?? []
+  const totalQuestions = questions.length
+  const answeredCount = Object.keys(selected).length
+  const { secondsLeft, formatTime } = useCountdown(initialSeconds ?? 10 * 60, handleSubmit, {
+    enabled: isLoaded && initialSeconds !== null
+  })
+
+  if (!questionSetId || isLoading) {
     return (
       <div className='flex items-center justify-center min-h-screen'>
         <LoadingSpinner variant='dots' />
@@ -124,8 +140,14 @@ export default function ManageEntryTest() {
     )
   }
 
+  if (isError) {
+    return (
+      <div className='flex items-center justify-center min-h-screen text-error'>Không thể tải dữ liệu bộ câu hỏi.</div>
+    )
+  }
+
   return (
-    <div className='min-h-screen bg-gray-100 dark:bg-neutral-900'>
+    <div className='min-h-screen bg-greyscale-25'>
       <ExamTestHeader
         title='Bài kiểm tra đầu vào'
         description='Đánh giá học lực học sinh'
