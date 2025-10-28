@@ -30,15 +30,15 @@ export function ModuleCard({
   return (
     <motion.div
       className={cn(
-        'flex w-full min-w-[240px] flex-col overflow-hidden rounded-xl border border-border bg-card transition-all',
+        'flex w-full min-w-[240px] flex-col overflow-hidden rounded-lg border border-border bg-card transition-all',
         className
       )}
       whileHover={{ y: -4, boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)' }}
       transition={{ duration: 0.2 }}
     >
       {/* Thumbnail */}
-      <div className='relative h-40 w-full overflow-hidden bg-greyscale-50 p-2'>
-        <div className='relative h-full w-full overflow-hidden rounded-lg'>
+      <div className='relative h-40 w-full overflow-hidden p-2'>
+        <div className='relative h-full w-full overflow-hidden rounded-md'>
           <Image
             src={thumbnail}
             alt={moduleName}
