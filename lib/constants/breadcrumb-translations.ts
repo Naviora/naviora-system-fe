@@ -1,3 +1,6 @@
+import { getNavigationConfig } from '@/lib/constants/navigation'
+import type { UserRole } from '@/lib/constants/roles'
+
 // Route segment translations to Vietnamese
 export const SEGMENT_TRANSLATIONS: Record<string, string> = {
   // Roles
@@ -18,6 +21,38 @@ export const SEGMENT_TRANSLATIONS: Record<string, string> = {
   dashboard: 'Bảng điều khiển',
   list: 'Danh sách',
   detail: 'Chi tiết'
+}
+
+/**
+ * Get segment translation for a specific role
+ * Checks ROLE_SPECIFIC_NAVIGATION first to get role-specific labels
+ * Falls back to SEGMENT_TRANSLATIONS if not found
+ */
+export function getSegmentTranslation(segment: string, role?: UserRole | null): string {
+  if (!role) {
+    return SEGMENT_TRANSLATIONS[segment] || ''
+  }
+
+  try {
+    const navigationConfig = getNavigationConfig(role)
+    const mainNav = navigationConfig.main
+
+    // Look for the segment in the navigation items
+    const navItem = mainNav.find((item) => {
+      const itemSegment = item.href.split('/').pop()
+      return itemSegment === segment
+    })
+
+    if (navItem) {
+      return navItem.name
+    }
+  } catch (error) {
+    // If there's any error, fall back to default translation
+    console.warn(`Error getting navigation config for role ${role}:`, error)
+  }
+
+  // Fallback to standard translation
+  return SEGMENT_TRANSLATIONS[segment] || ''
 }
 
 export function formatSegment(segment: string): string {
