@@ -27,9 +27,9 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible='icon' className='border-none'>
-      <div className='flex flex-col px-4 group-data-[collapsible=icon]:px-0 h-full'>
+      <div className='flex flex-col px-4 group-data-[collapsible=icon]:px-0 h-full transition-all duration-300 ease-in-out'>
         <SidebarHeader>
-          <div className='flex items-center justify-between  group-data-[collapsible=icon]:justify-end group-data-[collapsible=icon]:flex-col-reverse'>
+          <div className='flex items-center justify-between  group-data-[collapsible=icon]:justify-end group-data-[collapsible=icon]:flex-col-reverse '>
             <Logo size='sm' />
             <SidebarTrigger />
           </div>
@@ -54,7 +54,7 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu className='gap-2'>
                 {mainNavigation.map((item) => {
-                  const isActive = pathname === item.href
+                  const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
                   return (
                     <SidebarMenuItem key={item.name}>
                       <Link
@@ -82,7 +82,7 @@ export function AppSidebar() {
           </div>
           <SidebarMenu className='gap-2'>
             {bottomNavigation.map((item) => {
-              const isActive = pathname === item.href
+              const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
               return (
                 <SidebarMenuItem key={item.name}>
                   <Link

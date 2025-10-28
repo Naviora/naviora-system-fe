@@ -22,22 +22,22 @@ export function LecturerModuleCard({ module, className }: LecturerModuleCardProp
   return (
     <Card
       className={cn(
-        'group flex h-full flex-col overflow-hidden rounded-lg border border-greyscale-200 bg-greyscale-0 shadow-xs transition-all hover:shadow-md',
+        'group flex h-full flex-col overflow-hidden rounded-lg border border-greyscale-200 bg-greyscale-0 shadow-xs transition-all hover:shadow-md py-4',
         className
       )}
     >
-      <div className='relative h-40 w-full overflow-hidden bg-greyscale-50'>
+      <div className='relative h-40 w-full overflow-hidden px-4'>
         {banner ? (
           <Image
             src={banner}
             alt={name}
             fill
-            className='object-cover transition-transform duration-500 group-hover:scale-105'
+            className='object-cover transition-transform duration-500 group-hover:scale-105 rounded-md'
             sizes='(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw'
             priority={false}
           />
         ) : (
-          <div className='flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-25 via-primary-0 to-greyscale-50 text-sm font-medium text-primary'>
+          <div className='flex h-full w-full rounded-md items-center justify-center bg-gradient-to-br from-primary-25 via-primary-0 to-greyscale-50 text-sm font-medium text-primary'>
             {code}
           </div>
         )}
@@ -45,7 +45,7 @@ export function LecturerModuleCard({ module, className }: LecturerModuleCardProp
 
       <div className='flex flex-1 flex-col gap-4 p-4'>
         <div className='flex flex-col gap-2'>
-          <span className='inline-flex w-fit rounded-full bg-primary-0 px-3 py-1 text-xs font-medium uppercase tracking-wide text-primary'>
+          <span className='inline-flex w-fit rounded-full bg-primary-0 px-3 1 text-xs font-medium uppercase tracking-wide text-primary'>
             {code}
           </span>
           <div className='space-y-1'>

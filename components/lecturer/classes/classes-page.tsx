@@ -1,18 +1,19 @@
 'use client'
 
 import * as React from 'react'
-import { useMemo, useState } from 'react'
+import { useState, useMemo } from 'react'
 
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 
-import { ModuleToolbar } from '@/components/lecturer/modules/module-toolbar'
-import { LecturerModuleGrid } from '@/components/lecturer/modules/module-grid'
+import { ClassCard } from '@/components/lecturer/classes/class-card'
+import { ClassesToolbar } from '@/components/lecturer/classes/classes-toolbar'
 import { Button } from '@/components/ui/button'
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useModules } from '@/hooks/api/use-modules'
-import { MODULE_QUERY_DEFAULTS } from '@/lib/constants/modules'
+import { useClasses } from '@/hooks/api/use-classes'
+import { CLASS_QUERY_DEFAULTS } from '@/lib/constants/modules'
 import { ErrorHandler } from '@/lib/utils/error-handler'
-import { type ModuleDto } from '@/lib/validations/modules'
+import type { ClassType } from '@/types/api/class'
 
 function useDebounce<T>(value: T, delay = 400) {
   const [debouncedValue, setDebouncedValue] = useState(value)
@@ -26,17 +27,6 @@ function useDebounce<T>(value: T, delay = 400) {
   }, [value, delay])
 
   return debouncedValue
-}
-
-function mapModulesToCards(modules: ModuleDto[]) {
-  return modules.map((module) => ({
-    id: module.module_id,
-    name: module.module_name,
-    code: module.module_code,
-    description: module.module_description,
-    banner: module.banner ?? null,
-    updatedAt: module.updated_at
-  }))
 }
 
 type PaginationItem = number | 'ellipsis'
@@ -72,53 +62,63 @@ function getPaginationItems(currentPage: number, totalPages: number): Pagination
   return items
 }
 
-export function LecturerModulesPageClient() {
+export function LecturerClassesPageClient() {
   const [searchTerm, setSearchTerm] = useState('')
   const [page, setPage] = useState(1)
-  const [sortBy, setSortBy] = useState('module_name')
+  const [sortBy, setSortBy] = useState('class_name')
   const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('ASC')
+  const [classType, setClassType] = useState('all')
 
   const debouncedSearch = useDebounce(searchTerm)
 
   const queryParams = useMemo(
     () => ({
-      limit: MODULE_QUERY_DEFAULTS.limit,
+      limit: CLASS_QUERY_DEFAULTS.limit,
       page,
       q: debouncedSearch || undefined,
       sort_by: sortBy,
-      order: sortOrder
+      order: sortOrder,
+      class_type: classType !== 'all' ? (classType as ClassType) : undefined
     }),
-    [debouncedSearch, page, sortBy, sortOrder]
+    [debouncedSearch, page, sortBy, sortOrder, classType]
   )
 
-  const modulesQuery = useModules(queryParams)
+  const classesQuery = useClasses(queryParams)
 
-  const moduleCards = useMemo(() => {
-    const rawModules = modulesQuery.data?.data?.modules ?? []
-    return mapModulesToCards(rawModules)
-  }, [modulesQuery.data?.data?.modules])
-  const pagination = modulesQuery.data?.data?.pagination
+  const classes = classesQuery.data?.classes ?? []
+  const pagination = classesQuery.data?.pagination
   const totalPages = pagination?.total_pages ?? 0
   const totalRecords = pagination?.total_records ?? 0
-  const limit = pagination?.limit ?? MODULE_QUERY_DEFAULTS.limit
+  const limit = pagination?.limit ?? CLASS_QUERY_DEFAULTS.limit
   const currentPage = pagination?.current_page ?? page
-  const totalRecordCount = totalRecords || moduleCards.length
+  const totalRecordCount = totalRecords || classes.length
   const safeTotalPages = Math.max(totalPages || Math.ceil(totalRecordCount / limit) || 1, 1)
 
   const paginationItems = useMemo(() => getPaginationItems(currentPage, safeTotalPages), [currentPage, safeTotalPages])
 
-  const isFetchingPage = modulesQuery.isFetching && !modulesQuery.isLoading
-  const isInitialLoading = modulesQuery.isLoading
-
-  const hasModules = moduleCards.length > 0
+  const isInitialLoading = classesQuery.isLoading
+  const isFetchingPage = classesQuery.isFetching && !classesQuery.isLoading
+  const hasClasses = classes.length > 0
+  const skeletonCount = classes.length || CLASS_QUERY_DEFAULTS.limit
   const canGoPrevious = currentPage > 1
   const canGoNext = currentPage < safeTotalPages
-  const skeletonCount = moduleCards.length || limit
 
   const handleSearchChange = React.useCallback((value: string) => {
     setSearchTerm(value)
     setPage(1)
   }, [])
+
+  const handlePageChange = React.useCallback(
+    (nextPage: number) => {
+      if (nextPage === currentPage || nextPage < 1 || nextPage > safeTotalPages) {
+        return
+      }
+
+      setPage(nextPage)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    },
+    [currentPage, safeTotalPages]
+  )
 
   const handleSortChange = React.useCallback((newSortBy: string) => {
     setSortBy(newSortBy)
@@ -130,37 +130,39 @@ export function LecturerModulesPageClient() {
     setPage(1)
   }, [])
 
-  const handlePageChange = React.useCallback(
-    (nextPage: number) => {
-      if (nextPage === currentPage || nextPage < 1 || nextPage > safeTotalPages) {
-        return
-      }
-
-      setPage(nextPage)
-    },
-    [currentPage, safeTotalPages]
-  )
+  const handleClassTypeChange = React.useCallback((newType: string) => {
+    setClassType(newType)
+    setPage(1)
+  }, [])
 
   const fromRecord = totalRecordCount === 0 ? 0 : (currentPage - 1) * limit + 1
   const toRecord = totalRecordCount === 0 ? 0 : Math.min(currentPage * limit, totalRecordCount)
 
   return (
     <div className='flex flex-col gap-6 px-4 pb-10 pt-6 sm:px-6 lg:px-8'>
-      <div className='flex flex-col gap-1'>
-        <h1 className='text-2xl font-semibold text-greyscale-900 sm:text-3xl'>Danh sách chuyên đề</h1>
-        <p className='text-sm text-muted-foreground'>Xem nhanh các chuyên đề bạn đang phụ trách.</p>
+      {/* Header */}
+      <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+        <div className='flex flex-col gap-1'>
+          <h1 className='text-2xl font-semibold text-greyscale-900 sm:text-3xl'>Quản lý lớp học</h1>
+          <p className='text-sm text-muted-foreground'>Xem nhanh các lớp học bạn đang phụ trách.</p>
+        </div>
       </div>
 
+      {/* Content Section */}
       <section className='rounded-xl border border-greyscale-200 bg-card p-4 shadow-sm sm:p-6'>
-        <ModuleToolbar
-          searchValue={searchTerm}
+        {/* Toolbar */}
+        <ClassesToolbar
+          searchQuery={searchTerm}
           onSearchChange={handleSearchChange}
           sortBy={sortBy}
           onSortChange={handleSortChange}
           sortOrder={sortOrder}
           onSortOrderChange={handleSortOrderChange}
+          classType={classType}
+          onClassTypeChange={handleClassTypeChange}
         />
 
+        {/* Classes Grid */}
         <div className='mt-6'>
           {isInitialLoading ? (
             <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>
@@ -168,14 +170,14 @@ export function LecturerModulesPageClient() {
                 <Skeleton key={index} className='h-48 w-full rounded-xl bg-greyscale-100' />
               ))}
             </div>
-          ) : modulesQuery.isError ? (
+          ) : classesQuery.isError ? (
             <div className='flex flex-col items-center justify-center gap-3 rounded-lg border border-destructive/50 bg-destructive/5 p-8 text-center'>
-              <p className='text-sm font-medium text-destructive'>{ErrorHandler.getErrorMessage(modulesQuery.error)}</p>
-              <Button variant='outline' size='sm' onClick={() => modulesQuery.refetch()}>
+              <p className='text-sm font-medium text-destructive'>{ErrorHandler.getErrorMessage(classesQuery.error)}</p>
+              <Button variant='outline' size='sm' onClick={() => classesQuery.refetch()}>
                 Thử lại
               </Button>
             </div>
-          ) : hasModules ? (
+          ) : hasClasses ? (
             <>
               {isFetchingPage ? (
                 <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3' aria-hidden='true'>
@@ -185,12 +187,17 @@ export function LecturerModulesPageClient() {
                 </div>
               ) : (
                 <>
-                  <LecturerModuleGrid modules={moduleCards} />
+                  <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>
+                    {classes.map((classItem) => (
+                      <ClassCard key={classItem.class_id} classData={classItem} />
+                    ))}
+                  </div>
 
-                  {hasModules ? (
+                  {/* Pagination */}
+                  {safeTotalPages > 1 && (
                     <div className='mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
                       <p className='text-sm text-muted-foreground'>
-                        Hiển thị {fromRecord}-{toRecord} trên tổng số {totalRecordCount} chuyên đề
+                        Hiển thị {fromRecord}-{toRecord} trên tổng số {totalRecordCount} lớp học
                       </p>
                       <nav className='flex items-center justify-center gap-2' aria-label='Pagination'>
                         <Button
@@ -199,7 +206,7 @@ export function LecturerModulesPageClient() {
                           size='sm'
                           className='h-9 w-9 p-0'
                           onClick={() => handlePageChange(currentPage - 1)}
-                          disabled={!canGoPrevious || modulesQuery.isFetching}
+                          disabled={!canGoPrevious || classesQuery.isFetching}
                           aria-label='Trang trước'
                         >
                           <ChevronLeftIcon className='size-4' aria-hidden='true' />
@@ -223,8 +230,8 @@ export function LecturerModulesPageClient() {
                               size='sm'
                               className='h-9 w-9 p-0'
                               onClick={() => handlePageChange(item)}
-                              disabled={isActive || modulesQuery.isFetching}
-                              aria-current={isActive ? 'page' : undefined}
+                              disabled={classesQuery.isFetching}
+                              aria-label={`Trang ${item}`}
                             >
                               {item}
                             </Button>
@@ -236,24 +243,28 @@ export function LecturerModulesPageClient() {
                           size='sm'
                           className='h-9 w-9 p-0'
                           onClick={() => handlePageChange(currentPage + 1)}
-                          disabled={!canGoNext || modulesQuery.isFetching}
-                          aria-label='Trang tiếp theo'
+                          disabled={!canGoNext || classesQuery.isFetching}
+                          aria-label='Trang sau'
                         >
                           <ChevronRightIcon className='size-4' aria-hidden='true' />
                         </Button>
                       </nav>
                     </div>
-                  ) : null}
+                  )}
                 </>
               )}
             </>
           ) : (
-            <div className='flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-greyscale-200 bg-greyscale-50 p-10 text-center'>
-              <h2 className='text-lg font-semibold text-greyscale-900'>Chưa có chuyên đề nào</h2>
-              <p className='max-w-sm text-sm text-muted-foreground'>
-                Các chuyên đề bạn phụ trách sẽ hiển thị tại đây khi được ban giám hiệu giao.
-              </p>
-            </div>
+            <Empty>
+              <EmptyHeader>
+                <EmptyTitle>Chưa có lớp học nào</EmptyTitle>
+                <EmptyDescription>
+                  {searchTerm
+                    ? 'Không tìm thấy lớp học phù hợp với bộ lọc của bạn.'
+                    : 'Bắt đầu bằng cách tạo lớp học đầu tiên của bạn.'}
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
           )}
         </div>
       </section>

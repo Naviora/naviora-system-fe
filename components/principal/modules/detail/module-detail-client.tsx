@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 
 import { ModuleDetailView } from '@/components/principal/modules/detail'
 import { Button } from '@/components/ui/button'
@@ -9,12 +9,14 @@ import { LoadingPage } from '@/components/ui/loading'
 import { Separator } from '@/components/ui/separator'
 import { ErrorHandler } from '@/lib/utils/error-handler'
 import { useModuleDetail, useModuleLessons } from '@/hooks/api/use-modules'
+import { useSetBreadcrumbLabel } from '@/lib/context/breadcrumb-context'
 
 interface ModuleDetailPageClientProps {
   moduleId: string
 }
 
 export function ModuleDetailPageClient({ moduleId }: ModuleDetailPageClientProps) {
+  const setBreadcrumbLabel = useSetBreadcrumbLabel()
   const detailQuery = useModuleDetail(moduleId, {
     enabled: Boolean(moduleId)
   })
@@ -22,6 +24,13 @@ export function ModuleDetailPageClient({ moduleId }: ModuleDetailPageClientProps
   const lessonsQuery = useModuleLessons(moduleId, {
     enabled: Boolean(moduleId)
   })
+
+  // Update breadcrumb when module detail loads
+  useEffect(() => {
+    if (detailQuery.data?.module_name) {
+      setBreadcrumbLabel(detailQuery.data.module_name)
+    }
+  }, [detailQuery.data?.module_name, setBreadcrumbLabel])
 
   const isLoading = detailQuery.isLoading && !detailQuery.data
   const isLessonsLoading = lessonsQuery.isLoading && !lessonsQuery.data
