@@ -36,7 +36,7 @@ import { useCreateLesson, useDeleteLesson, useUpdateLesson, useLessonDetail } fr
 import { useCreateTeachingMaterial, useDeleteTeachingMaterial } from '@/hooks/api/use-materials'
 import { MaterialDialog } from './material-dialog'
 import { ErrorHandler } from '@/lib/utils/error-handler'
-import { cn, formatDateTime } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import type { LessonDto, ModuleDetailDto, MaterialDto } from '@/lib/validations/modules'
 
 interface ModuleDetailViewProps {
@@ -302,12 +302,6 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
   const toggleLesson = (lessonId: string) => {
     setExpandedLessonId((previous) => (previous === lessonId ? null : lessonId))
   }
-
-  const formatLessonTime = (value: string) =>
-    formatDateTime(value, {
-      hour: '2-digit',
-      minute: '2-digit'
-    })
 
   const isSubmitting =
     createLessonMutation.isPending || updateLessonMutation.isPending || createTeachingMaterialMutation.isPending

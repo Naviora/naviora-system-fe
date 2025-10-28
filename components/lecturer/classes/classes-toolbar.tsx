@@ -1,34 +1,39 @@
 'use client'
 
-import * as React from 'react'
 import { Search, SlidersHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import { Separator } from '@/components/ui/separator'
 
-export interface ModuleToolbarProps {
-  searchValue: string
+interface ClassesToolbarProps {
+  searchQuery: string
   onSearchChange: (value: string) => void
   sortBy: string
   onSortChange: (value: string) => void
   sortOrder: 'ASC' | 'DESC'
   onSortOrderChange: (value: 'ASC' | 'DESC') => void
+  classType: string
+  onClassTypeChange: (value: string) => void
 }
 
-export function ModuleToolbar({
-  searchValue,
+export function ClassesToolbar({
+  searchQuery,
   onSearchChange,
   sortBy,
   onSortChange,
   sortOrder,
-  onSortOrderChange
-}: ModuleToolbarProps) {
+  onSortOrderChange,
+  classType,
+  onClassTypeChange
+}: ClassesToolbarProps) {
   const handleReset = () => {
     onSearchChange('')
-    onSortChange('module_name')
+    onSortChange('class_name')
     onSortOrderChange('ASC')
+    onClassTypeChange('all')
   }
 
   return (
@@ -38,8 +43,8 @@ export function ModuleToolbar({
         <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-greyscale-500' />
         <Input
           type='search'
-          placeholder='Tìm kiếm chuyên đề...'
-          value={searchValue}
+          placeholder='Tìm kiếm lớp học...'
+          value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           className='pl-9'
         />
@@ -76,10 +81,11 @@ export function ModuleToolbar({
                       <SelectValue placeholder='Chọn tiêu chí' />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value='module_name'>Tên chuyên đề</SelectItem>
-                      <SelectItem value='module_code'>Mã chuyên đề</SelectItem>
+                      <SelectItem value='class_name'>Tên lớp</SelectItem>
+                      <SelectItem value='class_code'>Mã lớp</SelectItem>
+                      <SelectItem value='start_date'>Ngày bắt đầu</SelectItem>
+                      <SelectItem value='end_date'>Ngày kết thúc</SelectItem>
                       <SelectItem value='created_at'>Ngày tạo</SelectItem>
-                      <SelectItem value='updated_at'>Ngày cập nhật</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -98,6 +104,35 @@ export function ModuleToolbar({
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+            </div>
+
+            <Separator className='my-6' />
+
+            {/* Filter Section */}
+            <div className='space-y-4'>
+              <div className='flex items-center gap-2'>
+                <div className='h-8 w-1 bg-primary-600 rounded-full' />
+                <h3 className='text-base font-semibold text-greyscale-900'>Bộ lọc</h3>
+              </div>
+
+              <div className='space-y-2 pl-5'>
+                <Label htmlFor='class-type' className='text-sm font-medium text-greyscale-700'>
+                  Loại lớp học
+                </Label>
+                <Select value={classType} onValueChange={onClassTypeChange}>
+                  <SelectTrigger id='class-type' className='h-11'>
+                    <SelectValue placeholder='Tất cả loại lớp' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='all'>Tất cả</SelectItem>
+                    <SelectItem value='school'>Cấp trường</SelectItem>
+                    <SelectItem value='city'>Cấp thành phố</SelectItem>
+                    <SelectItem value='province'>Cấp tỉnh</SelectItem>
+                    <SelectItem value='national'>Cấp quốc gia</SelectItem>
+                    <SelectItem value='international'>Cấp quốc tế</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
