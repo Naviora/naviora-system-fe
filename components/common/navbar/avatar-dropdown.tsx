@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronDown, User, Settings, LogOut, HelpCircle } from 'lucide-react'
+import { ChevronDown, Settings, LogOut, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'

@@ -49,3 +49,4 @@ export function timeAgo(dateString: string) {
   if (diffMin > 0) return `${diffMin} phút trước`
   return `Vừa xong`
 }
+
