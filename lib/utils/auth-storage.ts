@@ -15,7 +15,8 @@ export const AUTH_STORAGE_KEYS = {
   accessToken: 'auth-token',
   refreshToken: 'refresh-token',
   userRole: 'user-role',
-  rememberMe: 'remember-me'
+  rememberMe: 'remember-me',
+  hasParticipatedEntryTest: 'has-participated-entry-test'
 } as const
 
 export const setStoredAuthTokens = (accessToken: string, refreshToken: string) => {
@@ -56,6 +57,21 @@ export const clearStoredUserRole = () => {
   if (typeof window === 'undefined') return
   localStorage.removeItem(AUTH_STORAGE_KEYS.userRole)
   dispatchRoleChangeEvent(null)
+}
+
+export const setStoredHasParticipatedEntryTest = (value: boolean) => {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(AUTH_STORAGE_KEYS.hasParticipatedEntryTest, value ? 'true' : 'false')
+}
+
+export const getStoredHasParticipatedEntryTest = (): boolean => {
+  if (typeof window === 'undefined') return false
+  return localStorage.getItem(AUTH_STORAGE_KEYS.hasParticipatedEntryTest) === 'true'
+}
+
+export const clearStoredHasParticipatedEntryTest = () => {
+  if (typeof window === 'undefined') return
+  localStorage.removeItem(AUTH_STORAGE_KEYS.hasParticipatedEntryTest)
 }
 
 export const clearAuthStorage = (options?: { clearRememberMe?: boolean; clearRole?: boolean }) => {
