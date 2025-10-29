@@ -19,6 +19,7 @@ import Image from 'next/image'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Separator } from '@/components/ui/separator'
 import GoogleLoginButton from '@/components/forms/login-gg-btn'
+import { getStoredHasParticipatedEntryTest } from '@/lib/utils/auth-storage'
 
 interface LoginFormProps {
   onSuccess?: () => void
@@ -47,8 +48,15 @@ export function LoginForm({ onSuccess, redirectTo, className = '' }: LoginFormPr
       if (onSuccess) {
         onSuccess()
       } else {
-        const targetRoute = redirectTo ?? getDefaultRouteForRole(response.role)
-        router.push(targetRoute)
+        if (
+          response.role === 'Student' &&
+          !getStoredHasParticipatedEntryTest()
+        ) {
+          router.push('/entry-test')
+        } else {
+          const targetRoute = redirectTo ?? getDefaultRouteForRole(response.role)
+          router.push(targetRoute)
+        }
       }
     } catch (error) {
       const errorMessage = ErrorHandler.getErrorMessage(error)

@@ -17,7 +17,8 @@ export const loginResponseDataSchema = z.object({
   access_token: z.string(),
   refresh_token: z.string(),
   expires_in: z.number(),
-  role: userRoleSchema
+  role: userRoleSchema,
+  has_participated_entry_test: z.boolean
 })
 
 export type LoginResponse = z.infer<typeof loginResponseDataSchema>
