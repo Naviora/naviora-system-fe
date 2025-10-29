@@ -62,8 +62,8 @@ export function LoginForm({ onSuccess, redirectTo, className = '' }: LoginFormPr
       <div className='mx-auto max-w-md space-y-6'>
         <div className='flex flex-col gap-2 items-center'>
           <Image width={60} height={60} src='/Naviora.png' alt='Logo' />
-          <h1 className='text-lg sm:text-xl md:text-2xl font-bold'>Welcome back to Naviora</h1>
-          <p className='text-muted-foreground'>Login with your email and password</p>
+          <h1 className='text-lg sm:text-xl md:text-2xl font-bold'>Chào mừng bạn đến với Naviora</h1>
+          <p className='text-muted-foreground'>Hãy đăng nhập để tiếp tục trải nghiệm</p>
         </div>
 
         <Form {...form}>
@@ -75,7 +75,7 @@ export function LoginForm({ onSuccess, redirectTo, className = '' }: LoginFormPr
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type='email' placeholder='Enter your email' {...field} />
+                    <Input type='email' placeholder='Email của bạn' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -87,10 +87,10 @@ export function LoginForm({ onSuccess, redirectTo, className = '' }: LoginFormPr
               name='password'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>Mật khẩu</FormLabel>
                   <FormControl>
                     <div className='relative'>
-                      <Input type={showPassword ? 'text' : 'password'} placeholder='Enter your password' {...field} />
+                      <Input type={showPassword ? 'text' : 'password'} placeholder='Nhập mật khẩu' {...field} />
                       <Button
                         type='button'
                         variant='ghost'
@@ -119,20 +119,20 @@ export function LoginForm({ onSuccess, redirectTo, className = '' }: LoginFormPr
                       <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                     <div className='space-y-1 leading-none'>
-                      <FormLabel className='text-sm font-normal'>Keep Sign in</FormLabel>
+                      <FormLabel className='text-sm font-normal'>Ghi nhớ</FormLabel>
                     </div>
                   </FormItem>
                 )}
               />
 
               <Link href='/auth/forgot-password' className='text-sm text-primary hover:underline'>
-                Forgot password?
+                Quên mật khẩu?
               </Link>
             </div>
 
             <div className='flex items-center gap-4'>
               <Separator className='flex-1' />
-              <span className='text-sm text-muted-foreground'>Or continue with</span>
+              <span className='text-sm text-muted-foreground'>Hoặc đăng nhập với</span>
               <Separator className='flex-1' />
             </div>
 
@@ -142,21 +142,14 @@ export function LoginForm({ onSuccess, redirectTo, className = '' }: LoginFormPr
               {loginMutation.isPending ? (
                 <>
                   <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                  Logging in...
+                  Đang đăng nhập...
                 </>
               ) : (
-                'Login'
+                'Đăng nhập'
               )}
             </Button>
           </form>
         </Form>
-
-        <div className='text-center text-sm'>
-          <span className='text-muted-foreground'>Don&apos;t have an account? </span>
-          <Link href='/auth/register' className='text-primary hover:underline'>
-            Register
-          </Link>
-        </div>
       </div>
     </FadeIn>
   )

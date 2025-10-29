@@ -42,14 +42,14 @@ export default function ManageQuestion({ onEdit }: ManageQuestionProps) {
   console.log('Check sort question: ', sortedQuestions)
 
   return (
-    <div className='bg-white rounded-lg shadow p-4'>
+    <div className='rounded-lg shadow p-4'>
       <div className='flex flex-col gap-2 mb-4'>
         <div className='flex gap-4 flex-wrap items-center'>
           <span className='font-medium text-sm'>Loại câu hỏi</span>
           {QUESTION_TYPES.map((type) => (
             <button
               key={type.value}
-              className={`text-sm px-2 py-1 rounded ${selectedType === type.value ? 'text-primary font-semibold' : 'text-gray-700 hover:bg-gray-100'}`}
+              className={`text-sm px-2 py-1 rounded ${selectedType === type.value ? 'text-primary font-semibold' : 'text-greyscale-700 hover:bg-greyscale-100'}`}
               onClick={() => setSelectedType(type.value)}
             >
               {type.label}
@@ -61,7 +61,7 @@ export default function ManageQuestion({ onEdit }: ManageQuestionProps) {
           {DIFFICULTY_LEVELS.map((level) => (
             <button
               key={level.value}
-              className={`text-sm px-2 py-1 rounded ${selectedDifficulty === level.value ? 'text-primary font-semibold' : 'text-gray-700 hover:bg-gray-100'}`}
+              className={`text-sm px-2 py-1 rounded ${selectedDifficulty === level.value ? 'text-primary font-semibold' : 'text-greyscale-700 hover:bg-greyscale-100'}`}
               onClick={() => setSelectedDifficulty(level.value)}
             >
               {level.label}
@@ -74,24 +74,24 @@ export default function ManageQuestion({ onEdit }: ManageQuestionProps) {
       <div className='flex items-center justify-between mb-4'>
         <div className='flex gap-4 items-center'>
           <button
-            className={`text-sm px-2 py-1 rounded border ${sortNewest ? 'bg-green-50 text-green-600 border-green-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}
+            className={`text-sm px-2 py-1 rounded border ${sortNewest ? 'bg-success-0 text-success-200 border-success-200' : 'bg-greyscale-25 text-greyscale-700 border-greyscale-200'}`}
             onClick={() => setSortNewest(true)}
           >
             Mới nhất ↑
           </button>
           <button
-            className={`text-sm px-2 py-1 rounded border ${!sortNewest ? 'bg-green-50 text-green-600 border-green-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}
+            className={`text-sm px-2 py-1 rounded border ${!sortNewest ? 'bg-success-0 text-success-200 border-success-200' : 'bg-greyscale-25 text-greyscale-700 border-greyscale-200'}`}
             onClick={() => setSortNewest(false)}
           >
             Cũ nhất ↓
           </button>
         </div>
         <div className='flex gap-4 items-center'>
-          <div className='text-sm text-gray-600'>
+          <div className='text-sm text-greyscale-600'>
             Tổng cộng <span className='font-semibold'>{questions.length}</span> câu
           </div>
           <div className='flex items-center gap-2'>
-            <label htmlFor='showAnswers' className='text-sm text-gray-700 cursor-pointer'>
+            <label htmlFor='showAnswers' className='text-sm text-greyscale-700 cursor-pointer'>
               Hiển thị đáp án
             </label>
             <Switch id='showAnswers' checked={showAnswers} onCheckedChange={setShowAnswers} />
@@ -102,11 +102,11 @@ export default function ManageQuestion({ onEdit }: ManageQuestionProps) {
       {/* Questions List */}
       <div className='space-y-6'>
         {isLoading && (
-          <div className='text-center text-gray-400 py-8'>
+          <div className='text-center text-greyscale-400 py-8'>
             <LoadingSpinner variant='dots' />
           </div>
         )}
-        {isError && <div className='text-center text-red-400 py-8'>Lỗi tải dữ liệu.</div>}
+        {isError && <div className='text-center text-error py-8'>Lỗi tải dữ liệu.</div>}
         {!isLoading &&
           !isError &&
           sortedQuestions.map((q, idx) => (

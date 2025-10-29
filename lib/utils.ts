@@ -24,6 +24,15 @@ export function formatDateTime(
   return new Intl.DateTimeFormat(locale, options).format(date)
 }
 
+export function formatDate(value: string | number | Date, locale = 'vi-VN') {
+  const date = value instanceof Date ? value : new Date(value)
+
+  if (Number.isNaN(date.getTime())) {
+    return ''
+  }
+
+  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(date)
+}
 
 //Function tính thời gian đã qua bao lâu
 export function timeAgo(dateString: string) {
@@ -40,3 +49,4 @@ export function timeAgo(dateString: string) {
   if (diffMin > 0) return `${diffMin} phút trước`
   return `Vừa xong`
 }
+

@@ -1,7 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-import { ChevronDown, User, Settings, LogOut, HelpCircle } from 'lucide-react'
+import { ChevronDown, Settings, LogOut, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -14,24 +13,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useProfile } from '@/hooks/api/use-profile'
 import { useLogout } from '@/hooks/api/use-auth'
 import { toast } from 'sonner'
 
-interface UserData {
-  name: string
-  email: string
-  avatar?: string
-}
-
-// Mock user data - replace with real data from auth context
-const mockUser: UserData = {
-  name: 'John Doe',
-  email: 'john.doe@example.com',
-  avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John'
-}
-
 export function AvatarDropdown() {
-  const [user] = useState<UserData>(mockUser)
+  const { data: profile, isLoading } = useProfile()
   const router = useRouter()
   const logoutMutation = useLogout()
 
@@ -42,10 +30,20 @@ export function AvatarDropdown() {
       router.push('/login')
     } catch (error) {
       console.error('Logout failed:', error)
-
       toast.error('Failed to log out. Please try again.')
     }
   }
+
+  if (isLoading || !profile) {
+    return <Skeleton className='h-8 w-8 rounded-lg' />
+  }
+
+  const getInitials = (name: string) =>
+    name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
 
   return (
     <DropdownMenu>
@@ -56,13 +54,9 @@ export function AvatarDropdown() {
           aria-label='User menu'
         >
           <Avatar className='h-6 w-6'>
-            <AvatarImage src={user.avatar} alt={user.name} />
+            <AvatarImage src={profile.avatar} alt={profile.name} />
             <AvatarFallback className='bg-primary-100 text-xs font-medium text-primary-foreground'>
-              {user.name
-                .split(' ')
-                .map((n) => n[0])
-                .join('')
-                .toUpperCase()}
+              {getInitials(profile.name)}
             </AvatarFallback>
           </Avatar>
           <ChevronDown className='h-4 w-4 text-greyscale-600' />
@@ -71,17 +65,11 @@ export function AvatarDropdown() {
       <DropdownMenuContent align='end' className='w-56'>
         <DropdownMenuLabel>
           <div className='flex flex-col space-y-1'>
-            <p className='text-sm font-medium text-greyscale-900'>{user.name}</p>
-            <p className='text-xs text-greyscale-500'>{user.email}</p>
+            <p className='text-sm font-medium text-greyscale-900'>{profile.name}</p>
+            <p className='text-xs text-greyscale-500'>{profile.email}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href='/profile' className='flex cursor-pointer items-center gap-2'>
-            <User className='h-4 w-4' />
-            <span>Profile</span>
-          </Link>
-        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href='/settings' className='flex cursor-pointer items-center gap-2'>
             <Settings className='h-4 w-4' />

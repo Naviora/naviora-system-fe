@@ -75,6 +75,8 @@ function getPaginationItems(currentPage: number, totalPages: number): Pagination
 export function LecturerModulesPageClient() {
   const [searchTerm, setSearchTerm] = useState('')
   const [page, setPage] = useState(1)
+  const [sortBy, setSortBy] = useState('module_name')
+  const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('ASC')
 
   const debouncedSearch = useDebounce(searchTerm)
 
@@ -82,9 +84,11 @@ export function LecturerModulesPageClient() {
     () => ({
       limit: MODULE_QUERY_DEFAULTS.limit,
       page,
-      q: debouncedSearch || undefined
+      q: debouncedSearch || undefined,
+      sort_by: sortBy,
+      order: sortOrder
     }),
-    [debouncedSearch, page]
+    [debouncedSearch, page, sortBy, sortOrder]
   )
 
   const modulesQuery = useModules(queryParams)
@@ -116,6 +120,16 @@ export function LecturerModulesPageClient() {
     setPage(1)
   }, [])
 
+  const handleSortChange = React.useCallback((newSortBy: string) => {
+    setSortBy(newSortBy)
+    setPage(1)
+  }, [])
+
+  const handleSortOrderChange = React.useCallback((newOrder: 'ASC' | 'DESC') => {
+    setSortOrder(newOrder)
+    setPage(1)
+  }, [])
+
   const handlePageChange = React.useCallback(
     (nextPage: number) => {
       if (nextPage === currentPage || nextPage < 1 || nextPage > safeTotalPages) {
@@ -141,7 +155,10 @@ export function LecturerModulesPageClient() {
         <ModuleToolbar
           searchValue={searchTerm}
           onSearchChange={handleSearchChange}
-          isSearchDisabled={modulesQuery.isFetching}
+          sortBy={sortBy}
+          onSortChange={handleSortChange}
+          sortOrder={sortOrder}
+          onSortOrderChange={handleSortOrderChange}
         />
 
         <div className='mt-6'>
@@ -160,73 +177,75 @@ export function LecturerModulesPageClient() {
             </div>
           ) : hasModules ? (
             <>
-              <LecturerModuleGrid modules={moduleCards} />
-
-              {hasModules ? (
-                <div className='mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
-                  <p className='text-sm text-muted-foreground'>
-                    Hiển thị {fromRecord}-{toRecord} trên tổng số {totalRecordCount} chuyên đề
-                  </p>
-                  <nav className='flex items-center justify-center gap-2' aria-label='Pagination'>
-                    <Button
-                      type='button'
-                      variant='outline'
-                      size='sm'
-                      className='h-9 w-9 p-0'
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={!canGoPrevious || modulesQuery.isFetching}
-                      aria-label='Trang trước'
-                    >
-                      <ChevronLeftIcon className='size-4' aria-hidden='true' />
-                    </Button>
-                    {paginationItems.map((item, index) => {
-                      if (item === 'ellipsis') {
-                        return (
-                          <span key={`ellipsis-${index}`} className='px-2 text-sm text-muted-foreground'>
-                            …
-                          </span>
-                        )
-                      }
-
-                      const isActive = item === currentPage
-
-                      return (
-                        <Button
-                          key={item}
-                          type='button'
-                          variant={isActive ? 'default' : 'outline'}
-                          size='sm'
-                          className='h-9 w-9 p-0'
-                          onClick={() => handlePageChange(item)}
-                          disabled={isActive || modulesQuery.isFetching}
-                          aria-current={isActive ? 'page' : undefined}
-                        >
-                          {item}
-                        </Button>
-                      )
-                    })}
-                    <Button
-                      type='button'
-                      variant='outline'
-                      size='sm'
-                      className='h-9 w-9 p-0'
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={!canGoNext || modulesQuery.isFetching}
-                      aria-label='Trang tiếp theo'
-                    >
-                      <ChevronRightIcon className='size-4' aria-hidden='true' />
-                    </Button>
-                  </nav>
-                </div>
-              ) : null}
-
               {isFetchingPage ? (
-                <div className='mt-4 grid gap-4 opacity-60 sm:grid-cols-2 xl:grid-cols-3' aria-hidden='true'>
+                <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3' aria-hidden='true'>
                   {Array.from({ length: skeletonCount }).map((_, index) => (
                     <Skeleton key={`loading-${index}`} className='h-48 w-full rounded-xl bg-greyscale-100' />
                   ))}
                 </div>
-              ) : null}
+              ) : (
+                <>
+                  <LecturerModuleGrid modules={moduleCards} />
+
+                  {hasModules ? (
+                    <div className='mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+                      <p className='text-sm text-muted-foreground'>
+                        Hiển thị {fromRecord}-{toRecord} trên tổng số {totalRecordCount} chuyên đề
+                      </p>
+                      <nav className='flex items-center justify-center gap-2' aria-label='Pagination'>
+                        <Button
+                          type='button'
+                          variant='outline'
+                          size='sm'
+                          className='h-9 w-9 p-0'
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          disabled={!canGoPrevious || modulesQuery.isFetching}
+                          aria-label='Trang trước'
+                        >
+                          <ChevronLeftIcon className='size-4' aria-hidden='true' />
+                        </Button>
+                        {paginationItems.map((item, index) => {
+                          if (item === 'ellipsis') {
+                            return (
+                              <span key={`ellipsis-${index}`} className='px-2 text-sm text-muted-foreground'>
+                                …
+                              </span>
+                            )
+                          }
+
+                          const isActive = item === currentPage
+
+                          return (
+                            <Button
+                              key={item}
+                              type='button'
+                              variant={isActive ? 'default' : 'outline'}
+                              size='sm'
+                              className='h-9 w-9 p-0'
+                              onClick={() => handlePageChange(item)}
+                              disabled={isActive || modulesQuery.isFetching}
+                              aria-current={isActive ? 'page' : undefined}
+                            >
+                              {item}
+                            </Button>
+                          )
+                        })}
+                        <Button
+                          type='button'
+                          variant='outline'
+                          size='sm'
+                          className='h-9 w-9 p-0'
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          disabled={!canGoNext || modulesQuery.isFetching}
+                          aria-label='Trang tiếp theo'
+                        >
+                          <ChevronRightIcon className='size-4' aria-hidden='true' />
+                        </Button>
+                      </nav>
+                    </div>
+                  ) : null}
+                </>
+              )}
             </>
           ) : (
             <div className='flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-greyscale-200 bg-greyscale-50 p-10 text-center'>

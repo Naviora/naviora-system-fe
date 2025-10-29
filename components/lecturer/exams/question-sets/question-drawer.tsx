@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
 import { IoMdAdd, IoMdClose } from 'react-icons/io'
@@ -11,7 +11,13 @@ import { Input } from '@/components/ui/input'
 import { SearchRequest } from '@/types/api/common'
 import { Question } from '@/lib/validations/lecturer/exams/question'
 
-export function QuestionBankDrawer({ onApply }: { onApply: (selectedQuestions: Question[]) => void }) {
+export function QuestionBankDrawer({
+  onApply,
+  selectedIds: externalSelectedIds
+}: {
+  onApply: (selectedQuestions: Question[]) => void
+  selectedIds?: string[]
+}) {
   const [open, setOpen] = useState(false)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [selectedType, setSelectedType] = useState('ALL')
@@ -45,6 +51,12 @@ export function QuestionBankDrawer({ onApply }: { onApply: (selectedQuestions: Q
     setSearchValue(search)
   }
 
+  useEffect(() => {
+    if (open) {
+      setSelectedIds(externalSelectedIds ?? [])
+    }
+  }, [open, externalSelectedIds])
+
   return (
     <>
       <Button variant='outline' size={'sm'} className='flex items-center gap-2' onClick={() => setOpen(true)}>
@@ -67,7 +79,7 @@ export function QuestionBankDrawer({ onApply }: { onApply: (selectedQuestions: Q
               {QUESTION_TYPES.map((type) => (
                 <button
                   key={type.value}
-                  className={`text-sm px-2 py-1 rounded ${selectedType === type.value ? 'text-primary font-semibold' : 'text-gray-700 hover:bg-gray-100'}`}
+                  className={`text-sm px-2 py-1 rounded ${selectedType === type.value ? 'text-primary font-semibold' : 'text-greyscale-700 hover:bg-greyscale-100'}`}
                   onClick={() => setSelectedType(type.value)}
                 >
                   {type.label}
@@ -79,7 +91,7 @@ export function QuestionBankDrawer({ onApply }: { onApply: (selectedQuestions: Q
               {DIFFICULTY_LEVELS.map((level) => (
                 <button
                   key={level.value}
-                  className={`text-sm px-2 py-1 rounded ${selectedDifficulty === level.value ? 'text-primary font-semibold' : 'text-gray-700 hover:bg-gray-100'}`}
+                  className={`text-sm px-2 py-1 rounded ${selectedDifficulty === level.value ? 'text-primary font-semibold' : 'text-greyscale-700 hover:bg-greyscale-100'}`}
                   onClick={() => setSelectedDifficulty(level.value)}
                 >
                   {level.label}
@@ -123,7 +135,7 @@ export function QuestionBankDrawer({ onApply }: { onApply: (selectedQuestions: Q
                       <span className='bg-yellow-50 text-yellow-700 px-2 py-0.5 rounded'>{getDifficultyLabel(q.difficulty)}</span>
                     </div>
                     <div className='font-medium'>{q.content}</div>
-                    <ul className='ml-4 list-disc text-sm text-gray-600'>
+                    <ul className='ml-4 list-disc text-sm text-greyscale-600'>
                       {q.answers?.map((a, idx: number) => (
                         <li key={a.answer_id || idx}>
                           {a.content} {a.is_correct && <span className='text-green-600 font-semibold'>(Đúng)</span>}
@@ -134,7 +146,7 @@ export function QuestionBankDrawer({ onApply }: { onApply: (selectedQuestions: Q
                 </div>
               ))}
           </div>
-          <div className='flex items-center justify-between px-6 py-4 border-t bg-white'>
+          <div className='flex items-center justify-between px-6 py-4 border-t bg-greyscale-0'>
             <span>
               Đã chọn: <b>{selectedIds.length}</b> câu
             </span>
