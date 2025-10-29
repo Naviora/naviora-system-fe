@@ -7,7 +7,9 @@ import {
   clearStoredUserRole,
   getStoredAccessToken,
   setStoredAuthTokens,
-  setStoredUserRole
+  setStoredUserRole,
+  setStoredHasParticipatedEntryTest,
+  clearStoredHasParticipatedEntryTest
 } from '@/lib/utils/auth-storage'
 
 export { getStoredUserRole, clearStoredUserRole } from '@/lib/utils/auth-storage'
@@ -20,6 +22,11 @@ export const useLogin = () => {
       if (typeof window !== 'undefined') {
         setStoredAuthTokens(response.access_token, response.refresh_token)
         setStoredUserRole(response.role)
+        if (response.role === 'Student') {
+          setStoredHasParticipatedEntryTest(!!response.has_participated_entry_test)
+        } else {
+          clearStoredHasParticipatedEntryTest()
+        }
       }
     },
     onError: (error) => {
@@ -38,6 +45,7 @@ export const useLogout = () => {
       if (typeof window !== 'undefined') {
         clearStoredAuthTokens()
         clearStoredUserRole()
+        clearStoredHasParticipatedEntryTest()
         localStorage.removeItem(AUTH_STORAGE_KEYS.rememberMe)
       }
     }

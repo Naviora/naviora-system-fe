@@ -6,6 +6,7 @@ import { SidebarProvider } from '@/components/ui/sidebar'
 import { AuthGuard } from '@/components/guard/auth-guard'
 import { usePathname } from 'next/navigation'
 import { BreadcrumbProvider } from '@/lib/context/breadcrumb-context'
+import { EntryTestGuard } from '@/components/guard/entry-test-guard'
 
 export default function MainLayout({
   children
@@ -16,7 +17,7 @@ export default function MainLayout({
   const isMeetingPage = pathname?.includes('/meeting')
 
   return (
-    <AuthGuard>
+       <AuthGuard>
       {isMeetingPage ? (
         children
       ) : (
