@@ -15,7 +15,6 @@ export default function ManageQuestion({ onEdit }: ManageQuestionProps) {
   const [selectedType, setSelectedType] = useState('ALL')
   const [selectedDifficulty, setSelectedDifficulty] = useState('ALL')
   const [sortNewest, setSortNewest] = useState(true)
-  const [showAnswers, setShowAnswers] = useState(false)
 
   const {
     data: questionsData,
@@ -90,12 +89,6 @@ export default function ManageQuestion({ onEdit }: ManageQuestionProps) {
           <div className='text-sm text-greyscale-600'>
             Tổng cộng <span className='font-semibold'>{questions.length}</span> câu
           </div>
-          <div className='flex items-center gap-2'>
-            <label htmlFor='showAnswers' className='text-sm text-greyscale-700 cursor-pointer'>
-              Hiển thị đáp án
-            </label>
-            <Switch id='showAnswers' checked={showAnswers} onCheckedChange={setShowAnswers} />
-          </div>
         </div>
       </div>
 
@@ -110,7 +103,7 @@ export default function ManageQuestion({ onEdit }: ManageQuestionProps) {
         {!isLoading &&
           !isError &&
           sortedQuestions.map((q, idx) => (
-            <QuestionCard key={q.question_id} question={q} index={idx} showAnswers={showAnswers} onEdit={onEdit} />
+            <QuestionCard key={q.question_id} question={q} index={idx} onEdit={onEdit} />
           ))}
         {!isLoading && !isError && sortedQuestions.length === 0 && (
           <NEmpty
