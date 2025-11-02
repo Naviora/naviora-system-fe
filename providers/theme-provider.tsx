@@ -13,6 +13,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       attribute='class'
       defaultTheme='system'
       enableSystem
+      storageKey='naviora-theme'
       disableTransitionOnChange
     >
       {children}

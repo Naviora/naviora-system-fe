@@ -84,9 +84,13 @@ export function ThemeToggleSimple() {
   }
 
   const toggleTheme = () => {
+    // Xử lý logic toggle: system -> dark -> light -> system (nếu cần) hoặc chỉ dark/light
     if (theme === 'dark') {
       setTheme('light')
+    } else if (theme === 'light') {
+      setTheme('dark')
     } else {
+      // Nếu theme hiện tại là 'system' hoặc undefined, mặc định chuyển sang 'dark'
       setTheme('dark')
     }
   }
