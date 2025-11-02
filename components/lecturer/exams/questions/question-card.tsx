@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react'
-import { Question } from '@/lib/validations/lecturer/exams/question'
+import { Answer, Question } from '@/lib/validations/lecturer/exams/question'
 import { FaRegEdit } from 'react-icons/fa'
 import { MdDeleteOutline, MdOutlineRemoveRedEye } from 'react-icons/md'
 import { getTypeLabel, getDifficultyLabel } from '@/lib/constants/exams'
@@ -131,7 +131,7 @@ export const QuestionCard = ({ question: q, index: idx, onEdit, onDelete }: Ques
             <div>
               <span className="font-semibold">Đáp án:</span>
               <ul className="list-disc ml-6 mt-1 space-y-1">
-                {q.answers?.map((ans: any, i: number) => (
+                {q.answers?.map((ans: Answer) => (
                   <li key={ans.answer_id} className={`text-base ${ans.is_correct ? 'text-green-700 font-semibold' : ''}`}>
                     {ans.content}
                     {ans.is_correct && (
