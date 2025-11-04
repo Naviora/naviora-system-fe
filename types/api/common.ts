@@ -68,7 +68,8 @@ export interface MultiFileUploadResponse {
 
 // Search types
 export interface SearchRequest {
-  query: string
+  q?: string
+  query?: string
   filters?: Record<string, unknown>
   page?: number
   limit?: number

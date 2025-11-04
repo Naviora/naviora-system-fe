@@ -1,6 +1,6 @@
 // API Configuration Constants
 export const API_CONFIG = {
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api',
+  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1',
   TIMEOUT: 30000, // 30 seconds
   RETRY_ATTEMPTS: 3,
   RETRY_DELAY: 1000 // 1 second
@@ -12,6 +12,27 @@ export const QUERY_KEYS = {
   AUTH: ['auth'] as const,
   CURRENT_USER: ['auth', 'currentUser'] as const,
   USER_PREFERENCES: ['auth', 'preferences'] as const,
+
+  // Roles
+  ROLES: ['roles'] as const,
+
+  // Modules
+  MODULES: ['modules'] as const,
+  MODULE_LIST: (filters?: Record<string, unknown>) => ['modules', 'list', filters] as const,
+  MODULE_DETAIL: (moduleId: string) => ['modules', 'detail', moduleId] as const,
+  MODULE_LESSONS: (moduleId: string) => ['modules', 'detail', moduleId, 'lessons'] as const,
+  LESSON_DETAIL: (lessonId: string) => ['lessons', 'detail', lessonId] as const,
+
+  // Materials
+  MATERIALS: ['materials'] as const,
+  MATERIAL_DETAIL: (materialId: string) => ['materials', 'detail', materialId] as const,
+  TEACHING_MATERIAL: ['teaching-material'] as const,
+  TEACHING_MATERIAL_DETAIL: (teachingMaterialId: string) =>
+    ['teaching-material', 'detail', teachingMaterialId] as const,
+
+  // Classes
+  CLASSES: ['classes'] as const,
+  CLASS_LIST: (filters?: Record<string, unknown>) => ['classes', 'list', filters] as const,
 
   // Users
   USERS: ['users'] as const,
