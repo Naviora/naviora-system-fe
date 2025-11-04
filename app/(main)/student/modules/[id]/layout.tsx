@@ -1,14 +1,21 @@
 'use client'
 
-import { ModuleDetailSidebar } from "@/components/student/modules/module-detail-sidebar";
+import { useParams, usePathname } from 'next/navigation'
+import { ModuleDetailSidebar } from '@/components/student/modules/detail'
 
 export default function ModuleDetailLayout({ children }: { children: React.ReactNode }) {
+  const params = useParams()
+  const pathname = usePathname()
+  const moduleId = params.id as string
+
+  // Extract lessonId từ URL: /student/modules/[id]/lessons/[lessonId]
+  const lessonIdMatch = pathname.match(/\/lessons\/([^\/]+)/)
+  const selectedLessonId = lessonIdMatch ? lessonIdMatch[1] : undefined
+
   return (
-    <div className="flex">
-      <ModuleDetailSidebar />
-      <main className="flex-grow p-6">
-        {children}
-      </main>
+    <div className='flex h-screen bg-gray-50 dark:bg-gray-900'>
+      <ModuleDetailSidebar moduleId={moduleId} selectedLessonId={selectedLessonId} />
+      <main className='flex-1 overflow-hidden'>{children}</main>
     </div>
-  );
+  )
 }
