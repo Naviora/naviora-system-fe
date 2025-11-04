@@ -191,9 +191,9 @@ jobs:
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]] && \
              [[ "${{ github.base_ref }}" == "develop" ]]; then
-            echo "TAG=pr-${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+            echo "TAG_FE=pr-${{ github.event.pull_request.number }}" >> $GITHUB_ENV
           else
-            echo "TAG=develop" >> $GITHUB_ENV
+            echo "TAG_FE=develop" >> $GITHUB_ENV
           fi
 
       - name: SSH and deploy to development
@@ -206,4 +206,4 @@ jobs:
           script: |
             docker pull ${{ env.NON_PROD_IMAGE_NAME }}:${{ env.TAG_FE }}
             cd be-non-prod
-            TAG=${{ env.TAG_FE }} docker compose up -d
+            TAG_FE=${{ env.TAG_FE }} docker compose up -d
