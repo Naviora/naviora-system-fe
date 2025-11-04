@@ -43,5 +43,7 @@ next-env.d.ts
 /docs
 /.gemini
 GEMINI.md
-
+/.github/commands
+.ai-devkit.json
+AGENTS.md
 /logs
