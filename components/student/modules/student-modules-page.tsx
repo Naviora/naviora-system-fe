@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { DayStreak } from '@/components/common/day-streak'
 import { StudentModuleGrid, StudentModuleToolbar } from '@/components/student/modules'
 import { motion } from 'framer-motion'
 import { useClassModules, type ClassModule } from '@/hooks/api/student/use-class-modules'
 import { ModuleCardProps } from '@/components/student/modules/module-card'
+import { useSetBreadcrumbItems } from '@/lib/context/breadcrumb-context'
 
 function transformClassModulesToCards(classModules: ClassModule[] | undefined): ModuleCardProps[] {
   if (!Array.isArray(classModules)) return []
@@ -23,6 +24,11 @@ function transformClassModulesToCards(classModules: ClassModule[] | undefined): 
 export function StudentModulesPageClient() {
   const [selectedClassId, setSelectedClassId] = useState<string>('')
   const { data: classModules, isLoading } = useClassModules(selectedClassId)
+  const setBreadcrumbItems = useSetBreadcrumbItems()
+
+  useEffect(() => {
+    setBreadcrumbItems([])
+  }, [setBreadcrumbItems])
 
   const transformedModules = transformClassModulesToCards(classModules)
 

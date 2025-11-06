@@ -1,11 +1,15 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect } from 'react'
 import { LessonContentViewer } from '@/components/student/modules/detail'
 import { ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useParams } from 'next/navigation'
 import { useLessonDetail } from '@/hooks/api/use-lessons'
+import { useModuleLessons } from '@/hooks/api/use-modules'
+import { useSetBreadcrumbItems } from '@/lib/context/breadcrumb-context'
+import { useRoleContext } from '@/providers/role-provider'
 
 // Transform API lesson response to Lesson interface
 interface MaterialFile {
@@ -64,15 +68,24 @@ export default function LessonPage() {
   const params = useParams()
   const moduleId = params.id as string
   const lessonId = params.lessonId as string
+  const setBreadcrumbItems = useSetBreadcrumbItems()
+  const { role } = useRoleContext()
 
   const { data: apiLesson, isLoading } = useLessonDetail(lessonId)
+  const { data: moduleData } = useModuleLessons(moduleId)
 
-  // Transform API response
-  // useLessonDetail returns wrapped response: { status_code, message, data: {...} }
-  // We need to check the structure and extract the actual lesson data
+  useEffect(() => {
+    if (apiLesson?.data?.lesson_name && moduleData?.module_name) {
+      setBreadcrumbItems([
+        { label: 'Chuyên đề', href: `/${role?.toLowerCase()}/modules` },
+        { label: moduleData.module_name, href: `/${role?.toLowerCase()}/modules/${moduleId}` },
+        { label: apiLesson.data.lesson_name, href: `/${role?.toLowerCase()}/modules/${moduleId}/lessons/${lessonId}` }
+      ])
+    }
+  }, [apiLesson?.data?.lesson_name, moduleData?.module_name, moduleId, lessonId, role, setBreadcrumbItems])
+
   const lesson = apiLesson?.data ? transformLessonResponse(apiLesson.data as Record<string, unknown>) : null
 
-  // Show loading state
   if (isLoading) {
     return (
       <div className='flex flex-col h-full items-center justify-center p-8'>
