@@ -106,9 +106,7 @@ export const LessonContentViewer = ({ lesson }: LessonContentViewerProps) => {
         {activeTab === 'content' && (
           <div className='max-w-4xl'>
             <h2 className='text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4'>{lesson.content.title}</h2>
-            <div className='prose dark:prose-invert max-w-none'>
-              <p className='text-gray-700 dark:text-gray-300 leading-relaxed'>{lesson.content.body}</p>
-            </div>
+            <div className='htmlContent max-w-none' dangerouslySetInnerHTML={{ __html: lesson.content.body }} />
           </div>
         )}
 
