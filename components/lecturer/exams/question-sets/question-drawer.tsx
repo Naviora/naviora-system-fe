@@ -74,7 +74,7 @@ export function QuestionBankDrawer({
         Thêm câu hỏi từ ngân hàng
       </Button>
       <Drawer open={open} onOpenChange={setOpen} direction='right'>
-        <DrawerContent className='!max-w-3xl w-full'>
+        <DrawerContent className='max-w-3xl! w-full'>
           <DrawerHeader>
             <DrawerTitle>Chọn câu hỏi từ ngân hàng</DrawerTitle>
             <DrawerClose asChild>
