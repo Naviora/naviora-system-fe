@@ -8,7 +8,6 @@ export default function ModuleDetailLayout({ children }: { children: React.React
   const pathname = usePathname()
   const moduleId = params.id as string
 
-  // Extract lessonId từ URL: /student/modules/[id]/lessons/[lessonId]
   const lessonIdMatch = pathname.match(/\/lessons\/([^\/]+)/)
   const selectedLessonId = lessonIdMatch ? lessonIdMatch[1] : undefined
 
