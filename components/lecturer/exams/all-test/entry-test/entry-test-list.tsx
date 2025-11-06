@@ -8,13 +8,28 @@ import EntryTestModal from "./entry-test-modal"
 import { useGetEntryTests, useCreateEntryTest, useDeleteEntryTest } from "@/hooks/api/lecturer/exams/use-entry-test"
 import { EntryTestCard } from "@/components/lecturer/exams/all-test/entry-test/entry-test-card"
 import { toast } from "sonner"
+import { Pagination } from "@/components/ui/pagination"
+import { Input } from "@/components/ui/input"
 
 export default function EntryTestList() {
   const [sortNewest, setSortNewest] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const [searchValue, setSearchValue] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 5
 
-  const { data, isLoading, isError } = useGetEntryTests()
+  const queryParams: any = {
+    limit: pageSize,
+    page: currentPage
+  }
+  if (searchValue.trim() !== '') {
+    queryParams.q = searchValue
+  }
+
+  const { data, isLoading, isError } = useGetEntryTests(queryParams)
   const entryTests = data?.entry_tests || []
+  const totalPages = data?.pagination?.total_pages ?? 1
 
   const createMutation = useCreateEntryTest()
   const deleteMutation = useDeleteEntryTest()
@@ -52,29 +67,40 @@ export default function EntryTestList() {
     return sortNewest ? dateB.getTime() - dateA.getTime() : dateA.getTime() - dateB.getTime()
   })
 
+  const handleSearch = () => {
+    setSearchValue(search)
+    setCurrentPage(1)
+  }
+
   return (
     <div className="bg-greyscale-0 rounded-lg shadow p-4">
       <div className="mb-2 flex items-center justify-between">
         <div className="text-lg font-semibold">Bài thi đầu vào</div>
         <Button
-          className="flex items-center gap-2 rounded-2xl h-[36px] text-sm bg-primary hover:bg-primary-300 text-greyscale-0 font-semibold"
+          className="flex items-center gap-2 rounded-2xl h-9 text-sm bg-primary hover:bg-primary-300 text-greyscale-0 font-semibold"
           onClick={() => setModalOpen(true)}
         >
           <IoMdAdd className="size-4 text-greyscale-0" />
           Thêm mới
         </Button>
       </div>
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex items-end justify-between">
         <div className="flex gap-2">
           <button
             className={`text-sm px-2 py-1 rounded border ${sortNewest ? 'bg-success-0 text-success-200 border-success-200' : 'bg-greyscale-25 text-greyscale-700 border-greyscale-200'}`}
-            onClick={() => setSortNewest(true)}
+            onClick={() => {
+              setSortNewest(true)
+              setCurrentPage(1)
+            }}
           >
             Mới nhất ↑
           </button>
           <button
             className={`text-sm px-2 py-1 rounded border ${!sortNewest ? 'bg-success-0 text-success-200 border-success-200' : 'bg-greyscale-25 text-greyscale-700 border-greyscale-200'}`}
-            onClick={() => setSortNewest(false)}
+            onClick={() => {
+              setSortNewest(false)
+              setCurrentPage(1)
+            }}
           >
             Cũ nhất ↓
           </button>
@@ -82,6 +108,24 @@ export default function EntryTestList() {
         <div className="text-sm text-greyscale-600">
           Tổng cộng <span className="font-semibold">{entryTests.length}</span> bài thi
         </div>
+      </div>
+
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex gap-2 items-center">
+          <Input
+            placeholder="Tìm kiếm bài thi đầu vào..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') handleSearch()
+            }}
+            className="w-xs h-8"
+          />
+          <Button variant="default" size="sm" onClick={handleSearch}>
+            Tìm kiếm
+          </Button>
+        </div>
+        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
       </div>
       <div className="space-y-6">
         {isLoading && <div className="text-center text-greyscale-400 py-8"><LoadingSpinner variant="dots" /></div>}

@@ -22,7 +22,7 @@ export default function OtherTestList() {
     <div className="bg-greyscale-0 rounded-lg shadow p-4">
       <div className="mb-2 flex items-center justify-between">
         <div className="text-lg font-semibold">Các bài thi khác</div>
-        <Button className="flex items-center gap-2 rounded-2xl h-[36px] text-sm bg-primary hover:bg-primary-300 text-greyscale-0 font-semibold">
+        <Button className="flex items-center gap-2 rounded-2xl h-9 text-sm bg-primary hover:bg-primary-300 text-greyscale-0 font-semibold">
           <IoMdAdd className="size-4 text-greyscale-0" />
           Thêm mới
         </Button>

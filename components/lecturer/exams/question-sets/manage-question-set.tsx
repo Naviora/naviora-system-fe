@@ -12,17 +12,45 @@ import { LoadingSpinner } from '@/components/ui'
 import { toast } from 'sonner'
 import { QuestionSetModal } from './question-set-modal'
 import { Question } from '@/lib/validations/lecturer/exams/question'
+import { Pagination } from '@/components/ui/pagination'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { SearchRequest } from '@/types/api/common'
 
 export default function ManageQuestionSet() {
   const [editId, setEditId] = useState<string | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [sortNewest, setSortNewest] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [search, setSearch] = useState('')
+  const [searchValue, setSearchValue] = useState('')
+  const pageSize = 5
+
+  const queryParams: SearchRequest = {
+    limit: pageSize,
+    page: currentPage
+  }
+  if (searchValue.trim() !== '') {
+    queryParams.q = searchValue
+  }
+
+  const { data: questionSetData, isLoading, isError } = useGetQuestionSets(queryParams)
+  const questionSets = questionSetData?.question_sets || []
+  const totalPages = questionSetData?.pagiantion?.total_pages ?? 0
+
+  const sortedSets = [...questionSets].sort((a, b) => {
+    const dateA = new Date(a.created_at)
+    const dateB = new Date(b.created_at)
+    return sortNewest ? dateB.getTime() - dateA.getTime() : dateA.getTime() - dateB.getTime()
+  })
+
+  const handleSearch = () => {
+    setSearchValue(search)
+    setCurrentPage(1)
+  }
+
   const deleteMutation = useDeleteQuestionSet()
   const updateMutation = useUpdateQuestionSet()
-  const { data: questionSetData, isLoading, isError } = useGetQuestionSets({ limit: 50, page: 1 })
-  const questionSets = questionSetData?.question_sets || []
-
-  // Lấy detail khi có editId
   const { data: editDetail, isLoading: isEditLoading } = useGetQuestionSetDetail(editId ?? '')
 
   const handleEdit = (data: any) => {
@@ -88,26 +116,26 @@ export default function ManageQuestionSet() {
     )
   }
 
-  const sortedSets = [...questionSets].sort((a, b) => {
-    const dateA = new Date(a.created_at)
-    const dateB = new Date(b.created_at)
-    return sortNewest ? dateB.getTime() - dateA.getTime() : dateA.getTime() - dateB.getTime()
-  })
-
   return (
     <div className='rounded-lg shadow p-4'>
       <div className='mb-2 text-lg font-semibold'>Danh sách bộ câu hỏi</div>
-      <div className='mb-4 flex items-center justify-between'>
+      <div className='mb-4 flex items-end justify-between'>
         <div className='flex gap-2'>
           <button
             className={`text-sm px-2 py-1 rounded border ${sortNewest ? 'bg-success-0 text-success-200 border-success-200' : 'bg-greyscale-25 text-greyscale-700 border-greyscale-200'}`}
-            onClick={() => setSortNewest(true)}
+            onClick={() => {
+              setSortNewest(true)
+              setCurrentPage(1)
+            }}
           >
             Mới nhất ↑
           </button>
           <button
             className={`text-sm px-2 py-1 rounded border ${!sortNewest ? 'bg-success-0 text-success-200 border-success-200' : 'bg-greyscale-25 text-greyscale-700 border-greyscale-200'}`}
-            onClick={() => setSortNewest(false)}
+            onClick={() => {
+              setSortNewest(false)
+              setCurrentPage(1)
+            }}
           >
             Cũ nhất ↓
           </button>
@@ -116,6 +144,28 @@ export default function ManageQuestionSet() {
           Tổng cộng <span className='font-semibold'>{questionSets.length}</span> bộ câu hỏi
         </div>
       </div>
+
+      <div className='flex items-center justify-between mb-4'>
+        {/* Search input */}
+        <div className='flex gap-2 items-center'>
+          <Input
+            placeholder='Tìm kiếm bộ câu hỏi...'
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleSearch()
+            }}
+            className='w-xs h-8'
+          />
+          <Button variant='default' size='sm' onClick={handleSearch}>
+            Tìm kiếm
+          </Button>
+        </div>
+        <div>
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+        </div>
+      </div>
+
       <div className='space-y-6'>
         {isLoading && (
           <div className='text-center text-greyscale-400 py-8'>
