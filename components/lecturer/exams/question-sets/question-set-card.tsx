@@ -46,7 +46,7 @@ export const QuestionSetCard = ({ questionSet: qs, index, onEdit, onDelete }: Qu
             onClick={() => onEdit(qs)}
           >
             <FaRegEdit />
-            <span>Chỉnh sửa</span>
+            <span>Sửa</span>
           </Button>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>

@@ -138,14 +138,6 @@ export function LoginForm({ onSuccess, redirectTo, className = '' }: LoginFormPr
               </Link>
             </div>
 
-            <div className='flex items-center gap-4'>
-              <Separator className='flex-1' />
-              <span className='text-sm text-muted-foreground'>Hoặc đăng nhập với</span>
-              <Separator className='flex-1' />
-            </div>
-
-            <GoogleLoginButton />
-
             <Button type='submit' className='w-full' disabled={loginMutation.isPending}>
               {loginMutation.isPending ? (
                 <>
