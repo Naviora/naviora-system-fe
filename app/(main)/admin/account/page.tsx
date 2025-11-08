@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -35,6 +35,199 @@ const createAccountSchema = z.object({
 })
 
 type CreateAccountFormData = z.infer<typeof createAccountSchema>
+
+// Utility functions for email and password generation
+const removeVietnameseDiacritics = (str: string): string => {
+  const diacriticsMap: Record<string, string> = {
+    à: 'a',
+    á: 'a',
+    ạ: 'a',
+    ả: 'a',
+    ã: 'a',
+    â: 'a',
+    ầ: 'a',
+    ấ: 'a',
+    ậ: 'a',
+    ẩ: 'a',
+    ẫ: 'a',
+    ă: 'a',
+    ằ: 'a',
+    ắ: 'a',
+    ặ: 'a',
+    ẳ: 'a',
+    ẵ: 'a',
+    è: 'e',
+    é: 'e',
+    ẹ: 'e',
+    ẻ: 'e',
+    ẽ: 'e',
+    ê: 'e',
+    ề: 'e',
+    ế: 'e',
+    ệ: 'e',
+    ể: 'e',
+    ễ: 'e',
+    ì: 'i',
+    í: 'i',
+    ị: 'i',
+    ỉ: 'i',
+    ĩ: 'i',
+    ò: 'o',
+    ó: 'o',
+    ọ: 'o',
+    ỏ: 'o',
+    õ: 'o',
+    ô: 'o',
+    ồ: 'o',
+    ố: 'o',
+    ộ: 'o',
+    ổ: 'o',
+    ỗ: 'o',
+    ơ: 'o',
+    ờ: 'o',
+    ớ: 'o',
+    ợ: 'o',
+    ở: 'o',
+    ỡ: 'o',
+    ù: 'u',
+    ú: 'u',
+    ụ: 'u',
+    ủ: 'u',
+    ũ: 'u',
+    ư: 'u',
+    ừ: 'u',
+    ứ: 'u',
+    ự: 'u',
+    ử: 'u',
+    ữ: 'u',
+    ỳ: 'y',
+    ý: 'y',
+    ỵ: 'y',
+    ỷ: 'y',
+    ỹ: 'y',
+    đ: 'd',
+    À: 'A',
+    Á: 'A',
+    Ạ: 'A',
+    Ả: 'A',
+    Ã: 'A',
+    Â: 'A',
+    Ầ: 'A',
+    Ấ: 'A',
+    Ậ: 'A',
+    Ẩ: 'A',
+    Ẫ: 'A',
+    Ă: 'A',
+    Ằ: 'A',
+    Ắ: 'A',
+    Ặ: 'A',
+    Ẳ: 'A',
+    Ẵ: 'A',
+    È: 'E',
+    É: 'E',
+    Ẹ: 'E',
+    Ẻ: 'E',
+    Ẽ: 'E',
+    Ê: 'E',
+    Ề: 'E',
+    Ế: 'E',
+    Ệ: 'E',
+    Ể: 'E',
+    Ễ: 'E',
+    Ì: 'I',
+    Í: 'I',
+    Ị: 'I',
+    Ỉ: 'I',
+    Ĩ: 'I',
+    Ò: 'O',
+    Ó: 'O',
+    Ọ: 'O',
+    Ỏ: 'O',
+    Õ: 'O',
+    Ô: 'O',
+    Ồ: 'O',
+    Ố: 'O',
+    Ộ: 'O',
+    Ổ: 'O',
+    Ỗ: 'O',
+    Ơ: 'O',
+    Ờ: 'O',
+    Ớ: 'O',
+    Ợ: 'O',
+    Ở: 'O',
+    Ỡ: 'O',
+    Ù: 'U',
+    Ú: 'U',
+    Ụ: 'U',
+    Ủ: 'U',
+    Ũ: 'U',
+    Ư: 'U',
+    Ừ: 'U',
+    Ứ: 'U',
+    Ự: 'U',
+    Ử: 'U',
+    Ữ: 'U',
+    Ỳ: 'Y',
+    Ý: 'Y',
+    Ỵ: 'Y',
+    Ỷ: 'Y',
+    Ỹ: 'Y',
+    Đ: 'D'
+  }
+
+  return str
+    .split('')
+    .map((char) => diacriticsMap[char] || char)
+    .join('')
+    .toLowerCase()
+}
+
+const generateEmailFromName = (name: string): string => {
+  if (!name.trim()) return ''
+
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 0) return ''
+
+  // Lấy tên (phần cuối cùng)
+  const lastName = removeVietnameseDiacritics(parts[parts.length - 1])
+
+  // Lấy chữ cái đầu của các phần còn lại (họ và tên đệm)
+  const initials = parts
+    .slice(0, -1)
+    .map((part) => removeVietnameseDiacritics(part)[0])
+    .join('')
+
+  // Format: tên + chữ cái đầu của họ và tên đệm
+  const email = `${lastName}${initials}@gmail.com`
+
+  return email
+}
+
+const generateRandomPassword = (): string => {
+  const lowercase = 'abcdefghijklmnopqrstuvwxyz'
+  const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const numbers = '0123456789'
+  const special = '!@#$%^&*'
+
+  // Đảm bảo có ít nhất 1 ký tự từ mỗi loại
+  let password = ''
+  password += lowercase[Math.floor(Math.random() * lowercase.length)]
+  password += uppercase[Math.floor(Math.random() * uppercase.length)]
+  password += numbers[Math.floor(Math.random() * numbers.length)]
+  password += special[Math.floor(Math.random() * special.length)]
+
+  // Thêm các ký tự ngẫu nhiên để đủ 12 ký tự
+  const allChars = lowercase + uppercase + numbers + special
+  for (let i = password.length; i < 12; i++) {
+    password += allChars[Math.floor(Math.random() * allChars.length)]
+  }
+
+  // Shuffle password để không có pattern rõ ràng
+  return password
+    .split('')
+    .sort(() => Math.random() - 0.5)
+    .join('')
+}
 
 export default function AccountPage() {
   const [query, setQuery] = useState('')
@@ -190,6 +383,51 @@ function CreateAccountDialog({
   })
 
   const [open, setOpen] = useState(false)
+  const [emailManuallyEdited, setEmailManuallyEdited] = useState(false)
+  const [passwordManuallyEdited, setPasswordManuallyEdited] = useState(false)
+
+  const nameValue = form.watch('name')
+
+  // Auto-generate email and password when name changes
+  useEffect(() => {
+    if (!open) return // Don't auto-generate when dialog is closed
+
+    if (nameValue && nameValue.trim()) {
+      // Auto-generate email if not manually edited
+      if (!emailManuallyEdited) {
+        const generatedEmail = generateEmailFromName(nameValue)
+        form.setValue('email', generatedEmail, {
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true
+        })
+      }
+
+      // Auto-generate password if not manually edited or if password is empty
+      const currentPassword = form.getValues('password')
+      if (!passwordManuallyEdited || !currentPassword) {
+        if (!currentPassword) {
+          // Reset flag if password was cleared, allowing regeneration
+          setPasswordManuallyEdited(false)
+        }
+        const generatedPassword = generateRandomPassword()
+        form.setValue('password', generatedPassword, {
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true
+        })
+      }
+    }
+  }, [nameValue, open, emailManuallyEdited, passwordManuallyEdited, form])
+
+  // Reset form and flags when dialog opens/closes
+  useEffect(() => {
+    if (!open) {
+      form.reset({ name: '', email: '', password: '', role: DEFAULT_USER_ROLE })
+      setEmailManuallyEdited(false)
+      setPasswordManuallyEdited(false)
+    }
+  }, [open, form])
 
   const onSubmit = (values: CreateAccountFormData) => {
     void values
@@ -229,7 +467,15 @@ function CreateAccountDialog({
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type='email' placeholder='name@example.com' {...field} />
+                    <Input
+                      type='email'
+                      placeholder='name@example.com'
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e)
+                        setEmailManuallyEdited(true)
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -243,7 +489,15 @@ function CreateAccountDialog({
                 <FormItem>
                   <FormLabel>Mật khẩu</FormLabel>
                   <FormControl>
-                    <Input type='password' placeholder='********' {...field} />
+                    <Input
+                      type='password'
+                      placeholder='********'
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e)
+                        setPasswordManuallyEdited(true)
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
