@@ -18,6 +18,12 @@ interface QuestionCardProps {
   onDelete?: (id: string) => void
 }
 
+const DIFFICULTY_COLORS: Record<string, string> = {
+  EASY: 'bg-green-50 text-green-700',
+  MEDIUM: 'bg-yellow-50 text-yellow-700',
+  HARD: 'bg-red-50 text-red-700',
+}
+
 export const QuestionCard = ({ question: q, index: idx, onEdit, onDelete }: QuestionCardProps) => {
   const [open, setOpen] = useState(false)
   const [viewOpen, setViewOpen] = useState(false)
@@ -49,7 +55,7 @@ export const QuestionCard = ({ question: q, index: idx, onEdit, onDelete }: Ques
             <span className='bg-blue-50 text-blue-600 text-xs px-2 py-0.5 rounded'>
               {getTypeLabel(q.type)}
             </span>
-            <span className='bg-yellow-50 text-yellow-700 text-xs px-2 py-0.5 rounded'>
+            <span className={` text-xs px-2 py-0.5 rounded ${DIFFICULTY_COLORS[q.difficulty]}`}>
               {getDifficultyLabel(q.difficulty)}
             </span>
           </div>
