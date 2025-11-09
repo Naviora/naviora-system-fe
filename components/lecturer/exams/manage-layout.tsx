@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import { Button } from '@/components/ui/button'
-import { IoIosSearch, IoMdAdd } from 'react-icons/io'
+import { IoMdAdd } from 'react-icons/io'
 import React, { useState } from 'react'
 import ManageQuestion from '@/components/lecturer/exams/questions/manage-question'
 import { QuestionDialog } from './questions/question-modal'
@@ -136,19 +136,19 @@ export default function ManageLayout() {
       <div className='flex justify-between'>
         <div className='flex gap-2'>
           <Button
-            className={`rounded-2xl h-[36px] w-[100px] flex justify-center text-sm ${activeTab === 'question' ? 'bg-primary-25 hover:bg-primary-25 text-primary dark:text-white font-semibold' : 'bg-greyscale-100 hover:bg-greyscale-200 text-greyscale-500'}`}
+            className={`rounded-2xl h-9 w-[100px] flex justify-center text-sm ${activeTab === 'question' ? 'bg-primary-25 hover:bg-primary-25 text-primary dark:text-white font-semibold' : 'bg-greyscale-100 hover:bg-greyscale-200 text-greyscale-500'}`}
             onClick={() => setActiveTab('question')}
           >
             Câu hỏi
           </Button>
           <Button
-            className={`rounded-2xl h-[36px] w-[100px] flex justify-center text-sm ${activeTab === 'question-set' ? 'bg-primary-25 hover:bg-primary-25 text-primary dark:text-white font-semibold' : 'bg-greyscale-100 hover:bg-greyscale-200 text-greyscale-500'}`}
+            className={`rounded-2xl h-9 w-[100px] flex justify-center text-sm ${activeTab === 'question-set' ? 'bg-primary-25 hover:bg-primary-25 text-primary dark:text-white font-semibold' : 'bg-greyscale-100 hover:bg-greyscale-200 text-greyscale-500'}`}
             onClick={() => setActiveTab('question-set')}
           >
             Bộ câu hỏi
           </Button>
           <Button
-            className={`rounded-2xl h-[36px] w-[100px] flex justify-center text-sm ${activeTab === 'exam' ? 'bg-primary-25 hover:bg-primary-25 text-primary dark:text-white font-semibold' : 'bg-greyscale-100 hover:bg-greyscale-200 text-greyscale-500'}`}
+            className={`rounded-2xl h-9 w-[100px] flex justify-center text-sm ${activeTab === 'exam' ? 'bg-primary-25 hover:bg-primary-25 text-primary dark:text-white font-semibold' : 'bg-greyscale-100 hover:bg-greyscale-200 text-greyscale-500'}`}
             onClick={() => setActiveTab('exam')}
           >
             Bài thi
@@ -156,14 +156,9 @@ export default function ManageLayout() {
         </div>
 
         <div className='flex gap-2'>
-          <Button variant='outline' className='rounded-2xl h-[36px] w-[200px] flex justify-center items-center text-sm'>
-            <IoIosSearch className='size-4 text-greyscale-500 ml-3' />
-            <input type='text' placeholder='Tìm kiếm...' className='border-none outline-none text-muted-foreground' />
-          </Button>
-
           {activeTab !== 'exam' && (
             <Button
-              className='rounded-2xl h-[36px] flex justify-center items-center text-sm bg-primary hover:bg-primary-300 text-greyscale-0 font-semibold'
+              className='rounded-2xl h-9 flex justify-center items-center text-sm bg-primary hover:bg-primary-300 text-greyscale-0 font-semibold'
               onClick={handleBtnAdd}
             >
               <IoMdAdd className='size-4 text-greyscale-0' />

@@ -1,25 +1,10 @@
 'use client'
 import { LoginForm } from '@/components/forms/login-form'
-import { LoadingSpinner } from '@/components/ui'
 import { isLoggedIn } from '@/hooks/api/use-auth'
-import { useRouter } from 'next/navigation'
-import React, { useEffect } from 'react'
 
 export default function LoginPage() {
-  const router = useRouter()
-
-  useEffect(() => {
-    if (isLoggedIn()) {
-      router.back()
-    }
-  }, [router])
-
   if (isLoggedIn()) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <LoadingSpinner size='lg' />
-      </div>
-    )
+    return null
   }
 
   return (
@@ -28,7 +13,8 @@ export default function LoginPage() {
       <div className='relative flex items-center justify-center bg-greyscale-0 md:w-1/2 w-full *:px-8'>
         <LoginForm className='w-full' />
         <div className='absolute bottom-4 text-sm text-muted-foreground'>
-          Bằng cách tiếp tục, bạn đồng ý với <span className='text-primary hover:underline'>Điều khoản Dịch vụ</span> và <span className='text-primary hover:underline'>Chính sách Bảo mật</span> của chúng tôi.
+          Bằng cách tiếp tục, bạn đồng ý với <span className='text-primary hover:underline'>Điều khoản Dịch vụ</span> và{' '}
+          <span className='text-primary hover:underline'>Chính sách Bảo mật</span> của chúng tôi.
         </div>
       </div>
       <div
@@ -36,7 +22,7 @@ export default function LoginPage() {
         style={{
           backgroundImage: "url('/login-bg.jpg')"
         }}
-        aria-hidden="true"
+        aria-hidden='true'
       ></div>
     </div>
   )

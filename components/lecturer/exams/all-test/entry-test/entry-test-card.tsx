@@ -49,7 +49,7 @@ export const EntryTestCard = ({ entryTest: et, index, onEdit, onDelete }: EntryT
             onClick={() => onEdit(et)}
           >
             <FaRegEdit />
-            <span>Chỉnh sửa</span>
+            <span>Sửa</span>
           </Button>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
