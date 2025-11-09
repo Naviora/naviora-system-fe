@@ -56,7 +56,7 @@ export default function QuestionSetDrawer({
       </Button>
 
       <Drawer open={open} onOpenChange={setOpen} direction='right'>
-        <DrawerContent className='!max-w-3xl w-full'>
+        <DrawerContent className='max-w-3xl! w-full'>
           <DrawerHeader>
             <DrawerTitle>Chọn bộ câu hỏi</DrawerTitle>
             <DrawerClose asChild>

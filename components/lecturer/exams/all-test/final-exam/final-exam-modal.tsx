@@ -7,7 +7,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import QuestionSetDrawer from '../question-set-drawer'
 import { MdDeleteOutline } from 'react-icons/md'
 
-interface EntryTestModalProps {
+interface FinalExamModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSubmit?: (data: any) => void
@@ -15,20 +15,18 @@ interface EntryTestModalProps {
   readOnly?: boolean
 }
 
-export default function EntryTestModal({
+export default function FinalExamModal({
   open,
   onOpenChange,
   onSubmit,
   initialData,
   readOnly = false
-}: EntryTestModalProps) {
+}: FinalExamModalProps) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [startTime, setStartTime] = useState<Date | null>(null)
   const [endTime, setEndTime] = useState<Date | null>(null)
   const [selectedQuestionSets, setSelectedQuestionSets] = useState<any[]>([])
-
-  console.log(selectedQuestionSets)
 
   useEffect(() => {
     if (initialData) {
@@ -68,14 +66,14 @@ export default function EntryTestModal({
       <DialogContent className='max-w-[800px]! w-full bg-greyscale-0'>
         <DialogHeader>
           <DialogTitle>
-            {readOnly ? 'Xem chi tiết bài kiểm tra đầu vào' : (initialData ? 'Chỉnh sửa bài kiểm tra đầu vào' : 'Tạo bài kiểm tra đầu vào mới')}
+            {readOnly ? 'Xem chi tiết bài thi cuối kỳ' : (initialData ? 'Chỉnh sửa bài thi cuối kỳ' : 'Tạo bài thi cuối kỳ mới')}
           </DialogTitle>
         </DialogHeader>
         <div className='space-y-4 bg-greyscale-25 rounded-lg p-6 border min-h-[50vh] max-h-[70vh] overflow-y-auto'>
           <div>
             <Input
               className='bg-greyscale-0'
-              placeholder='Tên bài kiểm tra'
+              placeholder='Tên bài thi'
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               disabled={readOnly}
