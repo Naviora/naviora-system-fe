@@ -51,7 +51,8 @@ const LECTURER_MAIN_NAVIGATION = navigationItemsSchema.parse([
 
 const PRINCIPAL_MAIN_NAVIGATION = navigationItemsSchema.parse([
   { name: 'Tổng quan', href: '/principal/dashboard', icon: RiHome5Fill },
-  { name: 'Quản lý chuyên đề', href: '/principal/modules', icon: RiBook2Fill }
+  { name: 'Quản lý chuyên đề', href: '/principal/modules', icon: RiBook2Fill },
+  { name: 'Quản lý lớp', href: '/principal/classes', icon: RiGroupFill }
 ])
 
 const ADMIN_MAIN_NAVIGATION = navigationItemsSchema.parse([
