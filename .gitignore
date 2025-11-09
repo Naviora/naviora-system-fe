@@ -45,5 +45,5 @@ next-env.d.ts
 GEMINI.md
 
 /logs
-.cursor
-AGENTS.md
+.cursor/
+AGENTS.md 
