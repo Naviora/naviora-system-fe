@@ -190,3 +190,74 @@ export const generateRandomPassword = (): string => {
     .sort(() => Math.random() - 0.5)
     .join('')
 }
+
+// Read Excel file and extract accounts data (name, email)
+export const readExcelFile = async (file: File): Promise<Array<{ name: string; email: string; row: number }>> => {
+  const XLSX = await import('xlsx')
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const data = e.target?.result
+        const workbook = XLSX.read(data, { type: 'binary' })
+        const firstSheetName = workbook.SheetNames[0]
+        const worksheet = workbook.Sheets[firstSheetName]
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' }) as Array<Array<string>>
+
+        // Find header row (look for "name" and "email" columns)
+        let nameColIndex = -1
+        let emailColIndex = -1
+        let headerRowIndex = -1
+
+        for (let i = 0; i < Math.min(5, jsonData.length); i++) {
+          const row = jsonData[i]
+          const nameIndex = row.findIndex(
+            (cell) => String(cell).toLowerCase().includes('name') || String(cell).toLowerCase().includes('tên')
+          )
+          const emailIndex = row.findIndex((cell) => String(cell).toLowerCase().includes('email'))
+
+          if (nameIndex >= 0 && emailIndex >= 0) {
+            nameColIndex = nameIndex
+            emailColIndex = emailIndex
+            headerRowIndex = i
+            break
+          }
+        }
+
+        // If no header found, assume first row is header and columns are A (name) and B (email)
+        if (nameColIndex === -1 || emailColIndex === -1) {
+          nameColIndex = 0
+          emailColIndex = 1
+          headerRowIndex = -1
+        }
+
+        // Extract data rows
+        const accounts: Array<{ name: string; email: string; row: number }> = []
+        const startRow = headerRowIndex >= 0 ? headerRowIndex + 1 : 0
+
+        for (let i = startRow; i < jsonData.length; i++) {
+          const row = jsonData[i]
+          const name = String(row[nameColIndex] || '').trim()
+          const email = String(row[emailColIndex] || '').trim()
+
+          // Skip empty rows
+          if (!name && !email) continue
+
+          accounts.push({
+            name,
+            email,
+            row: i + 1 // Excel row number (1-based)
+          })
+        }
+
+        resolve(accounts)
+      } catch (error) {
+        reject(new Error('Không thể đọc file Excel. Vui lòng kiểm tra định dạng file.'))
+      }
+    }
+    reader.onerror = () => {
+      reject(new Error('Không thể đọc file. Vui lòng thử lại.'))
+    }
+    reader.readAsBinaryString(file)
+  })
+}

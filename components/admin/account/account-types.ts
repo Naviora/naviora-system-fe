@@ -20,3 +20,11 @@ export const createAccountSchema = z.object({
 })
 
 export type CreateAccountFormData = z.infer<typeof createAccountSchema>
+
+// Import account data from Excel (name, email, password, and role_id)
+export type ImportAccountData = {
+  name: string
+  email: string
+  password: string
+  role_id: number
+}

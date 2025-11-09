@@ -1,9 +1,12 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { useRoleOptions } from '@/hooks/api/use-roles'
+import { useAccounts, useCreateAccount, useUpdateAccountRole } from '@/hooks/api/use-account'
 import { type UserRole } from '@/lib/constants/roles'
+import { PAGINATION } from '@/lib/constants/config'
+import { toast } from 'sonner'
 import {
   AccountFilters,
   AccountTable,
@@ -17,38 +20,74 @@ export default function AccountPage() {
   const [query, setQuery] = useState('')
   const [roleFilter, setRoleFilter] = useState<string>('')
   const [assigning, setAssigning] = useState<{ open: boolean; account?: AccountRow }>({ open: false })
+  const [page, setPage] = useState(0)
 
   // Role options from API (mapped to nice labels already)
   const { roleOptions } = useRoleOptions()
 
-  // Mock data (replace with API integration later)
-  const data = useMemo<AccountRow[]>(
-    () => [
-      { id: '1', name: 'Nguyễn Văn A', email: 'a@naviora.dev', role: 'Admin', status: 'active' },
-      { id: '2', name: 'Trần Thị B', email: 'b@naviora.dev', role: 'Lecturer', status: 'active' },
-      { id: '3', name: 'Lê Văn C', email: 'c@naviora.dev', role: 'Student', status: 'inactive' }
-    ],
-    []
+  // Reset pagination to first page when filters change
+  useEffect(() => {
+    setPage(0)
+  }, [query, roleFilter])
+
+  // Build API request params
+  const requestParams = useMemo(
+    () => ({
+      page: page + 1, // API uses 1-based pagination
+      limit: PAGINATION.DEFAULT_PAGE_SIZE,
+      search: query.trim() || undefined,
+      filters: {
+        ...(roleFilter && { role: roleFilter })
+      }
+    }),
+    [page, query, roleFilter]
   )
 
-  const filteredData = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    return data.filter((row) => {
-      const matchesQuery = !q || row.name.toLowerCase().includes(q) || row.email.toLowerCase().includes(q)
-      const matchesRole = !roleFilter || row.role === (roleFilter as UserRole)
-      return matchesQuery && matchesRole
-    })
-  }, [data, query, roleFilter])
+  // Fetch accounts from API
+  const { data: accountsData, isLoading, isError, error, isFetching, isPlaceholderData } = useAccounts(requestParams)
+
+  // Mutations
+  const createAccountMutation = useCreateAccount({
+    onSuccess: () => {
+      toast.success('Tạo tài khoản thành công')
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Có lỗi xảy ra khi tạo tài khoản')
+    }
+  })
+
+  const updateRoleMutation = useUpdateAccountRole({
+    onSuccess: () => {
+      toast.success('Cập nhật vai trò thành công')
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Có lỗi xảy ra khi cập nhật vai trò')
+    }
+  })
 
   const handleCreateAccount = async (formData: CreateAccountFormData) => {
-    // TODO: Call API to create account
-    console.log('Creating account:', formData)
+    // Map role (UserRole string) to role_id (number)
+    const selectedRole = roleOptions.find((r) => r.value === formData.role)
+    if (!selectedRole) {
+      toast.error('Vai trò không hợp lệ')
+      return
+    }
+
+    await createAccountMutation.mutateAsync({
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      role_id: selectedRole.id
+    })
   }
 
   const handleAssignRole = async (accountId: string, role: UserRole) => {
-    // TODO: Call API to assign role
-    console.log('Assigning role:', { accountId, role })
+    await updateRoleMutation.mutateAsync({ accountId, role })
   }
+
+  // Extract data and pagination info
+  const accounts = accountsData?.data ?? []
+  const hasMore = accountsData?.pagination?.hasNext ?? false
 
   return (
     <div className='flex flex-col gap-6 px-4 pb-10 pt-4 sm:px-6 lg:px-8'>
@@ -72,7 +111,43 @@ export default function AccountPage() {
           </CreateAccountDialog>
         </div>
 
-        <AccountTable data={filteredData} onAssignRole={(account) => setAssigning({ open: true, account })} />
+        {isLoading ? (
+          <div className='flex items-center justify-center py-8'>
+            <div className='text-greyscale-500'>Đang tải...</div>
+          </div>
+        ) : isError ? (
+          <div className='flex items-center justify-center py-8'>
+            <div className='text-error'>Lỗi: {error?.message || 'Có lỗi xảy ra'}</div>
+          </div>
+        ) : (
+          <>
+            <AccountTable
+              data={accounts as AccountRow[]}
+              onAssignRole={(account) => setAssigning({ open: true, account })}
+            />
+
+            <div className='flex flex-col gap-4 border-t border-greyscale-200 pt-4 sm:flex-row sm:items-center sm:justify-between'>
+              <span className='text-sm text-greyscale-600'>Trang hiện tại: {page + 1}</span>
+              <div className='flex items-center gap-2'>
+                <Button onClick={() => setPage((old) => Math.max(old - 1, 0))} disabled={page === 0} variant='outline'>
+                  Trang trước
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (!isPlaceholderData && hasMore) {
+                      setPage((old) => old + 1)
+                    }
+                  }}
+                  disabled={isPlaceholderData || !hasMore}
+                  variant='outline'
+                >
+                  Trang sau
+                </Button>
+                {isFetching ? <span className='text-sm text-greyscale-500'>Đang tải...</span> : null}
+              </div>
+            </div>
+          </>
+        )}
       </section>
 
       <AssignRoleDialog
