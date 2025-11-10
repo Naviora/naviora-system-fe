@@ -10,7 +10,7 @@ import { ClassesToolbar } from '@/components/lecturer/classes/classes-toolbar'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useClasses } from '@/hooks/api/use-classes'
+import { useAssignedClasses } from '@/hooks/api/use-classes'
 import { CLASS_QUERY_DEFAULTS } from '@/lib/constants/modules'
 import { ErrorHandler } from '@/lib/utils/error-handler'
 import type { ClassType } from '@/types/api/class'
@@ -83,7 +83,7 @@ export function LecturerClassesPageClient() {
     [debouncedSearch, page, sortBy, sortOrder, classType]
   )
 
-  const classesQuery = useClasses(queryParams)
+  const classesQuery = useAssignedClasses(queryParams)
 
   const classes = classesQuery.data?.classes ?? []
   const pagination = classesQuery.data?.pagination
@@ -188,7 +188,7 @@ export function LecturerClassesPageClient() {
               ) : (
                 <>
                   <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>
-                    {classes.map((classItem) => (
+                    {classes.map((classItem: typeof classes[0]) => (
                       <ClassCard key={classItem.class_id} classData={classItem} />
                     ))}
                   </div>

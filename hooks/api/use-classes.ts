@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api/client'
-import type { ClassesListParams, ClassesListResponse, CreateClassRequest, Class, ClassDetail } from '@/types/api/class'
+import type { ClassesListParams, ClassesListResponse, CreateClassRequest, Class, ClassDetail, AssignedClassesQueryParams, AssignedClassesListResponse } from '@/types/api/class'
 
 const CLASSES_QUERY_KEY = ['classes']
+const ASSIGNED_CLASSES_QUERY_KEY = ['assigned-classes']
 
 export const useClasses = (params: ClassesListParams = {}) => {
   return useQuery({
@@ -10,6 +11,17 @@ export const useClasses = (params: ClassesListParams = {}) => {
     queryFn: async () => {
       // apiClient.get already extracts data.data, so we get { classes, pagination } directly
       const data = await apiClient.get<ClassesListResponse['data']>('/classes', { params })
+      return data
+    }
+  })
+}
+
+export const useAssignedClasses = (params: AssignedClassesQueryParams = {}) => {
+  return useQuery({
+    queryKey: [...ASSIGNED_CLASSES_QUERY_KEY, 'list', params],
+    queryFn: async () => {
+      // apiClient.get already extracts data.data, so we get { classes, pagination } directly
+      const data = await apiClient.get<AssignedClassesListResponse['data']>('/classes/assigned-classes', { params })
       return data
     }
   })
