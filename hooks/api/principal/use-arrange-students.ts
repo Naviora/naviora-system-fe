@@ -82,7 +82,7 @@ const fetchClassesForArrangement = async (params?: GetClassesParams): Promise<Ge
   return response.data
 }
 
-export function useArrangeStudents(options?: { 
+export function useArrangeStudents(options?: {
   onSuccess?: (data: ArrangeStudentsResponse) => void
   onError?: (error: unknown) => void
 }) {

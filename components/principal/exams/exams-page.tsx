@@ -3,23 +3,10 @@
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronLeftIcon, ChevronRightIcon, SearchIcon } from 'lucide-react'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useEntryTests } from '@/hooks/api/principal/use-entry-tests'
 import { SectionHeader } from '@/components/common'
@@ -159,20 +146,18 @@ export function PrincipalExamsPageClient() {
               ) : entryTests.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className='text-center py-8 text-greyscale-500'>
-                    {searchQuery || statusFilter
-                      ? 'Không tìm thấy bài thi phù hợp'
-                      : 'Không có bài thi nào'}
+                    {searchQuery || statusFilter ? 'Không tìm thấy bài thi phù hợp' : 'Không có bài thi nào'}
                   </TableCell>
                 </TableRow>
               ) : (
                 entryTests.map((test) => (
                   <TableRow key={test.entry_test_id} className='hover:bg-greyscale-50'>
                     <TableCell className='font-medium max-w-xs truncate'>{test.title}</TableCell>
-                    <TableCell className='text-greyscale-600 max-w-xs truncate'>
-                      {test.description || '-'}
-                    </TableCell>
+                    <TableCell className='text-greyscale-600 max-w-xs truncate'>{test.description || '-'}</TableCell>
                     <TableCell>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(test.status)}`}>
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(test.status)}`}
+                      >
                         {test.status === 'DRAFT' && 'Nháp'}
                         {test.status === 'PUBLISHED' && 'Đã công bố'}
                         {test.status === 'ACTIVE' && 'Đang hoạt động'}
@@ -180,18 +165,10 @@ export function PrincipalExamsPageClient() {
                         {test.status === 'CANCELLED' && 'Đã hủy'}
                       </span>
                     </TableCell>
-                    <TableCell className='text-sm text-greyscale-600'>
-                      {formatDate(test.start_time)}
-                    </TableCell>
-                    <TableCell className='text-sm text-greyscale-600'>
-                      {formatDate(test.end_time)}
-                    </TableCell>
+                    <TableCell className='text-sm text-greyscale-600'>{formatDate(test.start_time)}</TableCell>
+                    <TableCell className='text-sm text-greyscale-600'>{formatDate(test.end_time)}</TableCell>
                     <TableCell className='text-right'>
-                      <Button
-                        variant='outline'
-                        size='sm'
-                        onClick={() => handleViewDetail(test.entry_test_id)}
-                      >
+                      <Button variant='outline' size='sm' onClick={() => handleViewDetail(test.entry_test_id)}>
                         Xem chi tiết
                       </Button>
                     </TableCell>

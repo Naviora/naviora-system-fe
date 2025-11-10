@@ -35,7 +35,12 @@ export function ScoreSpectrumChart({ data, title = 'Phổ điểm bài thi' }: S
               <CartesianGrid strokeDasharray='3 3' stroke='#e5e7eb' />
               <XAxis
                 dataKey='score'
-                label={{ value: 'Điểm số', position: 'insideBottom', offset: -10, style: { fontSize: '14px', fontWeight: 500 } }}
+                label={{
+                  value: 'Điểm số',
+                  position: 'insideBottom',
+                  offset: -10,
+                  style: { fontSize: '14px', fontWeight: 500 }
+                }}
                 style={{ fontSize: '12px' }}
                 tick={{ fill: '#6b7280' }}
               />

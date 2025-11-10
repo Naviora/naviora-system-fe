@@ -53,12 +53,7 @@ export function ActionDropdown({ actions, triggerClassName }: ActionDropdownProp
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          type='button'
-          variant='ghost'
-          size='icon'
-          className={cn('h-8 w-8', triggerClassName)}
-        >
+        <Button type='button' variant='ghost' size='icon' className={cn('h-8 w-8', triggerClassName)}>
           <span className='sr-only'>Mở menu</span>
           <MoreHorizontal className='h-4 w-4' />
         </Button>
@@ -73,9 +68,7 @@ export function ActionDropdown({ actions, triggerClassName }: ActionDropdownProp
               <DropdownMenuItem
                 onClick={action.onClick}
                 disabled={action.disabled}
-                className={cn(
-                  action.variant === 'destructive' && 'text-red-600 focus:text-red-600 focus:bg-red-50'
-                )}
+                className={cn(action.variant === 'destructive' && 'text-red-600 focus:text-red-600 focus:bg-red-50')}
               >
                 <Icon className='mr-2 h-4 w-4' />
                 {action.label}

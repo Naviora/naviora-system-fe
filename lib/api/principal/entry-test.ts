@@ -5,13 +5,7 @@ export const entryTestService = {
   /**
    * Update an entry test
    */
-  async updateEntryTest(
-    entryTestId: string,
-    data: Partial<EntryTestDto>
-  ): Promise<EntryTestDto> {
-    return apiClient.patch<EntryTestDto>(
-      `/entry-test/${entryTestId}`,
-      data
-    )
+  async updateEntryTest(entryTestId: string, data: Partial<EntryTestDto>): Promise<EntryTestDto> {
+    return apiClient.patch<EntryTestDto>(`/entry-test/${entryTestId}`, data)
   }
 }
