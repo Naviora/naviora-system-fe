@@ -28,6 +28,7 @@ import {
   type LessonResponseDto
 } from '@/lib/validations/modules'
 
+// ====  API Endpoints ====
 // Upload material file to cloud
 const uploadMaterialRequest = async (formData: FormData): Promise<MaterialResponseDto> => {
   const response = await axios_instance.post(MATERIALS_UPLOAD_ENDPOINT, formData, {

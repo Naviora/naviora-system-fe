@@ -38,7 +38,7 @@ export function ModuleCard({
   return (
     <motion.div
       className={cn(
-        'cursor-pointer flex w-full min-w-[240px] flex-col overflow-hidden rounded-lg border border-border bg-card transition-all',
+        'cursor-pointer flex w-full min-w-60 flex-col overflow-hidden rounded-lg border border-border bg-card transition-all',
         className
       )}
       whileHover={{ y: -4, boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)' }}

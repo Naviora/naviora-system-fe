@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api/client'
 import {
   type CreateQuestionSetRequest,
@@ -18,6 +18,20 @@ export const useGetQuestionSetDetail = (id: string) => {
   return useQuery({
     queryKey: ['question-set-detail', id],
     queryFn: () => apiClient.get<QuestionSetDetail>(`/question-set/${id}`),
+  })
+}
+
+// Gọi nhiều chi tiết bộ câu hỏi cùng lúc
+const fetchQuestionSetDetail = (id: string) =>
+  apiClient.get<QuestionSetDetail>(`/question-set/${id}`)
+
+export function useGetMultipleQuestionSetDetail(ids: string[]) {
+  return useQueries({
+    queries: ids.map(id => ({
+      queryKey: ['question-set-detail', id],
+      queryFn: () => fetchQuestionSetDetail(id),
+      enabled: !!id,
+    })),
   })
 }
 

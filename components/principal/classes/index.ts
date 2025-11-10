@@ -1,0 +1,6 @@
+export { PrincipalClassesPageClient } from './principal-classes-page'
+export { PrincipalClassesTable } from './principal-classes-table'
+export { ClassTableToolbar } from './class-table-toolbar'
+export { CreateClassForm, UpdateClassForm } from './class-form'
+export { createPrincipalClassColumns } from './columns'
+export { PrincipalClassRowActions } from './principal-classes-row-actions'

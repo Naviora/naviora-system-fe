@@ -64,13 +64,15 @@ export function createPrincipalModuleColumns({
       id: 'actions',
       header: () => <div className='flex justify-end text-sm font-medium text-greyscale-500'>Thao tác</div>,
       cell: ({ row }) => (
-        <PrincipalModuleRowActions
-          module={row.original}
-          onView={onView}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          isDeleting={isDeleteLoading && deletingModuleId === row.original.id}
-        />
+        <div className='flex justify-end'>
+          <PrincipalModuleRowActions
+            module={row.original}
+            onView={onView}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            isDeleting={isDeleteLoading && deletingModuleId === row.original.id}
+          />
+        </div>
       ),
       enableSorting: false,
       enableHiding: false

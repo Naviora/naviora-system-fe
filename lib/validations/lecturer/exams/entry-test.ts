@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 // Common schemas
-const userSchema = z.object({
+export const userSchema = z.object({
   id: z.string(),
   name: z.string(),
   email: z.string(),
@@ -21,7 +21,7 @@ const userSchema = z.object({
   version: z.number()
 })
 
-const roleSchema = z.object({
+export const roleSchema = z.object({
   id: z.number(),
   name: z.string(),
   description: z.string(),
@@ -33,7 +33,7 @@ const roleSchema = z.object({
   version: z.number()
 })
 
-const questionSetConfigSchema = z.object({
+export const questionSetConfigSchema = z.object({
   general: z.object({
     allow_review: z.boolean(),
     shuffle_answers: z.boolean(),
@@ -59,7 +59,7 @@ const questionSetConfigSchema = z.object({
   })
 })
 
-const questionSetSchema = z.object({
+export const questionSetSchema = z.object({
   question_set_id: z.string(),
   title: z.string(),
   description: z.string(),
@@ -72,12 +72,20 @@ const questionSetSchema = z.object({
   version: z.number()
 })
 
-const answeredSchema = z.array(
+export const answeredSchema = z.array(
   z.object({
     question_id: z.string(),
     answer_id: z.string()
   })
 )
+
+export const questionSetResponseSchema = z.object({
+  question_set_id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  total_questions: z.number(),
+  duration_minutes: z.number(),
+})
 
 // Entry Test CRUD
 export const createEntryTestSchema = z.object({
@@ -99,7 +107,7 @@ export const entryTestSchema = z.object({
   updated_at: z.string(),
   deleted_at: z.string().nullable(),
   version: z.number(),
-  question_sets: z.array(z.string()),
+  question_sets: z.array(questionSetResponseSchema),
   created_by: userSchema.extend({ role: roleSchema }),
   updated_by: z.any().nullable()
 })
@@ -119,7 +127,7 @@ export const startEntryTestResponseSchema = z.object({
   student_id: z.string(),
   entry_test_id: z.string(),
   question_set_id: z.string(),
-  attempt_status: z.enum(['IN_PROGRESS', 'SUBMITTED', 'PENDING', 'CANCELLED']),
+  attempt_status: z.enum(['IN_PROGRESS', 'SUBMITTED', 'GRADED', 'CANCELLED']),
   score: z.number().nullable(),
   answered: z.any().nullable(),
   penalty: z.number().nullable(),
@@ -147,7 +155,7 @@ export const submitEntryTestResponseSchema = z.object({
   student_id: z.string(),
   entry_test_id: z.string(),
   question_set_id: z.string(),
-  attempt_status: z.enum(['IN_PROGRESS', 'SUBMITTED', 'PENDING', 'CANCELLED']),
+  attempt_status: z.enum(['IN_PROGRESS', 'SUBMITTED', 'GRADED', 'CANCELLED']),
   score: z.number().nullable(),
   answered: answeredSchema,
   penalty: z.number().nullable(),
