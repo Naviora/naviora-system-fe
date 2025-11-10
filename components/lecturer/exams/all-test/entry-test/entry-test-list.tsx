@@ -5,7 +5,7 @@ import { NEmpty } from "@/components/ui/NEmpty"
 import { LoadingSpinner } from "@/components/ui"
 import { IoMdAdd } from "react-icons/io"
 import EntryTestModal from "./entry-test-modal"
-import { useGetEntryTests, useCreateEntryTest, useDeleteEntryTest } from "@/hooks/api/lecturer/exams/use-entry-test"
+import { useGetEntryTests, useCreateEntryTest, useDeleteEntryTest, useUpdateEntryTest } from "@/hooks/api/lecturer/exams/use-entry-test"
 import { EntryTestCard } from "@/components/lecturer/exams/all-test/entry-test/entry-test-card"
 import { toast } from "sonner"
 import { ExamToolBar } from "@/components/lecturer/exams/exam-toolbar"
@@ -16,6 +16,7 @@ export default function EntryTestList() {
   const [search, setSearch] = useState('')
   const [searchValue, setSearchValue] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
+  const [editData, setEditData] = useState<any>(null)
   const pageSize = 5
 
   const queryParams: any = {
@@ -32,22 +33,7 @@ export default function EntryTestList() {
 
   const createMutation = useCreateEntryTest()
   const deleteMutation = useDeleteEntryTest()
-
-  const handleCreate = (formData: any) => {
-    const payload = {
-      ...formData,
-      questionSets: formData.selectedQuestionSets?.map((qs: any) => qs.question_set_id) || []
-    }
-    createMutation.mutate(payload, {
-      onSuccess: () => {
-        toast.success("Tạo bài kiểm tra đầu vào thành công")
-        setModalOpen(false)
-      },
-      onError: (err) => {
-        toast.error(err?.message || "Có lỗi xảy ra")
-      }
-    })
-  }
+  const updateMutation = useUpdateEntryTest()
 
   const handleDelete = (id: string) => {
     deleteMutation.mutate(id, {
@@ -58,6 +44,48 @@ export default function EntryTestList() {
         toast.error(err?.message || "Xóa bài kiểm tra thất bại")
       }
     })
+  }
+
+  const handleEdit = (entryTest: any) => {
+    setEditData(entryTest)
+    setModalOpen(true)
+  }
+
+  const handleSubmit = (formData: any) => {
+    const payload = {
+      ...formData,
+      questionSets: formData.selectedQuestionSets?.map((qs: any) => qs.question_set_id) || []
+    }
+    if (editData && editData.entry_test_id) {
+      // Update
+      updateMutation.mutate(
+        {
+          entryTestId: editData.entry_test_id,
+          data: payload,
+        },
+        {
+          onSuccess: () => {
+            toast.success("Cập nhật bài kiểm tra thành công")
+            setModalOpen(false)
+            setEditData(null)
+          },
+          onError: (err) => {
+            toast.error(err?.message || "Có lỗi xảy ra")
+          },
+        }
+      )
+    } else {
+      // Create
+      createMutation.mutate(payload, {
+        onSuccess: () => {
+          toast.success("Tạo bài kiểm tra đầu vào thành công")
+          setModalOpen(false)
+        },
+        onError: (err) => {
+          toast.error(err?.message || "Có lỗi xảy ra")
+        },
+      })
+    }
   }
 
   const sortedTests = [...entryTests].sort((a, b) => {
@@ -112,7 +140,7 @@ export default function EntryTestList() {
                 key={test.entry_test_id}
                 entryTest={test}
                 index={idx}
-                onEdit={() => {/* TODO: handle edit */}}
+                onEdit={handleEdit}
                 onDelete={handleDelete}
               />
             ))}
@@ -121,8 +149,12 @@ export default function EntryTestList() {
       </div>
       <EntryTestModal
         open={modalOpen}
-        onOpenChange={setModalOpen}
-        onSubmit={handleCreate}
+        onOpenChange={(open) => {
+          setModalOpen(open)
+          if (!open) setEditData(null)
+        }}
+        initialData={editData}
+        onSubmit={handleSubmit}
       />
     </div>
   )

@@ -28,8 +28,6 @@ export default function EntryTestModal({
   const [endTime, setEndTime] = useState<Date | null>(null)
   const [selectedQuestionSets, setSelectedQuestionSets] = useState<any[]>([])
 
-  console.log(selectedQuestionSets)
-
   useEffect(() => {
     if (initialData) {
       setTitle(initialData.title || '')

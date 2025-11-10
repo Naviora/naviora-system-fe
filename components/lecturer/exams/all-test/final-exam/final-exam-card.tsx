@@ -18,7 +18,6 @@ interface FinalExamCardProps {
 export default function FinalExamCard({ finalExam: fe, index, onEdit, onDelete }: FinalExamCardProps) {
   const [open, setOpen] = useState(false)
   const [viewModalOpen, setViewModalOpen] = useState(false)
-  const [editModalOpen, setEditModalOpen] = useState(false)
 
   return (
     <div className='bg-greyscale-0 rounded shadow-sm border p-4 hover:shadow-md transition-all'>
@@ -69,18 +68,11 @@ export default function FinalExamCard({ finalExam: fe, index, onEdit, onDelete }
                 variant='ghost'
                 size='sm'
                 className='text-greyscale-500 hover:text-primary flex items-center gap-1'
-                onClick={() => setEditModalOpen(true)}
+                onClick={() => onEdit(fe)} 
               >
                 <FaRegEdit />
                 <span>Sửa</span>
               </Button>
-              <FinalExamModal
-                open={editModalOpen}
-                onOpenChange={setEditModalOpen}
-                initialData={fe}
-                onSubmit={onEdit}
-                readOnly={false}
-              />
             </>
           )}
           <Popover open={open} onOpenChange={setOpen}>

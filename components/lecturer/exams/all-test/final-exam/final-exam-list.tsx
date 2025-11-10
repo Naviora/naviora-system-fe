@@ -5,7 +5,7 @@ import { NEmpty } from "@/components/ui/NEmpty"
 import { LoadingSpinner } from "@/components/ui"
 import { IoMdAdd } from "react-icons/io"
 import FinalExamModal from "./final-exam-modal"
-import { useGetFinalExams, useCreateFinalExam, useDeleteFinalExam } from "@/hooks/api/lecturer/exams/use-final-exam"
+import { useGetFinalExams, useCreateFinalExam, useDeleteFinalExam, useUpdateFinalExam } from "@/hooks/api/lecturer/exams/use-final-exam"
 import FinalExamCard from "./final-exam-card"
 import { toast } from "sonner"
 import { ExamToolBar } from "@/components/lecturer/exams/exam-toolbar"
@@ -16,6 +16,7 @@ export default function FinalExamList() {
   const [search, setSearch] = useState('')
   const [searchValue, setSearchValue] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
+  const [editData, setEditData] = useState<any>(null)
   const pageSize = 5
 
   const queryParams: any = {
@@ -32,22 +33,7 @@ export default function FinalExamList() {
 
   const createMutation = useCreateFinalExam()
   const deleteMutation = useDeleteFinalExam()
-
-  const handleCreate = (formData: any) => {
-    const payload = {
-      ...formData,
-      questionSets: formData.selectedQuestionSets?.map((qs: any) => qs.question_set_id) || []
-    }
-    createMutation.mutate(payload, {
-      onSuccess: () => {
-        toast.success("Tạo bài thi cuối kỳ thành công")
-        setModalOpen(false)
-      },
-      onError: (err) => {
-        toast.error(err?.message || "Có lỗi xảy ra")
-      }
-    })
-  }
+  const updateMutation = useUpdateFinalExam()
 
   const handleDelete = (id: string) => {
     deleteMutation.mutate(id, {
@@ -58,6 +44,48 @@ export default function FinalExamList() {
         toast.error(err?.message || "Xóa bài thi thất bại")
       }
     })
+  }
+
+  const handleEdit = (finalExam: any) => {
+    setEditData(finalExam)
+    setModalOpen(true)
+  }
+
+  const handleSubmit = (formData: any) => {
+    const payload = {
+      ...formData,
+      questionSets: formData.selectedQuestionSets?.map((qs: any) => qs.question_set_id) || []
+    }
+    if (editData && editData.final_exam_id) {
+      // Update
+      updateMutation.mutate(
+        {
+          finalExamId: editData.final_exam_id,
+          data: payload,
+        },
+        {
+          onSuccess: () => {
+            toast.success("Cập nhật bài thi cuối kỳ thành công")
+            setModalOpen(false)
+            setEditData(null)
+          },
+          onError: (err) => {
+            toast.error(err?.message || "Có lỗi xảy ra")
+          },
+        }
+      )
+    } else {
+      // Create
+      createMutation.mutate(payload, {
+        onSuccess: () => {
+          toast.success("Tạo bài thi cuối kỳ thành công")
+          setModalOpen(false)
+        },
+        onError: (err) => {
+          toast.error(err?.message || "Có lỗi xảy ra")
+        },
+      })
+    }
   }
 
   const sortedTests = [...finalExams].sort((a, b) => {
@@ -112,7 +140,7 @@ export default function FinalExamList() {
                 key={test.final_exam_id}
                 finalExam={test}
                 index={idx}
-                onEdit={() => {/* TODO: handle edit */}}
+                onEdit={handleEdit}
                 onDelete={handleDelete}
               />
             ))}
@@ -121,8 +149,12 @@ export default function FinalExamList() {
       </div>
       <FinalExamModal
         open={modalOpen}
-        onOpenChange={setModalOpen}
-        onSubmit={handleCreate}
+        onOpenChange={(open) => {
+          setModalOpen(open)
+          if (!open) setEditData(null)
+        }}
+        initialData={editData}
+        onSubmit={handleSubmit}
       />
     </div>
   )

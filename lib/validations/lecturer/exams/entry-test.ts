@@ -79,6 +79,14 @@ export const answeredSchema = z.array(
   })
 )
 
+export const questionSetResponseSchema = z.object({
+  question_set_id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  total_questions: z.number(),
+  duration_minutes: z.number(),
+})
+
 // Entry Test CRUD
 export const createEntryTestSchema = z.object({
   title: z.string(),
@@ -99,7 +107,7 @@ export const entryTestSchema = z.object({
   updated_at: z.string(),
   deleted_at: z.string().nullable(),
   version: z.number(),
-  question_sets: z.array(z.string()),
+  question_sets: z.array(questionSetResponseSchema),
   created_by: userSchema.extend({ role: roleSchema }),
   updated_by: z.any().nullable()
 })

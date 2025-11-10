@@ -1,4 +1,4 @@
-import { roleSchema, userSchema } from '@/lib/validations/lecturer/exams/entry-test'
+import { questionSetResponseSchema, roleSchema, userSchema } from '@/lib/validations/lecturer/exams/entry-test'
 import { z } from 'zod'
 // Final Exam CRUD
 export const createFinalExamSchema = z.object({
@@ -20,7 +20,7 @@ export const finalExamSchema = z.object({
   updated_at: z.string(),
   deleted_at: z.string().nullable(),
   version: z.number(),
-  question_sets: z.array(z.string()),
+  question_sets: z.array(questionSetResponseSchema),
   created_by: userSchema.extend({ role: roleSchema }),
   updated_by: z.any().nullable()
 })

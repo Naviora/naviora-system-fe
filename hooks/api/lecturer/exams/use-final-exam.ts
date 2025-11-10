@@ -21,6 +21,17 @@ export const useCreateFinalExam = () => {
   })
 }
 
+export const useUpdateFinalExam = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ finalExamId, data }: { finalExamId: string; data: Partial<CreateFinalExamRequest> }) =>
+      apiClient.patch(`/final-exam/${finalExamId}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['final-exams'] })
+    }
+  })
+}
+
 export const useDeleteFinalExam = () => {
   const queryClient = useQueryClient()
   return useMutation({
