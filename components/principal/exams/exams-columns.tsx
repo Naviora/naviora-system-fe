@@ -102,11 +102,13 @@ export function createExamsColumns(options?: ExamsColumnsOptions): ColumnDef<Exa
       enableSorting: false,
       enableHiding: false,
       cell: ({ row }) => (
-        <ExamsRowActions
-          exam={row.original}
-          onView={options?.onView}
-          onEdit={options?.onEdit}
-        />
+        <div className='flex justify-end'>
+          <ExamsRowActions
+            exam={row.original}
+            onView={options?.onView}
+            onEdit={options?.onEdit}
+          />
+        </div>
       )
     }
   ]

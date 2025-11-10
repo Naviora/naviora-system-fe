@@ -34,18 +34,20 @@ export function createModuleColumns(options?: CreateModuleColumnsOptions): Colum
     },
     {
       id: 'actions',
-      header: 'Hành động',
+      header: () => <div className='flex justify-end text-sm font-medium text-greyscale-500'>Hành động</div>,
       cell: ({ row }) => (
-        <Button
-          type='button'
-          variant='ghost'
-          size='sm'
-          onClick={() => options?.onAssignLecturers?.(row.original)}
-          className='h-8 gap-2'
-        >
-          <Users className='h-4 w-4' />
-          Gán giáo viên
-        </Button>
+        <div className='flex justify-end'>
+          <Button
+            type='button'
+            variant='ghost'
+            size='sm'
+            onClick={() => options?.onAssignLecturers?.(row.original)}
+            className='h-8 gap-2'
+          >
+            <Users className='h-4 w-4' />
+            Gán giáo viên
+          </Button>
+        </div>
       )
     }
   ]

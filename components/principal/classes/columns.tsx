@@ -111,7 +111,11 @@ export function createPrincipalClassColumns({
     {
       id: 'actions',
       header: () => <div className='flex justify-end text-sm font-medium text-greyscale-500'>Thao tác</div>,
-      cell: ({ row }) => <PrincipalClassRowActions classItem={row.original} onEdit={onEdit} />,
+      cell: ({ row }) => (
+        <div className='flex justify-end'>
+          <PrincipalClassRowActions classItem={row.original} onEdit={onEdit} />
+        </div>
+      ),
       enableSorting: false,
       enableHiding: false
     }
