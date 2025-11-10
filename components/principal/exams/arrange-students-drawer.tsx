@@ -205,10 +205,8 @@ export function ArrangeStudentsDrawer({
     }
 
     // Check for duplicate classes
-    const selectedClassIds = scoreRanges
-      .filter((range) => range.classId)
-      .map((range) => range.classId)
-    
+    const selectedClassIds = scoreRanges.filter((range) => range.classId).map((range) => range.classId)
+
     const uniqueClassIds = new Set(selectedClassIds)
     if (selectedClassIds.length !== uniqueClassIds.size) {
       const selectedClasses = scoreRanges
@@ -217,7 +215,7 @@ export function ArrangeStudentsDrawer({
           const cls = activeClasses.find((c) => c.class_id === range.classId)
           return cls?.class_name || 'Unknown'
         })
-      
+
       const duplicateClass = selectedClasses.find((cls, idx) => selectedClasses.indexOf(cls) !== idx)
       toast.error(`Lớp học "${duplicateClass}" được chọn nhiều lần. Mỗi lớp chỉ được chọn một lần.`)
       return
@@ -235,10 +233,8 @@ export function ArrangeStudentsDrawer({
     }
 
     // Check for duplicate classes
-    const selectedClassIds = scoreRanges
-      .filter((range) => range.classId)
-      .map((range) => range.classId)
-    
+    const selectedClassIds = scoreRanges.filter((range) => range.classId).map((range) => range.classId)
+
     const uniqueClassIds = new Set(selectedClassIds)
     if (selectedClassIds.length !== uniqueClassIds.size) {
       const selectedClasses = scoreRanges
@@ -247,7 +243,7 @@ export function ArrangeStudentsDrawer({
           const cls = activeClasses.find((c) => c.class_id === range.classId)
           return cls?.class_name || 'Unknown'
         })
-      
+
       const duplicateClass = selectedClasses.find((cls, idx) => selectedClasses.indexOf(cls) !== idx)
       toast.error(`Lớp học "${duplicateClass}" được chọn nhiều lần. Mỗi lớp chỉ được chọn một lần.`)
       return
