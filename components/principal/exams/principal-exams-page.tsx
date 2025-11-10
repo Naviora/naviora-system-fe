@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useEntryTests } from '@/hooks/api/principal/use-entry-tests'
 import { PrincipalExamsTable } from './principal-exams-table'
+import { EditEntryTestModal } from './edit-entry-test-modal'
 import { ErrorHandler } from '@/lib/utils/error-handler'
 import type { EntryTestDto } from '@/hooks/api/principal/use-entry-tests'
 
@@ -60,6 +61,8 @@ export function PrincipalExamsPageClient() {
     pageIndex: 0,
     pageSize: EXAMS_QUERY_DEFAULTS.limit
   }))
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [selectedExam, setSelectedExam] = useState<EntryTestDto | null>(null)
 
   const debouncedSearch = useDebounce(searchTerm)
 
@@ -80,6 +83,22 @@ export function PrincipalExamsPageClient() {
   }, [examsQuery.data])
 
   const totalPages = examsQuery.data?.data?.pagination.total_pages ?? 1
+
+  const handleEditExam = (row: ExamsRow) => {
+    const exam = examsQuery.data?.data?.entry_tests?.find((t) => t.entry_test_id === row.id)
+    if (exam) {
+      setSelectedExam(exam)
+      setIsEditModalOpen(true)
+    }
+  }
+
+  const handleEditSubmit = async (data: Partial<EntryTestDto>) => {
+    // TODO: Call API to update exam
+    console.log('Update exam:', data)
+    setIsEditModalOpen(false)
+    // Refetch exams after update
+    examsQuery.refetch()
+  }
 
   const renderContent = () => {
     if (examsQuery.isLoading) {
@@ -114,9 +133,7 @@ export function PrincipalExamsPageClient() {
         onViewExam={(row: ExamsRow) => {
           router.push(`/principal/exams/${row.id}`)
         }}
-        onEditExam={(row: ExamsRow) => {
-          router.push(`/principal/exams/${row.id}/edit`)
-        }}
+        onEditExam={handleEditExam}
       />
     )
   }
@@ -133,6 +150,16 @@ export function PrincipalExamsPageClient() {
       </header>
 
       <section className='space-y-4'>{renderContent()}</section>
+
+      {/* Edit Entry Test Modal */}
+      {selectedExam && (
+        <EditEntryTestModal
+          open={isEditModalOpen}
+          onOpenChange={setIsEditModalOpen}
+          entryTest={selectedExam}
+          onSubmit={handleEditSubmit}
+        />
+      )}
     </div>
   )
 }
