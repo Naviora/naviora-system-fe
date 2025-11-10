@@ -38,14 +38,22 @@ export interface EntryTestDto {
   entry_test_id: string
   title: string
   description: string
-  status: 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'CLOSED'
+  status: 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED'
   start_time: string
   end_time: string
   created_at: string
   updated_at: string
   deleted_at?: string | null
   version: number
-  question_sets: string[] | Array<{ question_set_id: string; title: string; description: string; total_questions: number; duration_minutes: number }>
+  question_sets:
+    | string[]
+    | Array<{
+        question_set_id: string
+        title: string
+        description: string
+        total_questions: number
+        duration_minutes: number
+      }>
   created_by: CreatedByUser
   updated_by?: CreatedByUser | null
 }
@@ -243,7 +251,7 @@ export function useEntryTestStudentGrades(
 export interface UpdateEntryTestPayload {
   title: string
   description: string
-  status: 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'CLOSED' | 'ARCHIVED'
+  status: 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED'
   start_time: string
   end_time: string
 }
@@ -259,10 +267,7 @@ export function useUpdateEntryTest(
 ) {
   return useMutation<UpdateEntryTestResponse, Error, { id: string; payload: UpdateEntryTestPayload }>({
     mutationFn: async ({ id, payload }) => {
-      const response = await axios_instance.patch<UpdateEntryTestResponse>(
-        `${ENTRY_TEST_API_ENDPOINT}/${id}`,
-        payload
-      )
+      const response = await axios_instance.patch<UpdateEntryTestResponse>(`${ENTRY_TEST_API_ENDPOINT}/${id}`, payload)
       return response.data
     },
     ...options

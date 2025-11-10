@@ -86,10 +86,14 @@ export function PrincipalExamsPageClient() {
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case 'PUBLISHED':
-        return 'bg-green-100 text-green-800'
+        return 'bg-blue-100 text-blue-800'
       case 'DRAFT':
-        return 'bg-yellow-100 text-yellow-800'
-      case 'CLOSED':
+        return 'bg-greyscale-100 text-greyscale-800'
+      case 'ACTIVE':
+        return 'bg-green-100 text-green-800'
+      case 'COMPLETED':
+        return 'bg-purple-100 text-purple-800'
+      case 'CANCELLED':
         return 'bg-red-100 text-red-800'
       default:
         return 'bg-greyscale-100 text-greyscale-800'
@@ -121,7 +125,9 @@ export function PrincipalExamsPageClient() {
               <SelectItem value='all'>Tất cả trạng thái</SelectItem>
               <SelectItem value='DRAFT'>Nháp</SelectItem>
               <SelectItem value='PUBLISHED'>Đã công bố</SelectItem>
-              <SelectItem value='CLOSED'>Đã đóng</SelectItem>
+              <SelectItem value='ACTIVE'>Đang hoạt động</SelectItem>
+              <SelectItem value='COMPLETED'>Đã hoàn thành</SelectItem>
+              <SelectItem value='CANCELLED'>Đã hủy</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -169,7 +175,9 @@ export function PrincipalExamsPageClient() {
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(test.status)}`}>
                         {test.status === 'DRAFT' && 'Nháp'}
                         {test.status === 'PUBLISHED' && 'Đã công bố'}
-                        {test.status === 'CLOSED' && 'Đã đóng'}
+                        {test.status === 'ACTIVE' && 'Đang hoạt động'}
+                        {test.status === 'COMPLETED' && 'Đã hoàn thành'}
+                        {test.status === 'CANCELLED' && 'Đã hủy'}
                       </span>
                     </TableCell>
                     <TableCell className='text-sm text-greyscale-600'>

@@ -1,3 +1,11 @@
+export enum ExamStatus {
+  DRAFT = 'DRAFT',
+  PUBLISHED = 'PUBLISHED',
+  ACTIVE = 'ACTIVE',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED'
+}
+
 export interface UserDto {
   id: string
   name: string
@@ -11,7 +19,7 @@ export interface EntryTestDto {
   entry_test_id: string
   title: string
   description: string
-  status: 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'CLOSED' | 'ARCHIVED'
+  status: ExamStatus
   start_time: string
   end_time: string
   created_at: string

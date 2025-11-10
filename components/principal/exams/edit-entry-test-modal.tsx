@@ -3,23 +3,11 @@
 import * as React from 'react'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useUpdateEntryTest } from '@/hooks/api/principal/use-entry-tests'
 import type { EntryTestDto } from '@/hooks/api/principal/use-entry-tests'
 
@@ -34,15 +22,11 @@ const STATUS_OPTIONS = [
   { value: 'DRAFT', label: 'Nháp' },
   { value: 'PUBLISHED', label: 'Đã xuất bản' },
   { value: 'ACTIVE', label: 'Đang hoạt động' },
-  { value: 'CLOSED', label: 'Đã đóng' }
+  { value: 'COMPLETED', label: 'Đã hoàn thành' },
+  { value: 'CANCELLED', label: 'Đã hủy' }
 ]
 
-export function EditEntryTestModal({
-  open,
-  onOpenChange,
-  entryTest,
-  onSuccess
-}: EditEntryTestModalProps) {
+export function EditEntryTestModal({ open, onOpenChange, entryTest, onSuccess }: EditEntryTestModalProps) {
   const [formData, setFormData] = React.useState({
     title: entryTest.title,
     description: entryTest.description,
@@ -72,12 +56,12 @@ export function EditEntryTestModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     // Convert form data to API format
     const payload = {
       title: formData.title,
       description: formData.description,
-      status: formData.status as 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'CLOSED',
+      status: formData.status as 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED',
       start_time: new Date(formData.start_time).toISOString(),
       end_time: new Date(formData.end_time).toISOString()
     }
@@ -132,7 +116,11 @@ export function EditEntryTestModal({
           {/* Status */}
           <div className='space-y-2'>
             <Label htmlFor='status'>Trạng thái</Label>
-            <Select value={formData.status} onValueChange={(value) => handleChange('status', value)} disabled={updateMutation.isPending}>
+            <Select
+              value={formData.status}
+              onValueChange={(value) => handleChange('status', value)}
+              disabled={updateMutation.isPending}
+            >
               <SelectTrigger id='status'>
                 <SelectValue />
               </SelectTrigger>

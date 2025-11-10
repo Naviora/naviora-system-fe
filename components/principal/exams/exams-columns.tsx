@@ -10,16 +10,16 @@ const STATUS_BADGE_COLORS = {
   DRAFT: 'bg-greyscale-100 text-greyscale-700',
   PUBLISHED: 'bg-blue-100 text-blue-700',
   ACTIVE: 'bg-green-100 text-green-700',
-  CLOSED: 'bg-orange-100 text-orange-700',
-  ARCHIVED: 'bg-red-100 text-red-700'
+  COMPLETED: 'bg-purple-100 text-purple-700',
+  CANCELLED: 'bg-red-100 text-red-700'
 }
 
 const STATUS_LABELS = {
   DRAFT: 'Nháp',
   PUBLISHED: 'Đã xuất bản',
   ACTIVE: 'Đang hoạt động',
-  CLOSED: 'Đã đóng',
-  ARCHIVED: 'Lưu trữ'
+  COMPLETED: 'Đã hoàn thành',
+  CANCELLED: 'Đã hủy'
 }
 
 interface ExamsColumnsOptions {
@@ -103,11 +103,7 @@ export function createExamsColumns(options?: ExamsColumnsOptions): ColumnDef<Exa
       enableHiding: false,
       cell: ({ row }) => (
         <div className='flex justify-end'>
-          <ExamsRowActions
-            exam={row.original}
-            onView={options?.onView}
-            onEdit={options?.onEdit}
-          />
+          <ExamsRowActions exam={row.original} onView={options?.onView} onEdit={options?.onEdit} />
         </div>
       )
     }

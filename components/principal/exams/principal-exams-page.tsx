@@ -17,7 +17,7 @@ interface ExamsRow {
   id: string
   title: string
   description: string
-  status: 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'CLOSED' | 'ARCHIVED'
+  status: 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED'
   startTime: string
   endTime: string
   createdAt: string

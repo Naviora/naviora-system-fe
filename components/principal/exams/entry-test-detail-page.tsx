@@ -35,8 +35,8 @@ function getStatusBadge(status: string) {
     DRAFT: { label: 'Nháp', className: 'bg-greyscale-100 text-greyscale-700' },
     PUBLISHED: { label: 'Đã xuất bản', className: 'bg-blue-100 text-blue-700' },
     ACTIVE: { label: 'Đang hoạt động', className: 'bg-green-100 text-green-700' },
-    CLOSED: { label: 'Đã đóng', className: 'bg-red-100 text-red-700' },
-    ARCHIVED: { label: 'Lưu trữ', className: 'bg-greyscale-100 text-greyscale-600' }
+    COMPLETED: { label: 'Đã hoàn thành', className: 'bg-purple-100 text-purple-700' },
+    CANCELLED: { label: 'Đã hủy', className: 'bg-red-100 text-red-700' }
   }
   const config = statusMap[status as keyof typeof statusMap] || statusMap.DRAFT
   return (

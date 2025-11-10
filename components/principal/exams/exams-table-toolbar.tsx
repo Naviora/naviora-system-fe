@@ -18,8 +18,8 @@ const STATUS_OPTIONS = [
   { label: 'Nháp', value: 'DRAFT' },
   { label: 'Đã xuất bản', value: 'PUBLISHED' },
   { label: 'Đang hoạt động', value: 'ACTIVE' },
-  { label: 'Đã đóng', value: 'CLOSED' },
-  { label: 'Lưu trữ', value: 'ARCHIVED' }
+  { label: 'Đã hoàn thành', value: 'COMPLETED' },
+  { label: 'Đã hủy', value: 'CANCELLED' }
 ]
 
 export function ExamsTableToolbar({
