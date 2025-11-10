@@ -15,6 +15,18 @@ export const useClasses = (params: ClassesListParams = {}) => {
   })
 }
 
+export const useGetAssignedClasses = (params: ClassesListParams = {}) => {
+  return useQuery({
+    queryKey: [...CLASSES_QUERY_KEY, 'assigned'],
+    queryFn: async () => {
+      const data = await apiClient.get<ClassesListResponse['data']>('/classes/assigned-classes', {
+        params
+      })
+      return data
+    }
+  })
+}
+
 export const useClassDetail = (classId: string) => {
   return useQuery({
     queryKey: [...CLASSES_QUERY_KEY, 'detail', classId],

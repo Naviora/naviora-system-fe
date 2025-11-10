@@ -9,10 +9,12 @@ import {
   CalendarTodayTrigger,
   CalendarViewTrigger,
   CalendarWeekView,
-  CalendarYearView
+  CalendarYearView,
+  useCalendar
 } from '@/components/ui/full-calendar'
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
+import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -24,7 +26,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useClasses } from '@/hooks/api/use-classes'
+import { useGetAssignedClasses } from '@/hooks/api/use-classes'
+import { useCreateMeetingEvent, useGetMeetingEvents } from '@/hooks/api/use-meeting-event'
+import { useProfile } from '@/hooks/api/use-profile'
+import type { CreateMeetingEventRequest, MeetingEvent } from '@/types/api/meeting-event'
+import type { CalendarEvent } from '@/components/ui/full-calendar'
 import { toast } from 'sonner'
 
 type Invitee = { id: string; name: string }
@@ -44,37 +50,97 @@ const formSchema = z
     path: ['end_time']
   })
 
+// Component to fetch and update events based on calendar context
+function CalendarEventsLoader() {
+  const { date, view, setEvents } = useCalendar()
+
+  // Calculate start and end dates based on current view and date
+  const dateRange = useMemo(() => {
+    let start: Date
+    let end: Date
+
+    switch (view) {
+      case 'day':
+        start = new Date(date)
+        start.setHours(0, 0, 0, 0)
+        end = new Date(date)
+        end.setHours(23, 59, 59, 999)
+        break
+      case 'week':
+        start = startOfWeek(date, { weekStartsOn: 1 }) // Monday
+        end = endOfWeek(date, { weekStartsOn: 1 }) // Sunday
+        break
+      case 'month':
+        start = startOfMonth(date)
+        end = endOfMonth(date)
+        break
+      case 'year':
+        start = startOfYear(date)
+        end = endOfYear(date)
+        break
+      default:
+        // Default to week view
+        start = startOfWeek(date, { weekStartsOn: 1 })
+        end = endOfWeek(date, { weekStartsOn: 1 })
+    }
+
+    return {
+      start: start.toISOString(),
+      end: end.toISOString()
+    }
+  }, [date, view])
+
+  // Fetch meeting events with weekly query params
+  const { data: eventsData } = useGetMeetingEvents({
+    start: dateRange.start,
+    end: dateRange.end
+  })
+
+  // Transform API events to Calendar events and update calendar
+  useEffect(() => {
+    // Debug: log the actual data structure
+    console.log('eventsData:', eventsData)
+
+    // Handle different possible response structures
+    // Case 1: eventsData has .data property (array of events) - based on MeetingEventsListResponse type
+    // Case 2: eventsData is directly an array (if apiClient extracts differently)
+    let eventsArray: MeetingEvent[] = []
+
+    if (Array.isArray(eventsData)) {
+      eventsArray = eventsData
+    } else if (eventsData?.data && Array.isArray(eventsData.data)) {
+      eventsArray = eventsData.data
+    }
+
+    if (eventsArray.length === 0) {
+      setEvents([])
+      return
+    }
+
+    const calendarEvents: CalendarEvent[] = eventsArray.map((event: MeetingEvent, index: number) => ({
+      id: event.id,
+      start: new Date(event.start_time),
+      end: new Date(event.end_time),
+      title: event.title,
+      description: event.description || undefined,
+      // Cycle through colors for visual variety
+      color: (['blue', 'green', 'pink', 'purple'] as const)[index % 4]
+    }))
+
+    console.log('calendarEvents:', calendarEvents)
+    setEvents(calendarEvents)
+  }, [eventsData, setEvents])
+
+  return null
+}
+
 export default function CalendarPage() {
   const [open, setOpen] = useState(false)
 
   return (
     <>
-      <Calendar
-        events={[
-          {
-            id: '1',
-            start: new Date('2025-10-26T09:30:00Z'),
-            end: new Date('2025-10-26T14:30:00Z'),
-            title: 'Cuối kì 1',
-            description: 'Thi cuối kỳ môn Toán học cơ bản',
-            host: {
-              name: 'Nguyễn Văn A'
-            },
-            color: 'pink'
-          },
-          {
-            id: '2',
-            start: new Date('2025-10-27T10:00:00Z'),
-            end: new Date('2025-10-27T10:30:00Z'),
-            title: 'Cuối kì 2',
-            description: 'Thi cuối kỳ môn Vật lý đại cương',
-            host: {
-              name: 'Trần Thị B'
-            },
-            color: 'blue'
-          }
-        ]}
-      >
+      <Calendar>
+        <CalendarEventsLoader />
         <div className='h-dvh py-6 flex flex-col'>
           <div className='flex px-6 items-center gap-2 mb-6'>
             <CalendarViewTrigger view='week' className='aria-[current=true]:bg-accent'>
@@ -125,7 +191,9 @@ export default function CalendarPage() {
 }
 
 function CreateMeetingDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
-  const { data: classesData } = useClasses({ limit: 100, page: 1 })
+  const { data: classesData } = useGetAssignedClasses({ limit: 100, page: 1 })
+  const { data: profile } = useProfile()
+  const createMeetingMutation = useCreateMeetingEvent()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -151,10 +219,31 @@ function CreateMeetingDialog({ open, onOpenChange }: { open: boolean; onOpenChan
   }, [selectedClassId])
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    // Stub API call to create meeting event
-    await new Promise((resolve) => setTimeout(resolve, 800))
-    toast.success('Tạo cuộc họp thành công')
-    onOpenChange(false)
+    if (!profile?.account_id) {
+      toast.error('Không thể lấy thông tin người dùng')
+      return
+    }
+
+    // Transform Date objects to ISO string for API
+    const requestData: CreateMeetingEventRequest = {
+      class_id: values.class_id,
+      host_by: profile.account_id,
+      title: values.title,
+      description: values.description || undefined,
+      note: values.note || undefined,
+      invitees: values.invitees && values.invitees.length > 0 ? values.invitees : undefined,
+      start_time: values.start_time.toISOString(),
+      end_time: values.end_time.toISOString()
+    }
+
+    try {
+      await createMeetingMutation.mutateAsync(requestData)
+      toast.success('Tạo cuộc họp thành công')
+      form.reset()
+      onOpenChange(false)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Có lỗi xảy ra khi tạo cuộc họp')
+    }
   }
 
   return (
@@ -304,10 +393,20 @@ function CreateMeetingDialog({ open, onOpenChange }: { open: boolean; onOpenChan
             />
 
             <div className='flex justify-end gap-2 pt-2'>
-              <Button type='button' variant='outline' onClick={() => onOpenChange(false)}>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={() => {
+                  form.reset()
+                  onOpenChange(false)
+                }}
+                disabled={createMeetingMutation.isPending}
+              >
                 Hủy
               </Button>
-              <Button type='submit'>Tạo</Button>
+              <Button type='submit' disabled={createMeetingMutation.isPending}>
+                {createMeetingMutation.isPending ? 'Đang tạo...' : 'Tạo'}
+              </Button>
             </div>
           </form>
         </Form>
