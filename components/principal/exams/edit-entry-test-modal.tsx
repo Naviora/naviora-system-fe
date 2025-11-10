@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import { format } from 'date-fns'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -37,8 +38,16 @@ export function EditEntryTestModal({ open, onOpenChange, entryTest, onSuccess }:
 
   const updateMutation = useUpdateEntryTest({
     onSuccess: () => {
+      toast.success('Bài thi đã được cập nhật thành công', {
+        description: `${formData.title} đã được cập nhật`
+      })
       onOpenChange(false)
       onSuccess?.()
+    },
+    onError: (error) => {
+      toast.error('Lỗi khi cập nhật bài thi', {
+        description: error.message || 'Vui lòng thử lại'
+      })
     }
   })
 
