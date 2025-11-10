@@ -92,14 +92,6 @@ export function PrincipalExamsPageClient() {
     }
   }
 
-  const handleEditSubmit = async (data: Partial<EntryTestDto>) => {
-    // TODO: Call API to update exam
-    console.log('Update exam:', data)
-    setIsEditModalOpen(false)
-    // Refetch exams after update
-    examsQuery.refetch()
-  }
-
   const renderContent = () => {
     if (examsQuery.isLoading) {
       return (
@@ -157,7 +149,9 @@ export function PrincipalExamsPageClient() {
           open={isEditModalOpen}
           onOpenChange={setIsEditModalOpen}
           entryTest={selectedExam}
-          onSubmit={handleEditSubmit}
+          onSuccess={() => {
+            examsQuery.refetch()
+          }}
         />
       )}
     </div>

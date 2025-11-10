@@ -20,19 +20,20 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import { useUpdateEntryTest } from '@/hooks/api/principal/use-entry-tests'
 import type { EntryTestDto } from '@/hooks/api/principal/use-entry-tests'
 
 interface EditEntryTestModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   entryTest: EntryTestDto
-  onSubmit?: (data: Partial<EntryTestDto>) => void | Promise<void>
-  isLoading?: boolean
+  onSuccess?: () => void
 }
 
 const STATUS_OPTIONS = [
   { value: 'DRAFT', label: 'Nháp' },
   { value: 'PUBLISHED', label: 'Đã xuất bản' },
+  { value: 'ACTIVE', label: 'Đang hoạt động' },
   { value: 'CLOSED', label: 'Đã đóng' }
 ]
 
@@ -40,8 +41,7 @@ export function EditEntryTestModal({
   open,
   onOpenChange,
   entryTest,
-  onSubmit,
-  isLoading = false
+  onSuccess
 }: EditEntryTestModalProps) {
   const [formData, setFormData] = React.useState({
     title: entryTest.title,
@@ -49,6 +49,13 @@ export function EditEntryTestModal({
     status: entryTest.status,
     start_time: format(new Date(entryTest.start_time), "yyyy-MM-dd'T'HH:mm"),
     end_time: format(new Date(entryTest.end_time), "yyyy-MM-dd'T'HH:mm")
+  })
+
+  const updateMutation = useUpdateEntryTest({
+    onSuccess: () => {
+      onOpenChange(false)
+      onSuccess?.()
+    }
   })
 
   React.useEffect(() => {
@@ -65,8 +72,20 @@ export function EditEntryTestModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    await onSubmit?.(formData)
-    onOpenChange(false)
+    
+    // Convert form data to API format
+    const payload = {
+      title: formData.title,
+      description: formData.description,
+      status: formData.status as 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'CLOSED',
+      start_time: new Date(formData.start_time).toISOString(),
+      end_time: new Date(formData.end_time).toISOString()
+    }
+
+    updateMutation.mutate({
+      id: entryTest.entry_test_id,
+      payload
+    })
   }
 
   const handleChange = (field: string, value: string) => {
@@ -93,7 +112,7 @@ export function EditEntryTestModal({
               value={formData.title}
               onChange={(e) => handleChange('title', e.target.value)}
               placeholder='Nhập tên bài thi'
-              disabled={isLoading}
+              disabled={updateMutation.isPending}
             />
           </div>
 
@@ -105,7 +124,7 @@ export function EditEntryTestModal({
               value={formData.description}
               onChange={(e) => handleChange('description', e.target.value)}
               placeholder='Nhập mô tả bài thi'
-              disabled={isLoading}
+              disabled={updateMutation.isPending}
               rows={3}
             />
           </div>
@@ -113,7 +132,7 @@ export function EditEntryTestModal({
           {/* Status */}
           <div className='space-y-2'>
             <Label htmlFor='status'>Trạng thái</Label>
-            <Select value={formData.status} onValueChange={(value) => handleChange('status', value)} disabled={isLoading}>
+            <Select value={formData.status} onValueChange={(value) => handleChange('status', value)} disabled={updateMutation.isPending}>
               <SelectTrigger id='status'>
                 <SelectValue />
               </SelectTrigger>
@@ -135,7 +154,7 @@ export function EditEntryTestModal({
               type='datetime-local'
               value={formData.start_time}
               onChange={(e) => handleChange('start_time', e.target.value)}
-              disabled={isLoading}
+              disabled={updateMutation.isPending}
             />
           </div>
 
@@ -147,9 +166,16 @@ export function EditEntryTestModal({
               type='datetime-local'
               value={formData.end_time}
               onChange={(e) => handleChange('end_time', e.target.value)}
-              disabled={isLoading}
+              disabled={updateMutation.isPending}
             />
           </div>
+
+          {/* Error Message */}
+          {updateMutation.isError && (
+            <div className='rounded-md bg-destructive/10 p-3 text-sm text-destructive'>
+              {updateMutation.error?.message || 'Có lỗi xảy ra khi cập nhật bài thi'}
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className='flex justify-end gap-3 pt-4'>
@@ -157,12 +183,12 @@ export function EditEntryTestModal({
               type='button'
               variant='outline'
               onClick={() => onOpenChange(false)}
-              disabled={isLoading}
+              disabled={updateMutation.isPending}
             >
               Hủy
             </Button>
-            <Button type='submit' disabled={isLoading}>
-              {isLoading ? 'Đang lưu...' : 'Lưu thay đổi'}
+            <Button type='submit' disabled={updateMutation.isPending}>
+              {updateMutation.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
             </Button>
           </div>
         </form>

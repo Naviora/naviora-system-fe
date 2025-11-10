@@ -38,14 +38,14 @@ export interface EntryTestDto {
   entry_test_id: string
   title: string
   description: string
-  status: 'DRAFT' | 'PUBLISHED' | 'CLOSED'
+  status: 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'CLOSED'
   start_time: string
   end_time: string
   created_at: string
   updated_at: string
   deleted_at?: string | null
   version: number
-  question_sets: string[]
+  question_sets: string[] | Array<{ question_set_id: string; title: string; description: string; total_questions: number; duration_minutes: number }>
   created_by: CreatedByUser
   updated_by?: CreatedByUser | null
 }
