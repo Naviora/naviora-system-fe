@@ -55,7 +55,12 @@ const transformLessonResponse = (apiLesson: Record<string, unknown>): Transforme
   const materials = apiLesson.materials as Array<Record<string, unknown>> | undefined
   const reviewedExercises = apiLesson.reviewed_exercises as Array<Record<string, unknown>> | undefined
 
-  return {
+  console.log('DEBUG transformLessonResponse:', {
+    reviewed_exercises: reviewedExercises,
+    reviewedExercisesLength: reviewedExercises?.length
+  })
+
+  const result: TransformedLesson = {
     id: String(apiLesson.lesson_id),
     name: String(apiLesson.lesson_name),
     description: String(apiLesson.lesson_description || ''),
@@ -89,7 +94,7 @@ const transformLessonResponse = (apiLesson: Record<string, unknown>): Transforme
               : undefined
             const firstQuestionSet = questionSets && questionSets.length > 0 ? questionSets[0] : undefined
 
-            return {
+            const transformed = {
               id: String(ex.reviewed_exercise_id || ''),
               title: firstQuestionSet?.title, // Get title from first question set
               description: firstQuestionSet?.description, // Get description from first question set
@@ -99,9 +104,14 @@ const transformLessonResponse = (apiLesson: Record<string, unknown>): Transforme
               studentSubmissions: ex.student_submissions ? (ex.student_submissions as Array<Record<string, unknown>>) : [],
               questionSets
             }
+            console.log('DEBUG transformed exercise:', transformed)
+            return transformed
           })
         : undefined
   }
+
+  console.log('DEBUG final result reviewExercises:', result.reviewExercises)
+  return result
 }
 
 export default function LessonPage() {

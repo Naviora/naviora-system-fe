@@ -78,12 +78,18 @@ export const LessonContentViewer = ({ lesson }: LessonContentViewerProps) => {
   const lessonId = params.lessonId as string
   const [isCompleting, setIsCompleting] = useState(false)
 
+  console.log('DEBUG LessonContentViewer lesson:', lesson)
+  console.log('DEBUG reviewExercises:', lesson.reviewExercises)
+  console.log('DEBUG reviewExercises length:', lesson.reviewExercises?.length)
+
   const availableTabs: LessonTab[] = [
     'content',
     ...(lesson.quiz ? ['quiz'] : []),
     ...(lesson.reviewExercises && lesson.reviewExercises.length > 0 ? ['review-exercise'] : []),
     ...(lesson.materials ? ['materials'] : [])
   ] as LessonTab[]
+
+  console.log('DEBUG availableTabs:', availableTabs)
 
   const handleToggleCompletion = async () => {
     setIsCompleting(true)
