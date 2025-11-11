@@ -6,11 +6,13 @@ import { FileText, HelpCircle, Paperclip, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useToggleLessonCompletion } from '@/hooks/api/use-modules'
-import { useStartReviewedExercise } from '@/hooks/api/use-reviewed-exercises'
+import { useStartReviewedExercise } from '@/hooks/api/lecturer/exams/use-reviewed-exercise-submission'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { QUERY_KEYS } from '@/lib/constants/config'
 import { useParams } from 'next/navigation'
+import { saveReviewedExerciseSession, clearReviewedExerciseSession } from '@/lib/utils/exam-test-indb'
+import { format } from 'date-fns'
 
 // Status mapping
 const statusVietnamMap: Record<string, string> = {
@@ -21,6 +23,12 @@ const statusVietnamMap: Record<string, string> = {
   ENDED: 'Đã kết thúc',
   ARCHIVED: 'Đã lưu trữ',
   COMPLETED: 'Đã hoàn thành'
+}
+
+const attemptStatusVietnamMap: Record<string, string> = {
+  SUBMITTED: 'Đã nộp',
+  IN_PROGRESS: 'Đang làm',
+  DRAFT: 'Bản nháp'
 }
 
 type LessonTab = 'content' | 'quiz' | 'materials' | 'review-exercise'
@@ -96,7 +104,17 @@ export const LessonContentViewer = ({ lesson }: LessonContentViewerProps) => {
 
     setStartingExerciseId(exerciseId)
     try {
-      await startReviewedExercise.mutateAsync(exerciseId)
+      const response = await startReviewedExercise.mutateAsync({ reviewedExerciseId: exerciseId })
+      await clearReviewedExerciseSession()
+      await saveReviewedExerciseSession({
+        reviewed_exercise_id: response.reviewed_exercise_id,
+        question_set_id: response.question_set_id,
+        reviewed_exercise_submission_id: response.reviewed_exercise_submission_id,
+        attempt_status: response.attempt_status,
+        student_id: response.student_id,
+        created_at: response.created_at,
+        updated_at: response.updated_at
+      })
       toast.success('Bắt đầu bài tập thành công')
       // Redirect to the exercise taking page
       router.push(`/student/modules/${moduleId}/lessons/${lessonId}/reviewed-exercise/${exerciseId}`)
@@ -241,56 +259,108 @@ export const LessonContentViewer = ({ lesson }: LessonContentViewerProps) => {
           <div className='max-w-4xl'>
             <h2 className='text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4'>Bài tập ôn tập</h2>
             <div className='space-y-3'>
-              {lesson.reviewExercises.map((exercise, idx) => (
-                <div
-                  key={exercise.id || idx}
-                  className='p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow'
-                >
-                  <div className='flex items-start justify-between'>
-                    <div className='flex-1'>
-                      <h3 className='font-semibold text-gray-900 dark:text-gray-100 mb-1'>
-                        {exercise.title || 'Bài tập ôn tập'}
-                      </h3>
-                      {exercise.description && (
-                        <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>{exercise.description}</p>
-                      )}
-                      <div className='flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400'>
-                        {exercise.questionCount && <span>📝 {exercise.questionCount} câu hỏi</span>}
-                        {exercise.status && (
-                          <span
-                            className={cn(
-                              'px-2 py-1 rounded-full text-xs font-medium',
-                              exercise.status === 'ACTIVE'
-                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                : exercise.status === 'DRAFT'
-                                  ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-                                  : 'bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-300'
+              {lesson.reviewExercises.map((exercise, idx) => {
+                const latestSubmission = (
+                  Array.isArray(exercise.studentSubmissions) ? exercise.studentSubmissions[0] : undefined
+                ) as
+                  | {
+                      reviewed_exercise_submission_id?: string
+                      attempt_status?: string
+                      score?: number
+                      submitted_at?: string
+                    }
+                  | undefined
+
+                const submittedAtLabel = latestSubmission?.submitted_at
+                  ? (() => {
+                      const parsed = new Date(latestSubmission.submitted_at as string)
+                      return Number.isNaN(parsed.getTime()) ? null : format(parsed, 'dd/MM/yyyy HH:mm')
+                    })()
+                  : null
+
+                const attemptStatusLabel = latestSubmission?.attempt_status
+                  ? attemptStatusVietnamMap[latestSubmission.attempt_status] || latestSubmission.attempt_status
+                  : null
+
+                return (
+                  <div
+                    key={exercise.id || idx}
+                    className='p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow'
+                  >
+                    <div className='flex items-start justify-between gap-3'>
+                      <div className='flex-1'>
+                        <h3 className='font-semibold text-gray-900 dark:text-gray-100 mb-1'>
+                          {exercise.title || 'Bài tập ôn tập'}
+                        </h3>
+                        {exercise.description && (
+                          <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>{exercise.description}</p>
+                        )}
+                        <div className='flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-gray-400'>
+                          {exercise.questionCount && <span>📝 {exercise.questionCount} câu hỏi</span>}
+                          {exercise.status && (
+                            <span
+                              className={cn(
+                                'px-2 py-1 rounded-full text-xs font-medium',
+                                exercise.status === 'ACTIVE'
+                                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                  : exercise.status === 'DRAFT'
+                                    ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                    : 'bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-300'
+                              )}
+                            >
+                              {statusVietnamMap[exercise.status] || exercise.status}
+                            </span>
+                          )}
+                        </div>
+
+                        {exercise.isSubmitted && (
+                          <div className='mt-3 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-xs sm:text-sm text-green-700 dark:border-green-800/60 dark:bg-green-900/20 dark:text-green-300'>
+                            <div className='flex items-center gap-2 font-semibold'>
+                              <Check className='h-4 w-4' />
+                              Đã nộp bài
+                            </div>
+                            {attemptStatusLabel && <p className='mt-1'>Trạng thái: {attemptStatusLabel}</p>}
+                            {typeof latestSubmission?.score === 'number' && (
+                              <p className='mt-1'>
+                                Điểm: <span className='font-semibold'>{latestSubmission.score}</span>
+                              </p>
                             )}
-                          >
-                            {statusVietnamMap[exercise.status] || exercise.status}
-                          </span>
+                            {submittedAtLabel && (
+                              <p className='mt-1 text-[11px] sm:text-xs text-green-600 dark:text-green-400'>
+                                Nộp lúc: {submittedAtLabel}
+                              </p>
+                            )}
+                          </div>
                         )}
                       </div>
-                    </div>
-                    <Button
-                      className='ml-2'
-                      disabled={exercise.status !== 'ACTIVE' || startingExerciseId === exercise.id}
-                      onClick={() => {
-                        if (exercise.status === 'ACTIVE') {
-                          handleStartReviewedExercise(exercise.id)
+                      <Button
+                        className='ml-2'
+                        disabled={
+                          exercise.status !== 'ACTIVE' || startingExerciseId === exercise.id || exercise.isSubmitted
                         }
-                      }}
-                      title={
-                        exercise.status !== 'ACTIVE'
-                          ? `Bài tập này hiện tại là ${statusVietnamMap[exercise.status || ''] || exercise.status}`
-                          : 'Làm bài tập'
-                      }
-                    >
-                      {startingExerciseId === exercise.id ? 'Đang tải...' : 'Làm bài tập'}
-                    </Button>
+                        onClick={() => {
+                          if (exercise.status === 'ACTIVE' && !exercise.isSubmitted) {
+                            handleStartReviewedExercise(exercise.id)
+                          }
+                        }}
+                        title={
+                          exercise.status !== 'ACTIVE'
+                            ? `Bài tập này hiện tại là ${statusVietnamMap[exercise.status || ''] || exercise.status}`
+                            : exercise.isSubmitted
+                              ? 'Bạn đã nộp bài này'
+                              : 'Làm bài tập'
+                        }
+                      >
+                        {exercise.isSubmitted
+                          ? 'Đã nộp'
+                          : startingExerciseId === exercise.id
+                            ? 'Đang tải...'
+                            : 'Làm bài tập'}
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         )}
