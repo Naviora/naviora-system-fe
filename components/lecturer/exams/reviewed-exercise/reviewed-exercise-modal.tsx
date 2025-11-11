@@ -2,6 +2,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Label } from '@/components/ui/label'
 import React, { useEffect, useState } from 'react'
 import QuestionSetDrawer from '@/components/lecturer/exams/all-test/question-set-drawer'
 import { MdDeleteOutline } from 'react-icons/md'
@@ -28,18 +30,21 @@ export default function ReviewedExerciseModal({
   readOnly = false,
   isLoading = false
 }: ReviewedExerciseModalProps) {
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
+  const [status, setStatus] = useState<string>('DRAFT')
+  const [startTime, setStartTime] = useState('')
+  const [endTime, setEndTime] = useState('')
   const [selectedQuestionSets, setSelectedQuestionSets] = useState<any[]>([])
 
   useEffect(() => {
     if (initialData) {
-      setTitle(initialData.title || '')
-      setDescription(initialData.description || '')
+      setStatus(initialData.status || 'DRAFT')
+      setStartTime(initialData.start_time ? new Date(initialData.start_time).toISOString().slice(0, 16) : '')
+      setEndTime(initialData.end_time ? new Date(initialData.end_time).toISOString().slice(0, 16) : '')
       setSelectedQuestionSets(initialData.question_sets || [])
     } else {
-      setTitle('')
-      setDescription('')
+      setStatus('DRAFT')
+      setStartTime('')
+      setEndTime('')
       setSelectedQuestionSets([])
     }
   }, [initialData, open])
@@ -47,10 +52,11 @@ export default function ReviewedExerciseModal({
   const handleSubmit = () => {
     if (onSubmit) {
       onSubmit({
-        title,
-        description,
         lessonId,
-        selectedQuestionSets
+        status,
+        startTime: new Date(startTime).toISOString(),
+        endTime: new Date(endTime).toISOString(),
+        questionSets: selectedQuestionSets.map((set: any) => set.question_set_id)
       })
     }
     onOpenChange(false)
@@ -80,23 +86,46 @@ export default function ReviewedExerciseModal({
             </div>
           ) : (
             <>
-              <div>
-                <Input
-                  className='bg-greyscale-0'
-                  placeholder='Tên bài tập'
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  disabled={readOnly}
-                />
+              <div className='space-y-2'>
+                <Label htmlFor='status'>Trạng thái</Label>
+                <Select value={status} onValueChange={setStatus} disabled={readOnly}>
+                  <SelectTrigger className='bg-greyscale-0'>
+                    <SelectValue placeholder='Chọn trạng thái' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='DRAFT'>Nháp</SelectItem>
+                    <SelectItem value='ACTIVE'>Đang mở</SelectItem>
+                    <SelectItem value='CLOSED'>Đã đóng</SelectItem>
+                    <SelectItem value='PENDING'>Chờ kích hoạt</SelectItem>
+                    <SelectItem value='ENDED'>Đã kết thúc</SelectItem>
+                    <SelectItem value='ARCHIVED'>Đã lưu trữ</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div>
-                <Input
-                  className='bg-greyscale-0'
-                  placeholder='Mô tả'
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  disabled={readOnly}
-                />
+
+              <div className='grid grid-cols-2 gap-4'>
+                <div className='space-y-2'>
+                  <Label htmlFor='startTime'>Thời gian bắt đầu</Label>
+                  <Input
+                    id='startTime'
+                    type='datetime-local'
+                    className='bg-greyscale-0'
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                    disabled={readOnly}
+                  />
+                </div>
+                <div className='space-y-2'>
+                  <Label htmlFor='endTime'>Thời gian kết thúc</Label>
+                  <Input
+                    id='endTime'
+                    type='datetime-local'
+                    className='bg-greyscale-0'
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                    disabled={readOnly}
+                  />
+                </div>
               </div>
 
               {!readOnly && (

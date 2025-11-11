@@ -3,12 +3,11 @@ import { questionSetResponseSchema, userSchema, roleSchema } from '@/lib/validat
 
 // Reviewed Exercise CRUD
 export const createReviewedExerciseSchema = z.object({
-  title: z.string(),
-  description: z.string(),
   lessonId: z.string(),
-  questionSets: z.array(z.string()),
+  status: z.enum(['ACTIVE', 'CLOSED', 'DRAFT', 'ARCHIVED', 'PENDING', 'ENDED']),
   startTime: z.string(),
-  endTime: z.string()
+  endTime: z.string(),
+  questionSets: z.array(z.string())
 })
 
 export const reviewedExerciseSchema = z.object({

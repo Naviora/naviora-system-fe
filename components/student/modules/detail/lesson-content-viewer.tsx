@@ -99,9 +99,7 @@ export const LessonContentViewer = ({ lesson }: LessonContentViewerProps) => {
       await startReviewedExercise.mutateAsync(exerciseId)
       toast.success('Bắt đầu bài tập thành công')
       // Redirect to the exercise taking page
-      router.push(
-        `/student/modules/${moduleId}/lessons/${lessonId}/reviewed-exercise/${exerciseId}`
-      )
+      router.push(`/student/modules/${moduleId}/lessons/${lessonId}/reviewed-exercise/${exerciseId}`)
     } catch (error) {
       toast.error('Lỗi khi bắt đầu bài tập')
       console.error('Error starting reviewed exercise:', error)
