@@ -25,6 +25,13 @@ interface ReviewExercise {
   description?: string
   questionCount?: number
   status?: string
+  isSubmitted?: boolean
+  studentSubmissions?: Array<Record<string, unknown>>
+  questionSets?: Array<{
+    question_set_id: string
+    title: string
+    description: string
+  }>
 }
 
 interface TransformedLesson {
@@ -77,7 +84,16 @@ const transformLessonResponse = (apiLesson: Record<string, unknown>): Transforme
             title: undefined, // Will be fetched separately
             description: undefined, // Will be fetched separately
             questionCount: undefined, // Will be fetched separately
-            status: ex.status ? String(ex.status) : undefined
+            status: ex.status ? String(ex.status) : undefined,
+            isSubmitted: ex.is_submitted ? Boolean(ex.is_submitted) : false,
+            studentSubmissions: ex.student_submissions ? (ex.student_submissions as Array<Record<string, unknown>>) : [],
+            questionSets: ex.question_sets
+              ? (ex.question_sets as Array<{
+                  question_set_id: string
+                  title: string
+                  description: string
+                }>)
+              : undefined
           }))
         : undefined
   }
@@ -122,7 +138,16 @@ export default function LessonPage() {
           title: undefined,
           description: undefined,
           questionCount: undefined,
-          status: ex.status ? String(ex.status) : undefined
+          status: ex.status ? String(ex.status) : undefined,
+          isSubmitted: ex.is_submitted ? Boolean(ex.is_submitted) : false,
+          studentSubmissions: ex.student_submissions ? (ex.student_submissions as Array<Record<string, unknown>>) : [],
+          questionSets: ex.question_sets
+            ? (ex.question_sets as Array<{
+                question_set_id: string
+                title: string
+                description: string
+              }>)
+            : undefined
         }))
         setEnrichedReviewExercises(enriched)
       } catch (error) {

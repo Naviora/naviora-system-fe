@@ -54,6 +54,13 @@ type Lesson = {
     description?: string
     questionCount?: number
     status?: string
+    isSubmitted?: boolean
+    studentSubmissions?: Array<Record<string, unknown>>
+    questionSets?: Array<{
+      question_set_id: string
+      title: string
+      description: string
+    }>
   }>
 }
 
