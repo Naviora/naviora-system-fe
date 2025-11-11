@@ -74,7 +74,7 @@ function useDebounce<T>(value: T, delay = 400) {
 export function PrincipalExamsPageClient() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('entry-test')
-  
+
   // Entry Test State
   const [entryTestSearchTerm, setEntryTestSearchTerm] = useState('')
   const [entryTestStatusFilter, setEntryTestStatusFilter] = useState<string | null>(null)
