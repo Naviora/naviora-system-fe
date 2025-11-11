@@ -2,14 +2,10 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Book, Menu, CheckCircle2, Circle } from 'lucide-react'
-import { useQueryClient } from '@tanstack/react-query'
+import { Book, Menu, Circle, CheckCircle2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useModuleLessons, useToggleLessonCompletion } from '@/hooks/api/use-modules'
-import { Checkbox } from '@/components/ui/checkbox'
+import { useModuleLessons } from '@/hooks/api/use-modules'
 import { Progress } from '@/components/ui/progress'
-import { QUERY_KEYS } from '@/lib/constants/config'
-import { toast } from 'sonner'
 
 type Lesson = {
   lesson_id: string
@@ -44,7 +40,7 @@ const ModuleInfoHeader = ({ module }: { module: Module }) => {
     <div className='p-3 space-y-3'>
       <h2 className='text-2xl font-semibold text-gray-800 dark:text-gray-100'>{module.module_name}</h2>
       <p className='text-sm text-gray-600 dark:text-gray-400'>{module.module_description}</p>
-      
+
       <div className='space-y-2'>
         <div className='flex items-center justify-between text-sm text-gray-600 dark:text-gray-400'>
           <div className='flex items-center'>
@@ -68,34 +64,11 @@ interface ModuleLessonsListProps {
 }
 
 const ModuleLessonsList = ({ module, moduleId, selectedLessonId }: ModuleLessonsListProps) => {
-  const queryClient = useQueryClient()
-  const toggleCompletion = useToggleLessonCompletion()
-
-  const handleToggleCompletion = async (e: React.MouseEvent, lessonId: string) => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    try {
-      await toggleCompletion.mutateAsync(lessonId, {
-        onSuccess: () => {
-          // Invalidate module lessons query to refresh data
-          queryClient.invalidateQueries({
-            queryKey: QUERY_KEYS.MODULE_LESSONS(moduleId)
-          })
-          toast.success('Cập nhật trạng thái bài học thành công')
-        }
-      })
-    } catch (error) {
-      toast.error('Không thể cập nhật trạng thái bài học')
-      console.error('Toggle lesson completion error:', error)
-    }
-  }
-
   return (
     <div className='space-y-2'>
       {module.lessons?.map((lesson) => {
         const isCompleted = lesson.is_completed ?? false
-        
+
         return (
           <Link
             key={lesson.lesson_id}
@@ -108,24 +81,18 @@ const ModuleLessonsList = ({ module, moduleId, selectedLessonId }: ModuleLessons
             )}
           >
             <div className='flex items-center gap-2'>
-              <Checkbox
-                checked={isCompleted}
-                onCheckedChange={() => {}}
-                onClick={(e) => handleToggleCompletion(e, lesson.lesson_id)}
-                className='shrink-0'
-              />
               {isCompleted ? (
                 <CheckCircle2 className='h-4 w-4 text-green-500 shrink-0' />
               ) : (
                 <Circle className='h-4 w-4 text-gray-400 shrink-0' />
               )}
               <div className='flex-1'>
-                <p className={cn(
-                  'font-medium text-sm',
-                  isCompleted 
-                    ? 'text-gray-500 dark:text-gray-400 line-through' 
-                    : 'text-gray-900 dark:text-gray-100'
-                )}>
+                <p
+                  className={cn(
+                    'font-medium text-sm',
+                    isCompleted ? 'text-gray-500 dark:text-gray-400 line-through' : 'text-gray-900 dark:text-gray-100'
+                  )}
+                >
                   {lesson.lesson_name}
                 </p>
                 <p className='text-xs text-gray-500 dark:text-gray-400'>{lesson.lesson_description}</p>
@@ -147,7 +114,7 @@ export const ModuleDetailSidebar = ({ moduleId, selectedLessonId }: ModuleDetail
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const { data: moduleData, isLoading } = useModuleLessons(moduleId)
 
-  const moduleInfo = (moduleData as Module) 
+  const moduleInfo = moduleData as Module
 
   return (
     <div

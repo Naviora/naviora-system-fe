@@ -16,6 +16,7 @@ interface MaterialFile {
   name: string
   type: string
   size: string
+  path?: string
 }
 
 interface TransformedLesson {
@@ -41,7 +42,7 @@ const transformLessonResponse = (apiLesson: Record<string, unknown>): Transforme
     name: String(apiLesson.lesson_name),
     description: String(apiLesson.lesson_description || ''),
     duration: '00:00', // API doesn't provide duration
-    completed: false, // API doesn't provide completion status
+    completed: Boolean(apiLesson.is_completed) || false,
     content: {
       title: String(apiLesson.lesson_name),
       body: String(apiLesson.lesson_content || 'Nội dung bài học sẽ được cập nhật sớm')
@@ -52,12 +53,9 @@ const transformLessonResponse = (apiLesson: Record<string, unknown>): Transforme
             title: 'Tài liệu Hỗ trợ',
             files: materials.map((m) => ({
               name: String(m.material_name || 'Tài liệu'),
-              type:
-                String(m.material_name || 'FILE')
-                  .split('.')
-                  .pop()
-                  ?.toUpperCase() || 'FILE',
-              size: String(m.material_size || '0 KB')
+              type: String(m.material_type || 'FILE').toUpperCase(),
+              size: String(m.material_size || '0 KB'),
+              path: String(m.material_path || '')
             }))
           }
         : undefined
@@ -113,7 +111,7 @@ export default function LessonPage() {
   }
 
   return (
-    <div className='flex flex-col h-full'>
+    <div className='flex flex-col h-full w-full'>
       <LessonContentViewer lesson={lesson} />
     </div>
   )

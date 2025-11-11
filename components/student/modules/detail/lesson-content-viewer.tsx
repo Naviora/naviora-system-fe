@@ -1,9 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { FileText, HelpCircle, Paperclip } from 'lucide-react'
+import { FileText, HelpCircle, Paperclip, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { useToggleLessonCompletion } from '@/hooks/api/use-modules'
+import { toast } from 'sonner'
+import { useQueryClient } from '@tanstack/react-query'
+import { QUERY_KEYS } from '@/lib/constants/config'
+import { useParams } from 'next/navigation'
 
 type LessonTab = 'content' | 'quiz' | 'materials'
 
@@ -28,6 +33,7 @@ type Lesson = {
       name: string
       type: string
       size: string
+      path?: string
     }>
   }
 }
@@ -38,12 +44,37 @@ interface LessonContentViewerProps {
 
 export const LessonContentViewer = ({ lesson }: LessonContentViewerProps) => {
   const [activeTab, setActiveTab] = useState<LessonTab>('content')
+  const queryClient = useQueryClient()
+  const toggleCompletion = useToggleLessonCompletion()
+  const params = useParams()
+  const moduleId = params.id as string
+  const [isCompleting, setIsCompleting] = useState(false)
 
   const availableTabs: LessonTab[] = [
     'content',
     ...(lesson.quiz ? ['quiz'] : []),
     ...(lesson.materials ? ['materials'] : [])
   ] as LessonTab[]
+
+  const handleToggleCompletion = async () => {
+    setIsCompleting(true)
+    try {
+      await toggleCompletion.mutateAsync(lesson.id, {
+        onSuccess: () => {
+          // Invalidate module lessons query to refresh sidebar
+          queryClient.invalidateQueries({
+            queryKey: QUERY_KEYS.MODULE_LESSONS(moduleId)
+          })
+          toast.success('Cập nhật trạng thái bài học thành công')
+        }
+      })
+    } catch (error) {
+      toast.error('Không thể cập nhật trạng thái bài học')
+      console.error('Toggle lesson completion error:', error)
+    } finally {
+      setIsCompleting(false)
+    }
+  }
 
   return (
     <div className='flex flex-col h-full bg-white dark:bg-gray-800'>
@@ -104,9 +135,22 @@ export const LessonContentViewer = ({ lesson }: LessonContentViewerProps) => {
       {/* Tab Content */}
       <div className='flex-1 overflow-y-auto p-6'>
         {activeTab === 'content' && (
-          <div className='max-w-4xl'>
-            <h2 className='text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4'>{lesson.content.title}</h2>
-            <div className='htmlContent max-w-none' dangerouslySetInnerHTML={{ __html: lesson.content.body }} />
+          <div className='space-y-6'>
+            <div>
+              <h2 className='text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4'>{lesson.content.title}</h2>
+              <div className='htmlContent max-w-none' dangerouslySetInnerHTML={{ __html: lesson.content.body }} />
+            </div>
+            <div className='border-t border-gray-200 dark:border-gray-700 pt-6 flex justify-end'>
+              <Button
+                onClick={handleToggleCompletion}
+                disabled={isCompleting}
+                variant={lesson.completed ? 'destructive' : 'default'}
+                className='w-full sm:w-auto'
+              >
+                <Check className='mr-2 h-4 w-4' />
+                {lesson.completed ? 'Bỏ hoàn thành' : 'Hoàn thành bài học'}
+              </Button>
+            </div>
           </div>
         )}
 
@@ -149,7 +193,27 @@ export const LessonContentViewer = ({ lesson }: LessonContentViewerProps) => {
                     <span className='text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded'>
                       {file.type}
                     </span>
-                    <Button variant='outline' size='sm'>
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      onClick={() => {
+                        if (file.path) {
+                          // Add Cloudinary attachment flag to force download
+                          const downloadUrl = file.path.includes('cloudinary')
+                            ? `${file.path}?fl_attachment`
+                            : file.path
+
+                          const link = document.createElement('a')
+                          link.href = downloadUrl
+                          link.download = file.name || 'download'
+                          link.target = '_blank'
+                          document.body.appendChild(link)
+                          link.click()
+                          document.body.removeChild(link)
+                        }
+                      }}
+                      disabled={!file.path}
+                    >
                       Tải xuống
                     </Button>
                   </div>
