@@ -91,11 +91,11 @@ export const LessonContentViewer = ({ lesson }: LessonContentViewerProps) => {
   const handleStartReviewedExercise = async (exerciseId: string) => {
     setStartingExerciseId(exerciseId)
     try {
-      const result = await startReviewedExercise.mutateAsync(exerciseId)
+      await startReviewedExercise.mutateAsync(exerciseId)
       toast.success('Bắt đầu bài tập thành công')
       // Redirect to the exercise taking page
       router.push(
-        `/student/modules/${moduleId}/lessons/${lessonId}/reviewed-exercise/${exerciseId}/submit/${result.data.reviewed_exercise_submission_id}`
+        `/student/modules/${moduleId}/lessons/${lessonId}/reviewed-exercise/${exerciseId}`
       )
     } catch (error) {
       toast.error('Lỗi khi bắt đầu bài tập')
