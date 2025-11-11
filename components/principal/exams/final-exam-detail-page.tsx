@@ -119,7 +119,6 @@ export function FinalExamDetailPageClient({ finalExamId }: FinalExamDetailPageCl
 
   const statistics = scoreSpectrumQuery.data?.data?.statistics as ScoreSpectrumStatistics | undefined
   const scoreRanges = scoreSpectrumQuery.data?.data?.score_ranges ?? []
-  const hasNoSubmissions = scoreSpectrumQuery.isError || (scoreRanges.length === 0 && !scoreSpectrumQuery.isLoading)
 
   return (
     <div className='flex flex-col gap-6 px-4 pb-10 pt-4 sm:px-6 lg:px-8'>
@@ -160,42 +159,31 @@ export function FinalExamDetailPageClient({ finalExamId }: FinalExamDetailPageCl
         </div>
       </section>
 
-      {/* No Submissions State */}
-      {hasNoSubmissions ? (
-        <div className='rounded-lg border border-amber-200 bg-amber-50 p-6'>
-          <p className='text-sm text-amber-900'>
-            Chưa có bài nộp nào cho bài thi này. Thống kê và biểu đồ sẽ hiển thị khi có học sinh nộp bài.
-          </p>
-        </div>
-      ) : (
-        <>
-          {/* Statistics Cards */}
-          {statistics && (
-            <section>
-              <div className='mb-3'>
-                <h2 className='text-lg font-semibold text-greyscale-900'>Thống kê tổng quan</h2>
-              </div>
-              <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6'>
-                <StatCard label='Tổng bài nộp' value={statistics.total_submissions} />
-                <StatCard label='Điểm trung bình' value={statistics.average_score.toFixed(2)} subtext='/10' />
-                <StatCard label='Điểm cao nhất' value={statistics.highest_score} />
-                <StatCard label='Điểm thấp nhất' value={statistics.lowest_score} />
-                <StatCard label='Trung vị' value={statistics.median_score} />
-                <StatCard label='Độ lệch chuẩn' value={statistics.standard_deviation.toFixed(2)} />
-              </div>
-            </section>
-          )}
-
-          {/* Score Spectrum Chart */}
-          <section>
-            {scoreSpectrumQuery.isLoading ? (
-              <Skeleton className='h-96 w-full rounded-lg' />
-            ) : (
-              <ScoreSpectrumChart data={scoreRanges} />
-            )}
-          </section>
-        </>
+      {/* Statistics Cards */}
+      {statistics && (
+        <section>
+          <div className='mb-3'>
+            <h2 className='text-lg font-semibold text-greyscale-900'>Thống kê tổng quan</h2>
+          </div>
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6'>
+            <StatCard label='Tổng bài nộp' value={statistics.total_submissions} />
+            <StatCard label='Điểm trung bình' value={statistics.average_score.toFixed(2)} subtext='/10' />
+            <StatCard label='Điểm cao nhất' value={statistics.highest_score} />
+            <StatCard label='Điểm thấp nhất' value={statistics.lowest_score} />
+            <StatCard label='Trung vị' value={statistics.median_score} />
+            <StatCard label='Độ lệch chuẩn' value={statistics.standard_deviation.toFixed(2)} />
+          </div>
+        </section>
       )}
+
+      {/* Score Spectrum Chart */}
+      <section>
+        {scoreSpectrumQuery.isLoading ? (
+          <Skeleton className='h-96 w-full rounded-lg' />
+        ) : (
+          <ScoreSpectrumChart data={scoreRanges} />
+        )}
+      </section>
 
       {/* Student Grades Section */}
       <section className='space-y-4'>
