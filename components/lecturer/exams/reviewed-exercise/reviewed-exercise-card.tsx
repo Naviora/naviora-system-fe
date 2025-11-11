@@ -4,13 +4,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { FaRegEdit } from 'react-icons/fa'
 import { MdDeleteOutline, MdOutlineRemoveRedEye } from 'react-icons/md'
 import { timeAgo } from '@/lib/utils'
-import { ReviewedExercise } from '@/lib/validations/lecturer/exams/reviewed-exercise'
+import type { ReviewedExerciseSummary } from '@/lib/validations/lecturer/exams/reviewed-exercise'
 
 interface ReviewedExerciseCardProps {
-  exercise: ReviewedExercise
-  onEdit: (data: ReviewedExercise) => void
+  exercise: ReviewedExerciseSummary
+  onEdit: (data: ReviewedExerciseSummary) => void
   onDelete: (id: string) => void
-  onView?: (data: ReviewedExercise) => void
+  onView?: (data: ReviewedExerciseSummary) => void
 }
 
 export default function ReviewedExerciseCard({ exercise, onEdit, onDelete, onView }: ReviewedExerciseCardProps) {
@@ -26,7 +26,7 @@ export default function ReviewedExerciseCard({ exercise, onEdit, onDelete, onVie
     <div className='bg-greyscale-50 rounded border p-3 hover:shadow-sm transition-all'>
       <div className='flex items-center justify-between mb-2'>
         <div className='flex items-center gap-2'>
-          <span className='text-sm font-semibold text-greyscale-800'>{exercise.title || 'Bài tập ôn tập'}</span>
+          <span className='text-sm font-semibold text-greyscale-800'>{String(exercise.title) || 'Bài tập ôn tập'}</span>
           {exercise.status && (
             <span className='text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700'>{exercise.status}</span>
           )}
@@ -39,7 +39,7 @@ export default function ReviewedExerciseCard({ exercise, onEdit, onDelete, onVie
       </div>
 
       {exercise.description && (
-        <div className='mb-2 text-greyscale-600 text-xs line-clamp-1'>{exercise.description}</div>
+        <div className='mb-2 text-greyscale-600 text-xs line-clamp-1'>{String(exercise.description)}</div>
       )}
 
       <div className='flex items-center justify-between text-xs text-greyscale-400'>

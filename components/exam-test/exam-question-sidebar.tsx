@@ -43,7 +43,7 @@ export function ExamQuestionSidebar({
                 variant='outline'
                 className={`
                   w-full h-10 text-base font-semibold transition-all
-                  ${isCurrent ? '!bg-primary text-white' : isAnswered ? '!bg-success-25 text-success-200' : ''}
+                  ${isCurrent ? 'bg-primary! text-white' : isAnswered ? 'bg-success-25! text-success-200' : ''}
                 `}
                 onClick={() => onJump(i)}
               >
