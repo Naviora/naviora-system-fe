@@ -177,7 +177,7 @@ export const lessonSchema = z.object({
   created_at: z.string().min(1),
   updated_at: z.string().min(1),
   materials: z.array(materialSchema).optional(),
-  is_completed: z.boolean().optional()
+  is_completed: z.preprocess((val) => (val === null ? false : val), z.boolean().optional())
 })
 
 export const lessonResponseSchema = z.object({
@@ -208,7 +208,7 @@ export const lessonCompletionResponseSchema = z.object({
 
 export const moduleLessonsSchema = moduleSchema.extend({
   lessons: z.array(lessonSchema),
-  progress_percent: z.number().optional()
+  progress_percent: z.preprocess((val) => (val === null ? 0 : val), z.number().optional())
 })
 
 export const moduleDetailResponseSchema = z.object({
