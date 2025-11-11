@@ -11,8 +11,8 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   return (
     <NextThemesProvider
       attribute='class'
-      defaultTheme='system'
-      enableSystem
+      defaultTheme='light'
+      themes={['light', 'dark']}
       storageKey='naviora-theme'
       disableTransitionOnChange
     >
