@@ -40,7 +40,22 @@ export default function ReviewedExerciseModal({
       setStatus(initialData.status || 'DRAFT')
       setStartTime(initialData.start_time ? new Date(initialData.start_time).toISOString().slice(0, 16) : '')
       setEndTime(initialData.end_time ? new Date(initialData.end_time).toISOString().slice(0, 16) : '')
-      setSelectedQuestionSets(initialData.question_sets || [])
+      
+      // Handle question_sets - could be array of objects or array of IDs
+      const questionSets = initialData.question_sets || []
+      if (questionSets.length > 0) {
+        // Check if first item is an object or a string
+        if (typeof questionSets[0] === 'object' && questionSets[0] !== null) {
+          // Already objects with full data
+          setSelectedQuestionSets(questionSets)
+        } else {
+          // Array of string IDs - need to fetch full data or show message
+          console.warn('Question sets are IDs only, full data needed for display')
+          setSelectedQuestionSets([])
+        }
+      } else {
+        setSelectedQuestionSets([])
+      }
     } else {
       setStatus('DRAFT')
       setStartTime('')
