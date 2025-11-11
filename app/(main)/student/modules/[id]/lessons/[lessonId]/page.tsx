@@ -79,22 +79,27 @@ const transformLessonResponse = (apiLesson: Record<string, unknown>): Transforme
         : undefined,
     reviewExercises:
       reviewedExercises && reviewedExercises.length > 0
-        ? reviewedExercises.map((ex) => ({
-            id: String(ex.reviewed_exercise_id || ''),
-            title: undefined, // Will be fetched separately
-            description: undefined, // Will be fetched separately
-            questionCount: undefined, // Will be fetched separately
-            status: ex.status ? String(ex.status) : undefined,
-            isSubmitted: ex.is_submitted ? Boolean(ex.is_submitted) : false,
-            studentSubmissions: ex.student_submissions ? (ex.student_submissions as Array<Record<string, unknown>>) : [],
-            questionSets: ex.question_sets
+        ? reviewedExercises.map((ex) => {
+            const questionSets = ex.question_sets
               ? (ex.question_sets as Array<{
                   question_set_id: string
                   title: string
                   description: string
                 }>)
               : undefined
-          }))
+            const firstQuestionSet = questionSets && questionSets.length > 0 ? questionSets[0] : undefined
+
+            return {
+              id: String(ex.reviewed_exercise_id || ''),
+              title: firstQuestionSet?.title, // Get title from first question set
+              description: firstQuestionSet?.description, // Get description from first question set
+              questionCount: undefined, // Will be fetched separately
+              status: ex.status ? String(ex.status) : undefined,
+              isSubmitted: ex.is_submitted ? Boolean(ex.is_submitted) : false,
+              studentSubmissions: ex.student_submissions ? (ex.student_submissions as Array<Record<string, unknown>>) : [],
+              questionSets
+            }
+          })
         : undefined
   }
 }
@@ -133,22 +138,27 @@ export default function LessonPage() {
       try {
         // For now, create exercises with available data
         // Full details would require fetching each exercise individually
-        const enriched: ReviewExercise[] = reviewedExercises.map((ex) => ({
-          id: String(ex.reviewed_exercise_id || ''),
-          title: undefined,
-          description: undefined,
-          questionCount: undefined,
-          status: ex.status ? String(ex.status) : undefined,
-          isSubmitted: ex.is_submitted ? Boolean(ex.is_submitted) : false,
-          studentSubmissions: ex.student_submissions ? (ex.student_submissions as Array<Record<string, unknown>>) : [],
-          questionSets: ex.question_sets
+        const enriched: ReviewExercise[] = reviewedExercises.map((ex) => {
+          const questionSets = ex.question_sets
             ? (ex.question_sets as Array<{
                 question_set_id: string
                 title: string
                 description: string
               }>)
             : undefined
-        }))
+          const firstQuestionSet = questionSets && questionSets.length > 0 ? questionSets[0] : undefined
+
+          return {
+            id: String(ex.reviewed_exercise_id || ''),
+            title: firstQuestionSet?.title, // Get title from first question set
+            description: firstQuestionSet?.description, // Get description from first question set
+            questionCount: undefined,
+            status: ex.status ? String(ex.status) : undefined,
+            isSubmitted: ex.is_submitted ? Boolean(ex.is_submitted) : false,
+            studentSubmissions: ex.student_submissions ? (ex.student_submissions as Array<Record<string, unknown>>) : [],
+            questionSets
+          }
+        })
         setEnrichedReviewExercises(enriched)
       } catch (error) {
         console.error('Error fetching exercise details:', error)
