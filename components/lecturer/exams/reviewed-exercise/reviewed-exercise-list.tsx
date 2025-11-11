@@ -46,46 +46,49 @@ export default function ReviewedExerciseList({ lessonId, lessonName, exercises =
   }
 
   const handleEdit = (exercise: any) => {
-    // Fetch full exercise detail before opening edit modal
+    // Use exercise data directly from list (already has full question_sets from lesson detail)
+    setEditData(exercise)
     setSelectedExerciseId(exercise.reviewed_exercise_id)
-    setEditData(null) // Clear edit data first
     setIsViewMode(false)
     setModalOpen(true)
   }
 
   const handleView = (exercise: any) => {
-    // Fetch full exercise detail before opening view modal
+    // Use exercise data directly from list (already has full question_sets from lesson detail)
+    setEditData(exercise)
     setSelectedExerciseId(exercise.reviewed_exercise_id)
-    setEditData(null) // Clear edit data first
     setIsViewMode(true)
     setModalOpen(true)
   }
 
   const handleSubmit = (formData: any) => {
     // Validation
-    if (!formData.title?.trim()) {
-      toast.error('Vui lòng nhập tên bài tập')
+    if (!formData.status) {
+      toast.error('Vui lòng chọn trạng thái')
       return
     }
 
-    if (!formData.selectedQuestionSets || formData.selectedQuestionSets.length === 0) {
+    if (!formData.startTime) {
+      toast.error('Vui lòng chọn thời gian bắt đầu')
+      return
+    }
+
+    if (!formData.endTime) {
+      toast.error('Vui lòng chọn thời gian kết thúc')
+      return
+    }
+
+    if (!formData.questionSets || formData.questionSets.length === 0) {
       toast.error('Vui lòng chọn ít nhất một bộ câu hỏi')
       return
     }
 
-    // Auto-fill startTime and endTime
-    const yesterday = new Date()
-    yesterday.setDate(yesterday.getDate() - 1)
-
-    const endDate = new Date('2030-12-31T23:59:59')
-
     const payload = {
-      title: formData.title,
-      description: formData.description,
       lessonId: lessonId,
-      questionSets: formData.selectedQuestionSets?.map((qs: any) => qs.question_set_id) || [],
-      startTime: yesterday.toISOString(),
-      endTime: endDate.toISOString()
+      status: formData.status,
+      startTime: formData.startTime,
+      endTime: formData.endTime,
+      questionSets: formData.questionSets
     }
 
     if (editData && editData.reviewed_exercise_id) {

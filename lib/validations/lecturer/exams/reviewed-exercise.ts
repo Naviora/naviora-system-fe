@@ -10,23 +10,25 @@ export const createReviewedExerciseSchema = z.object({
   questionSets: z.array(z.string())
 })
 
-export const reviewedExerciseSchema = z.object({
-  reviewed_exercise_id: z.string(),
-  lesson_id: z.string(),
-  status: z.enum(['ACTIVE', 'CLOSED', 'DRAFT', 'ARCHIVED', 'PENDING', 'ENDED']).optional(),
-  start_time: z.string().optional(),
-  end_time: z.string().optional(),
-  lecturer_id: z.string().optional(),
-  created_at: z.string(),
-  updated_at: z.string(),
-  deleted_at: z.string().nullable().optional(),
-  version: z.number().optional(),
-  question_sets: z.array(questionSetResponseSchema).optional(),
-  created_by: userSchema.extend({ role: roleSchema }).optional(),
-  updated_by: z.any().nullable().optional(),
-  lesson: z.any().optional(),
-  lecturer: z.any().optional()
-}).passthrough()
+export const reviewedExerciseSchema = z
+  .object({
+    reviewed_exercise_id: z.string(),
+    lesson_id: z.string(),
+    status: z.enum(['ACTIVE', 'CLOSED', 'DRAFT', 'ARCHIVED', 'PENDING', 'ENDED']).optional(),
+    start_time: z.string().optional(),
+    end_time: z.string().optional(),
+    lecturer_id: z.string().optional(),
+    created_at: z.string(),
+    updated_at: z.string(),
+    deleted_at: z.string().nullable().optional(),
+    version: z.number().optional(),
+    question_sets: z.array(questionSetResponseSchema).optional(),
+    created_by: userSchema.extend({ role: roleSchema }).optional(),
+    updated_by: z.any().nullable().optional(),
+    lesson: z.any().optional(),
+    lecturer: z.any().optional()
+  })
+  .passthrough()
 
 // Simplified schema for lesson detail response
 export const reviewedExerciseSummarySchema = z
@@ -75,6 +77,70 @@ export const reviewedExerciseSubmissionSchema = z.object({
   reviewed_exercise_submission_id: z.string()
 })
 
+export const reviewedExerciseAnsweredRecordSchema = z.object({
+  question_id: z.string(),
+  answer_id: z.string()
+})
+
+const reviewedExerciseSubmissionQuestionSetSchema = z.object({
+  question_set_id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  questions: z.array(z.string()),
+  config: z.object({
+    general: z.object({
+      allow_review: z.boolean(),
+      shuffle_answers: z.boolean(),
+      total_questions: z.number(),
+      duration_minutes: z.number(),
+      shuffle_questions: z.boolean()
+    }),
+    scoring: z.object({
+      per_question: z.boolean(),
+      passing_score: z.number()
+    }),
+    behavior: z.object({
+      max_attempts: z.number(),
+      show_correct_after_submit: z.boolean()
+    }),
+    proctoring: z.object({
+      enable_tab_tracking: z.boolean(),
+      enable_copy_paste_restriction: z.boolean()
+    }),
+    composition: z.object({
+      topics: z.array(z.string()),
+      question_sources: z.array(z.string())
+    })
+  }),
+  is_in_use: z.boolean(),
+  created_at: z.string(),
+  updated_at: z.string(),
+  deleted_at: z.string().nullable(),
+  version: z.number()
+})
+
+export const reviewedExerciseSubmissionDetailSchema = reviewedExerciseSubmissionSchema.extend({
+  score: z.number(),
+  answered: z.array(reviewedExerciseAnsweredRecordSchema),
+  penalty: z.number().nullable(),
+  note: z.string().nullable(),
+  submitted_at: z.string(),
+  student: userSchema,
+  reviewed_exercise: z.object({
+    reviewed_exercise_id: z.string(),
+    lesson_id: z.string(),
+    status: z.enum(['ACTIVE', 'CLOSED', 'DRAFT', 'ARCHIVED', 'PENDING', 'ENDED']),
+    start_time: z.string(),
+    end_time: z.string(),
+    lecturer_id: z.string(),
+    created_at: z.string(),
+    updated_at: z.string(),
+    deleted_at: z.string().nullable(),
+    version: z.number()
+  }),
+  question_set: reviewedExerciseSubmissionQuestionSetSchema
+})
+
 export const startReviewedExerciseResponseSchema = z.object({
   status_code: z.number().int(),
   message: z.string(),
@@ -87,4 +153,6 @@ export type ReviewedExercise = z.infer<typeof reviewedExerciseSchema>
 export type ReviewedExerciseSummary = z.infer<typeof reviewedExerciseSummarySchema>
 export type GetReviewedExercisesResponse = z.infer<typeof getReviewedExercisesResponseSchema>
 export type ReviewedExerciseSubmission = z.infer<typeof reviewedExerciseSubmissionSchema>
+export type ReviewedExerciseAnsweredRecord = z.infer<typeof reviewedExerciseAnsweredRecordSchema>
+export type ReviewedExerciseSubmissionDetail = z.infer<typeof reviewedExerciseSubmissionDetailSchema>
 export type StartReviewedExerciseResponse = z.infer<typeof startReviewedExerciseResponseSchema>
