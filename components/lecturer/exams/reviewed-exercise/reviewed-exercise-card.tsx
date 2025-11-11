@@ -11,9 +11,10 @@ interface ReviewedExerciseCardProps {
   onEdit: (data: ReviewedExerciseSummary) => void
   onDelete: (id: string) => void
   onView?: (data: ReviewedExerciseSummary) => void
+  index?: number
 }
 
-export default function ReviewedExerciseCard({ exercise, onEdit, onDelete, onView }: ReviewedExerciseCardProps) {
+export default function ReviewedExerciseCard({ exercise, onEdit, onDelete, onView, index }: ReviewedExerciseCardProps) {
   const [open, setOpen] = useState(false)
 
   const handleView = () => {
@@ -22,11 +23,14 @@ export default function ReviewedExerciseCard({ exercise, onEdit, onDelete, onVie
     }
   }
 
+  // Generate exercise name based on index
+  const exerciseName = index !== undefined ? `Bài tập số ${index + 1}` : String(exercise.title) || 'Bài tập ôn tập'
+
   return (
     <div className='bg-greyscale-50 rounded border p-3 hover:shadow-sm transition-all'>
       <div className='flex items-center justify-between mb-2'>
         <div className='flex items-center gap-2'>
-          <span className='text-sm font-semibold text-greyscale-800'>{String(exercise.title) || 'Bài tập ôn tập'}</span>
+          <span className='text-sm font-semibold text-greyscale-800'>{exerciseName}</span>
           {exercise.status && (
             <span className='text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700'>{exercise.status}</span>
           )}

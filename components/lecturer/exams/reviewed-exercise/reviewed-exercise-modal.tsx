@@ -1,10 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import { DatePicker } from '@/components/ui/date-picker'
 import React, { useEffect, useMemo, useState } from 'react'
+import { addHours } from 'date-fns'
 import QuestionSetDrawer from '@/components/lecturer/exams/all-test/question-set-drawer'
 import { MdDeleteOutline } from 'react-icons/md'
 import { Loader2 } from 'lucide-react'
@@ -33,8 +40,8 @@ export default function ReviewedExerciseModal({
   isLoading = false
 }: ReviewedExerciseModalProps) {
   const [status, setStatus] = useState<string>('DRAFT')
-  const [startTime, setStartTime] = useState('')
-  const [endTime, setEndTime] = useState('')
+  const [startTime, setStartTime] = useState<Date | null>(null)
+  const [endTime, setEndTime] = useState<Date | null>(null)
   const [selectedQuestionSets, setSelectedQuestionSets] = useState<Array<QuestionSet | QuestionSetDetail>>([])
   const [hasUserInteracted, setHasUserInteracted] = useState(false)
 
@@ -59,13 +66,16 @@ export default function ReviewedExerciseModal({
 
     if (initialData) {
       setStatus(initialData.status || 'DRAFT')
-      setStartTime(initialData.start_time ? new Date(initialData.start_time).toISOString().slice(0, 16) : '')
-      setEndTime(initialData.end_time ? new Date(initialData.end_time).toISOString().slice(0, 16) : '')
+      setStartTime(initialData.start_time ? new Date(initialData.start_time) : null)
+      setEndTime(initialData.end_time ? new Date(initialData.end_time) : null)
       setSelectedQuestionSets([])
     } else {
       setStatus('DRAFT')
-      setStartTime('')
-      setEndTime('')
+      // Auto-fill: Start time = now, End time = now + 2 hours
+      const now = new Date()
+      const twoHoursLater = addHours(now, 2)
+      setStartTime(now)
+      setEndTime(twoHoursLater)
       setSelectedQuestionSets([])
     }
   }, [initialData, open])
@@ -97,6 +107,11 @@ export default function ReviewedExerciseModal({
       setSelectedQuestionSets([])
       return
     }
+  }, [open, hasUserInteracted, rawInitialQuestionSets, initialQuestionSetIds])
+
+  // Separate effect for loading question set details
+  useEffect(() => {
+    if (!open || hasUserInteracted || initialQuestionSetIds.length === 0) return
 
     const loadedSets = questionSetQueries
       .filter((query) => query.status === 'success' && query.data)
@@ -110,15 +125,20 @@ export default function ReviewedExerciseModal({
         return isSame ? prev : loadedSets
       })
     }
-  }, [open, hasUserInteracted, rawInitialQuestionSets, initialQuestionSetIds, questionSetQueries])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialQuestionSetIds.length, open, hasUserInteracted])
 
   const handleSubmit = () => {
+    if (!startTime || !endTime) {
+      return
+    }
+
     if (onSubmit) {
       onSubmit({
         lessonId,
         status,
-        startTime: new Date(startTime).toISOString(),
-        endTime: new Date(endTime).toISOString(),
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString(),
         questionSets: selectedQuestionSets.map((set: any) => set.question_set_id)
       })
     }
@@ -128,6 +148,14 @@ export default function ReviewedExerciseModal({
   const handleRemoveQuestionSet = (id: string) => {
     setHasUserInteracted(true)
     setSelectedQuestionSets((prev) => prev.filter((set) => set.question_set_id !== id))
+  }
+
+  const handleStartTimeChange = (date: Date | undefined) => {
+    setStartTime(date || null)
+  }
+
+  const handleEndTimeChange = (date: Date | undefined) => {
+    setEndTime(date || null)
   }
 
   return (
@@ -170,23 +198,21 @@ export default function ReviewedExerciseModal({
               <div className='grid grid-cols-2 gap-4'>
                 <div className='space-y-2'>
                   <Label htmlFor='startTime'>Thời gian bắt đầu</Label>
-                  <Input
-                    id='startTime'
-                    type='datetime-local'
-                    className='bg-greyscale-0'
+                  <DatePicker
                     value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
+                    onChange={handleStartTimeChange}
+                    placeholder='Chọn thời gian bắt đầu'
+                    showTimeSelect={true}
                     disabled={readOnly}
                   />
                 </div>
                 <div className='space-y-2'>
                   <Label htmlFor='endTime'>Thời gian kết thúc</Label>
-                  <Input
-                    id='endTime'
-                    type='datetime-local'
-                    className='bg-greyscale-0'
+                  <DatePicker
                     value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
+                    onChange={handleEndTimeChange}
+                    placeholder='Chọn thời gian kết thúc'
+                    showTimeSelect={true}
                     disabled={readOnly}
                   />
                 </div>

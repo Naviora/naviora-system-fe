@@ -158,10 +158,11 @@ export default function ReviewedExerciseList({ lessonId, lessonName, exercises =
 
       {exercises.length > 0 && (
         <div className='space-y-2'>
-          {exercises.map((exercise: any) => (
+          {exercises.map((exercise: any, index: number) => (
             <ReviewedExerciseCard
               key={exercise.reviewed_exercise_id}
               exercise={exercise}
+              index={index}
               onView={handleView}
               onEdit={handleEdit}
               onDelete={handleDelete}
