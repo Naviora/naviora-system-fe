@@ -63,7 +63,7 @@ export function LecturerClassDetailPage({ classId }: LecturerClassDetailPageProp
           <TabsTrigger value='students'>Học sinh</TabsTrigger>
           <TabsTrigger value='modules'>Chuyên đề</TabsTrigger>
         </TabsList>
-        
+
         {/* Overview Tab */}
         <TabsContent value='overview' className='space-y-6 mt-6'>
           {classDetailQuery.isLoading ? (

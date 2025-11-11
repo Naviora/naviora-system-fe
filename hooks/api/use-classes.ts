@@ -1,6 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api/client'
-import type { ClassesListParams, ClassesListResponse, CreateClassRequest, Class, ClassDetail, AssignedClassesQueryParams, AssignedClassesListResponse } from '@/types/api/class'
+import type {
+  ClassesListParams,
+  ClassesListResponse,
+  CreateClassRequest,
+  Class,
+  ClassDetail,
+  AssignedClassesQueryParams,
+  AssignedClassesListResponse
+} from '@/types/api/class'
 
 const CLASSES_QUERY_KEY = ['classes']
 const ASSIGNED_CLASSES_QUERY_KEY = ['assigned-classes']

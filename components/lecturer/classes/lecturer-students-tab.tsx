@@ -9,7 +9,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useClassStudents } from '@/hooks/api/use-classes'
-import { createLecturerStudentColumns, type LecturerStudentRow } from '@/components/lecturer/classes/lecturer-student-columns'
+import {
+  createLecturerStudentColumns,
+  type LecturerStudentRow
+} from '@/components/lecturer/classes/lecturer-student-columns'
 
 interface LecturerStudentsTabProps {
   classId: string
