@@ -23,7 +23,16 @@ export interface ClassModule {
 export interface ClassModuleResponse {
   status_code: number
   message: string
-  data: ClassModule[]
+  data: {
+    modules: ClassModule[]
+    pagination: {
+      limit: number
+      current_page: number
+      total_records: number
+      total_pages: number
+      next_page?: number
+    }
+  }
 }
 
 export function useClassModules(classId: string | undefined) {
@@ -32,7 +41,7 @@ export function useClassModules(classId: string | undefined) {
     queryFn: async () => {
       if (!classId) return []
       const response = await axios_instance.get<ClassModuleResponse>(`/modules/in-class/${classId}`)
-      return response.data.data || []
+      return response.data.data.modules || []
     },
     enabled: !!classId,
     staleTime: 1000 * 60 * 5

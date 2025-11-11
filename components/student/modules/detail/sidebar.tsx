@@ -2,9 +2,14 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Book, Menu, Circle } from 'lucide-react'
+import { Book, Menu, CheckCircle2, Circle } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 import { cn } from '@/lib/utils'
-import { useModuleLessons } from '@/hooks/api/use-modules'
+import { useModuleLessons, useToggleLessonCompletion } from '@/hooks/api/use-modules'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Progress } from '@/components/ui/progress'
+import { QUERY_KEYS } from '@/lib/constants/config'
+import { toast } from 'sonner'
 
 type Lesson = {
   lesson_id: string
@@ -13,6 +18,7 @@ type Lesson = {
   lesson_content?: string | null
   created_at?: string
   updated_at?: string
+  is_completed?: boolean
   materials?: Array<{
     material_id?: string
     material_name?: string
@@ -24,22 +30,32 @@ type Module = {
   module_id: string
   module_name: string
   module_description?: string
+  progress_percent?: number
   lessons?: Lesson[]
 }
 
 // Components
 const ModuleInfoHeader = ({ module }: { module: Module }) => {
   const totalLessons = module.lessons?.length || 0
+  const completedLessons = module.lessons?.filter((l) => l.is_completed).length || 0
+  const progressPercent = module.progress_percent ?? 0
 
   return (
-    <div className='p-3'>
+    <div className='p-3 space-y-3'>
       <h2 className='text-2xl font-semibold text-gray-800 dark:text-gray-100'>{module.module_name}</h2>
-      <p className='text-sm text-gray-600 dark:text-gray-400 mt-1'>{module.module_description}</p>
-      <div className='mt-3 flex items-center text-sm text-gray-600 dark:text-gray-400 gap-3'>
-        <div className='flex items-center'>
-          <Book className='mr-2 h-4 w-4' />
-          <span>{totalLessons} bài học</span>
+      <p className='text-sm text-gray-600 dark:text-gray-400'>{module.module_description}</p>
+      
+      <div className='space-y-2'>
+        <div className='flex items-center justify-between text-sm text-gray-600 dark:text-gray-400'>
+          <div className='flex items-center'>
+            <Book className='mr-2 h-4 w-4' />
+            <span>
+              {completedLessons}/{totalLessons} bài học
+            </span>
+          </div>
+          <span className='font-medium'>{progressPercent.toFixed(0)}%</span>
         </div>
+        <Progress value={progressPercent} className='h-2' />
       </div>
     </div>
   )
@@ -51,30 +67,76 @@ interface ModuleLessonsListProps {
   selectedLessonId?: string
 }
 
-const ModuleLessonsList = ({ module, moduleId, selectedLessonId }: ModuleLessonsListProps) => (
-  <div className='space-y-2'>
-    {module.lessons?.map((lesson) => (
-      <Link
-        key={lesson.lesson_id}
-        href={`/student/modules/${moduleId}/lessons/${lesson.lesson_id}`}
-        className={cn(
-          'w-full text-left p-3 rounded-lg transition-colors duration-200 block',
-          selectedLessonId === lesson.lesson_id
-            ? 'bg-blue-100 dark:bg-blue-900 border-l-4 border-blue-600'
-            : 'bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600'
-        )}
-      >
-        <div className='flex items-center gap-2'>
-          <Circle className='h-4 w-4 text-gray-400 shrink-0' />
-          <div className='flex-1'>
-            <p className='font-medium text-sm text-gray-900 dark:text-gray-100'>{lesson.lesson_name}</p>
-            <p className='text-xs text-gray-500 dark:text-gray-400'>{lesson.lesson_description}</p>
-          </div>
-        </div>
-      </Link>
-    ))}
-  </div>
-)
+const ModuleLessonsList = ({ module, moduleId, selectedLessonId }: ModuleLessonsListProps) => {
+  const queryClient = useQueryClient()
+  const toggleCompletion = useToggleLessonCompletion()
+
+  const handleToggleCompletion = async (e: React.MouseEvent, lessonId: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    try {
+      await toggleCompletion.mutateAsync(lessonId, {
+        onSuccess: () => {
+          // Invalidate module lessons query to refresh data
+          queryClient.invalidateQueries({
+            queryKey: QUERY_KEYS.MODULE_LESSONS(moduleId)
+          })
+          toast.success('Cập nhật trạng thái bài học thành công')
+        }
+      })
+    } catch (error) {
+      toast.error('Không thể cập nhật trạng thái bài học')
+      console.error('Toggle lesson completion error:', error)
+    }
+  }
+
+  return (
+    <div className='space-y-2'>
+      {module.lessons?.map((lesson) => {
+        const isCompleted = lesson.is_completed ?? false
+        
+        return (
+          <Link
+            key={lesson.lesson_id}
+            href={`/student/modules/${moduleId}/lessons/${lesson.lesson_id}`}
+            className={cn(
+              'w-full text-left p-3 rounded-lg transition-colors duration-200 block',
+              selectedLessonId === lesson.lesson_id
+                ? 'bg-blue-100 dark:bg-blue-900 border-l-4 border-blue-600'
+                : 'bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600'
+            )}
+          >
+            <div className='flex items-center gap-2'>
+              <Checkbox
+                checked={isCompleted}
+                onCheckedChange={() => {}}
+                onClick={(e) => handleToggleCompletion(e, lesson.lesson_id)}
+                className='shrink-0'
+              />
+              {isCompleted ? (
+                <CheckCircle2 className='h-4 w-4 text-green-500 shrink-0' />
+              ) : (
+                <Circle className='h-4 w-4 text-gray-400 shrink-0' />
+              )}
+              <div className='flex-1'>
+                <p className={cn(
+                  'font-medium text-sm',
+                  isCompleted 
+                    ? 'text-gray-500 dark:text-gray-400 line-through' 
+                    : 'text-gray-900 dark:text-gray-100'
+                )}>
+                  {lesson.lesson_name}
+                </p>
+                <p className='text-xs text-gray-500 dark:text-gray-400'>{lesson.lesson_description}</p>
+              </div>
+            </div>
+          </Link>
+        )
+      })}
+    </div>
+  )
+}
 
 interface ModuleDetailSidebarProps {
   moduleId: string

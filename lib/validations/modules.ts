@@ -176,7 +176,8 @@ export const lessonSchema = z.object({
   lesson_content: z.string().nullable().optional(),
   created_at: z.string().min(1),
   updated_at: z.string().min(1),
-  materials: z.array(materialSchema).optional()
+  materials: z.array(materialSchema).optional(),
+  is_completed: z.boolean().optional()
 })
 
 export const lessonResponseSchema = z.object({
@@ -194,8 +195,20 @@ export const createLessonSchema = z.object({
 
 export const updateLessonSchema = createLessonSchema
 
+// Lesson completion schema
+export const lessonCompletionResponseSchema = z.object({
+  status_code: z.number().int(),
+  message: z.string(),
+  data: z.object({
+    lesson_id: z.string().min(1),
+    completed: z.boolean(),
+    completed_at: z.string().nullable().optional()
+  })
+})
+
 export const moduleLessonsSchema = moduleSchema.extend({
-  lessons: z.array(lessonSchema)
+  lessons: z.array(lessonSchema),
+  progress_percent: z.number().optional()
 })
 
 export const moduleDetailResponseSchema = z.object({
@@ -281,6 +294,7 @@ export type CreateTeachingMaterialPayload = z.infer<typeof createTeachingMateria
 export type UpdateTeachingMaterialPayload = z.infer<typeof updateTeachingMaterialSchema>
 export type MaterialResponseDto = z.infer<typeof materialResponseSchema>
 export type TeachingMaterialResponseDto = z.infer<typeof teachingMaterialResponseSchema>
+export type LessonCompletionResponseDto = z.infer<typeof lessonCompletionResponseSchema>
 
 export interface UpdateModuleFormValues {
   moduleId: string
