@@ -41,7 +41,11 @@ const deleteLessonRequest = async (lessonId: string): Promise<LessonResponseDto>
 
 const getLessonDetailRequest = async (lessonId: string): Promise<LessonResponseDto> => {
   const response = await axios_instance.get(`${LESSONS_API_ENDPOINT}/${lessonId}`)
-  return lessonResponseSchema.parse(response.data)
+  console.log('DEBUG API raw response:', response.data)
+  const parsed = lessonResponseSchema.parse(response.data)
+  console.log('DEBUG parsed result:', parsed)
+  console.log('DEBUG reviewed_exercises:', parsed.data?.reviewed_exercises)
+  return parsed
 }
 
 export const useCreateLesson = (
