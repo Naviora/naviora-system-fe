@@ -89,6 +89,11 @@ export const LessonContentViewer = ({ lesson }: LessonContentViewerProps) => {
   ] as LessonTab[]
 
   const handleStartReviewedExercise = async (exerciseId: string) => {
+    // Prevent multiple calls
+    if (startingExerciseId !== null) {
+      return
+    }
+
     setStartingExerciseId(exerciseId)
     try {
       await startReviewedExercise.mutateAsync(exerciseId)
@@ -100,7 +105,6 @@ export const LessonContentViewer = ({ lesson }: LessonContentViewerProps) => {
     } catch (error) {
       toast.error('Lỗi khi bắt đầu bài tập')
       console.error('Error starting reviewed exercise:', error)
-    } finally {
       setStartingExerciseId(null)
     }
   }
