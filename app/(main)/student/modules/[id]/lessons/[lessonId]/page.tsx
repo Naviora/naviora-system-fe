@@ -96,7 +96,9 @@ const transformLessonResponse = (apiLesson: Record<string, unknown>): Transforme
               questionCount: undefined, // Will be fetched separately
               status: ex.status ? String(ex.status) : undefined,
               isSubmitted: ex.is_submitted ? Boolean(ex.is_submitted) : false,
-              studentSubmissions: ex.student_submissions ? (ex.student_submissions as Array<Record<string, unknown>>) : [],
+              studentSubmissions: ex.student_submissions
+                ? (ex.student_submissions as Array<Record<string, unknown>>)
+                : [],
               questionSets
             }
             return transformed
@@ -158,7 +160,9 @@ export default function LessonPage() {
             questionCount: undefined,
             status: ex.status ? String(ex.status) : undefined,
             isSubmitted: ex.is_submitted ? Boolean(ex.is_submitted) : false,
-            studentSubmissions: ex.student_submissions ? (ex.student_submissions as Array<Record<string, unknown>>) : [],
+            studentSubmissions: ex.student_submissions
+              ? (ex.student_submissions as Array<Record<string, unknown>>)
+              : [],
             questionSets
           }
         })

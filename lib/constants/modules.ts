@@ -4,7 +4,7 @@ export const LESSONS_API_ENDPOINT = '/lessons'
 export const MATERIALS_API_ENDPOINT = '/materials'
 export const MATERIALS_UPLOAD_ENDPOINT = '/materials/upload'
 export const TEACHING_MATERIALS_API_ENDPOINT = '/teaching-material'
-export const REVIEWED_EXERCISES_API_ENDPOINT = '/reviewed-exercises'
+export const REVIEWED_EXERCISES_API_ENDPOINT = '/reviewed-exercise'
 
 export const MODULE_QUERY_DEFAULTS = {
   limit: 12,

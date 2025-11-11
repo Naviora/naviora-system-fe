@@ -62,7 +62,7 @@ export const reviewedExerciseSubmissionSchema = z.object({
   student_id: z.string(),
   reviewed_exercise_id: z.string(),
   question_set_id: z.string(),
-  attempt_status: z.enum(['IN_PROGRESS', 'SUBMITTED', 'GRADED', 'ABANDONED']),
+  attempt_status: z.enum(['IN_PROGRESS', 'SUBMITTED', 'GRADED', 'CANCELLED']),
   score: z.number().nullable().optional(),
   answered: z.number().nullable().optional(),
   penalty: z.number().nullable().optional(),

@@ -84,7 +84,7 @@ export const questionSetResponseSchema = z.object({
   title: z.string(),
   description: z.string(),
   total_questions: z.number().optional(),
-  duration_minutes: z.number().optional(),
+  duration_minutes: z.number().optional()
 })
 
 // Entry Test CRUD
