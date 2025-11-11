@@ -41,7 +41,9 @@ export const reviewedExerciseSummarySchema = z
     lecturer_id: z.string().optional(),
     created_at: z.string().optional(),
     updated_at: z.string().optional(),
-    question_sets: z.array(questionSetResponseSchema).optional()
+    question_sets: z.array(questionSetResponseSchema).optional(),
+    is_submitted: z.boolean().optional(),
+    student_submissions: z.array(z.any()).optional()
   })
   .passthrough() // Allow additional fields from API
 
