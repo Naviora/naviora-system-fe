@@ -50,20 +50,29 @@ export function useWebRTC(roomId: string, userId: string, options: UseWebRTCOpti
         {
           urls: 'stun:stun.relay.metered.ca:80'
         },
+        // {
+        //   urls: 'turn:sg.relay.metered.ca:80',
+        //   username: 'ce7e305ee5978a6e226b86c8',
+        //   credential: 'hWphRx79NhBy3EXy'
+        // },
+        // {
+        //   urls: 'turn:sg.relay.metered.ca:80?transport=tcp',
+        //   username: 'ce7e305ee5978a6e226b86c8',
+        //   credential: 'hWphRx79NhBy3EXy'
+        // },
+        // {
+        //   urls: 'turn:sg.relay.metered.ca:443',
+        //   username: 'ce7e305ee5978a6e226b86c8',
+        //   credential: 'hWphRx79NhBy3EXy'
+        // },
         {
-          urls: 'turn:sg.relay.metered.ca:80',
-          username: 'ce7e305ee5978a6e226b86c8',
-          credential: 'hWphRx79NhBy3EXy'
-        },
-        {
-          urls: 'turn:sg.relay.metered.ca:80?transport=tcp',
-          username: 'ce7e305ee5978a6e226b86c8',
-          credential: 'hWphRx79NhBy3EXy'
-        },
-        {
-          urls: 'turn:sg.relay.metered.ca:443',
-          username: 'ce7e305ee5978a6e226b86c8',
-          credential: 'hWphRx79NhBy3EXy'
+          urls: [
+            'stun:103.200.20.196:3478',
+            'turn:103.200.20.196:3478?transport=udp',
+            'turn:103.200.20.196:3478?transport=tcp'
+          ],
+          username: 'naviora',
+          credential: 'strongturnpassword123'
         },
         {
           urls: 'turns:sg.relay.metered.ca:443?transport=tcp',
