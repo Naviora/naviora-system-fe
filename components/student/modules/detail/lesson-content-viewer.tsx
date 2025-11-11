@@ -6,6 +6,7 @@ import { FileText, HelpCircle, Paperclip, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useToggleLessonCompletion } from '@/hooks/api/use-modules'
+import { useStartReviewedExercise } from '@/hooks/api/use-reviewed-exercises'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { QUERY_KEYS } from '@/lib/constants/config'
@@ -70,17 +71,15 @@ interface LessonContentViewerProps {
 
 export const LessonContentViewer = ({ lesson }: LessonContentViewerProps) => {
   const [activeTab, setActiveTab] = useState<LessonTab>('content')
+  const [startingExerciseId, setStartingExerciseId] = useState<string | null>(null)
   const queryClient = useQueryClient()
   const toggleCompletion = useToggleLessonCompletion()
+  const startReviewedExercise = useStartReviewedExercise()
   const params = useParams()
   const router = useRouter()
   const moduleId = params.id as string
   const lessonId = params.lessonId as string
   const [isCompleting, setIsCompleting] = useState(false)
-
-  console.log('DEBUG LessonContentViewer lesson:', lesson)
-  console.log('DEBUG reviewExercises:', lesson.reviewExercises)
-  console.log('DEBUG reviewExercises length:', lesson.reviewExercises?.length)
 
   const availableTabs: LessonTab[] = [
     'content',
@@ -89,7 +88,22 @@ export const LessonContentViewer = ({ lesson }: LessonContentViewerProps) => {
     ...(lesson.materials ? ['materials'] : [])
   ] as LessonTab[]
 
-  console.log('DEBUG availableTabs:', availableTabs)
+  const handleStartReviewedExercise = async (exerciseId: string) => {
+    setStartingExerciseId(exerciseId)
+    try {
+      const result = await startReviewedExercise.mutateAsync(exerciseId)
+      toast.success('Bắt đầu bài tập thành công')
+      // Redirect to the exercise taking page
+      router.push(
+        `/student/modules/${moduleId}/lessons/${lessonId}/reviewed-exercise/${exerciseId}/submit/${result.data.reviewed_exercise_submission_id}`
+      )
+    } catch (error) {
+      toast.error('Lỗi khi bắt đầu bài tập')
+      console.error('Error starting reviewed exercise:', error)
+    } finally {
+      setStartingExerciseId(null)
+    }
+  }
 
   const handleToggleCompletion = async () => {
     setIsCompleting(true)
@@ -258,12 +272,10 @@ export const LessonContentViewer = ({ lesson }: LessonContentViewerProps) => {
                     </div>
                     <Button
                       className='ml-2'
-                      disabled={exercise.status !== 'ACTIVE'}
+                      disabled={exercise.status !== 'ACTIVE' || startingExerciseId === exercise.id}
                       onClick={() => {
                         if (exercise.status === 'ACTIVE') {
-                          router.push(
-                            `/student/modules/${moduleId}/lessons/${lessonId}/reviewed-exercise/${exercise.id}`
-                          )
+                          handleStartReviewedExercise(exercise.id)
                         }
                       }}
                       title={
@@ -272,7 +284,7 @@ export const LessonContentViewer = ({ lesson }: LessonContentViewerProps) => {
                           : 'Làm bài tập'
                       }
                     >
-                      Làm bài tập
+                      {startingExerciseId === exercise.id ? 'Đang tải...' : 'Làm bài tập'}
                     </Button>
                   </div>
                 </div>

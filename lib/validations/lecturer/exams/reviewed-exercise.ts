@@ -57,8 +57,34 @@ export const getReviewedExercisesResponseSchema = z.object({
   })
 })
 
+// Reviewed Exercise Submission schemas
+export const reviewedExerciseSubmissionSchema = z.object({
+  student_id: z.string(),
+  reviewed_exercise_id: z.string(),
+  question_set_id: z.string(),
+  attempt_status: z.enum(['IN_PROGRESS', 'SUBMITTED', 'GRADED', 'ABANDONED']),
+  score: z.number().nullable().optional(),
+  answered: z.number().nullable().optional(),
+  penalty: z.number().nullable().optional(),
+  note: z.string().nullable().optional(),
+  submitted_at: z.string().nullable().optional(),
+  created_at: z.string(),
+  updated_at: z.string(),
+  deleted_at: z.string().nullable().optional(),
+  version: z.number(),
+  reviewed_exercise_submission_id: z.string()
+})
+
+export const startReviewedExerciseResponseSchema = z.object({
+  status_code: z.number().int(),
+  message: z.string(),
+  data: reviewedExerciseSubmissionSchema
+})
+
 // Types
 export type CreateReviewedExerciseRequest = z.infer<typeof createReviewedExerciseSchema>
 export type ReviewedExercise = z.infer<typeof reviewedExerciseSchema>
 export type ReviewedExerciseSummary = z.infer<typeof reviewedExerciseSummarySchema>
 export type GetReviewedExercisesResponse = z.infer<typeof getReviewedExercisesResponseSchema>
+export type ReviewedExerciseSubmission = z.infer<typeof reviewedExerciseSubmissionSchema>
+export type StartReviewedExerciseResponse = z.infer<typeof startReviewedExerciseResponseSchema>
