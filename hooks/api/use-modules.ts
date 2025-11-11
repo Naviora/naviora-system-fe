@@ -20,6 +20,7 @@ import {
   modulesResponseSchema,
   moduleDetailResponseSchema,
   moduleLessonsResponseSchema,
+  lessonCompletionResponseSchema,
   type ClassDto,
   type ClassesResponseDataDto,
   type ClassesResponseDto,
@@ -30,6 +31,7 @@ import {
   type ModulesResponseDto,
   type ModuleDetailDto,
   type ModuleLessonsDto,
+  type LessonCompletionResponseDto,
   type UpdateModuleFormValues
 } from '@/lib/validations/modules'
 
@@ -157,6 +159,11 @@ const updateModuleRequest = async ({ moduleId, data }: UpdateModuleFormValues): 
   return moduleResponseSchema.parse(response.data)
 }
 
+const toggleLessonCompletion = async (lessonId: string): Promise<LessonCompletionResponseDto> => {
+  const response = await axios_instance.patch(`/lessons/${lessonId}/complete`)
+  return lessonCompletionResponseSchema.parse(response.data)
+}
+
 export const useModules = <TData = ModulesResponseDto>(
   params?: ModulesQueryParams,
   options?: UseQueryOptions<ModulesResponseDto, unknown, TData>
@@ -208,6 +215,15 @@ export const useUpdateModule = (
 ): UseMutationResult<ModuleResponseDto, unknown, UpdateModuleFormValues> => {
   return useMutation({
     mutationFn: updateModuleRequest,
+    ...options
+  })
+}
+
+export const useToggleLessonCompletion = (
+  options?: UseMutationOptions<LessonCompletionResponseDto, unknown, string>
+): UseMutationResult<LessonCompletionResponseDto, unknown, string> => {
+  return useMutation({
+    mutationFn: toggleLessonCompletion,
     ...options
   })
 }

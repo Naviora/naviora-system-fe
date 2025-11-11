@@ -14,24 +14,24 @@ export const useGetQuestionSets = (params?: SearchRequest) => {
   })
 }
 
-export const useGetQuestionSetDetail = (id: string) => {
+export const useGetQuestionSetDetail = (id: string, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ['question-set-detail', id],
     queryFn: () => apiClient.get<QuestionSetDetail>(`/question-set/${id}`),
+    enabled: options?.enabled ?? Boolean(id)
   })
 }
 
 // Gọi nhiều chi tiết bộ câu hỏi cùng lúc
-const fetchQuestionSetDetail = (id: string) =>
-  apiClient.get<QuestionSetDetail>(`/question-set/${id}`)
+const fetchQuestionSetDetail = (id: string) => apiClient.get<QuestionSetDetail>(`/question-set/${id}`)
 
 export function useGetMultipleQuestionSetDetail(ids: string[]) {
   return useQueries({
-    queries: ids.map(id => ({
+    queries: ids.map((id) => ({
       queryKey: ['question-set-detail', id],
       queryFn: () => fetchQuestionSetDetail(id),
-      enabled: !!id,
-    })),
+      enabled: !!id
+    }))
   })
 }
 
