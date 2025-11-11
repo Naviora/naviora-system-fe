@@ -40,6 +40,7 @@ export const meetingEventSchema = z.object({
     email: z.string(),
     avatar: z.string().optional()
   }),
+  meeting_code: z.string(),
   start_time: z.string().datetime(),
   end_time: z.string().datetime(),
   created_at: z.string().datetime().optional(),

@@ -123,6 +123,7 @@ function CalendarEventsLoader() {
       end: new Date(event.end_time),
       title: event.title,
       description: event.description || undefined,
+      meetingCode: event.meeting_code,
       host: event.host_detail
         ? {
             name: event.host_detail.name,

@@ -10,10 +10,11 @@ import { Monitor, MicOff, VideoOff } from 'lucide-react'
 
 type Props = {
   signalingUrl: string
+  initialRoomId?: string
 }
 
-export default function WebRTCRoom({ signalingUrl }: Props) {
-  const [roomId, setRoomId] = useState('demo-room')
+export default function WebRTCRoom({ signalingUrl, initialRoomId }: Props) {
+  const [roomId, setRoomId] = useState(() => initialRoomId || 'demo-room')
   const [userId, setUserId] = useState(() => `user-${Math.random().toString(36).slice(2, 8)}`)
   const [joined, setJoined] = useState(false)
   const [started, setStarted] = useState(false)
