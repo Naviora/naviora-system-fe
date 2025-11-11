@@ -123,6 +123,12 @@ function CalendarEventsLoader() {
       end: new Date(event.end_time),
       title: event.title,
       description: event.description || undefined,
+      host: event.host_detail
+        ? {
+            name: event.host_detail.name,
+            avatar: event.host_detail.avatar ?? null
+          }
+        : undefined,
       // Cycle through colors for visual variety
       color: (['blue', 'green', 'pink', 'purple'] as const)[index % 4]
     }))

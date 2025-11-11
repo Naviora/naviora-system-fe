@@ -33,6 +33,13 @@ export const meetingEventSchema = z.object({
   description: z.string().optional(),
   note: z.string().optional(),
   invitees: z.array(inviteeSchema).optional(),
+  host_by: z.string(),
+  host_detail: z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string(),
+    avatar: z.string().optional()
+  }),
   start_time: z.string().datetime(),
   end_time: z.string().datetime(),
   created_at: z.string().datetime().optional(),
