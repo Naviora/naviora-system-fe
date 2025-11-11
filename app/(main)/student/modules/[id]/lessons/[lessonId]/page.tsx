@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { LessonContentViewer } from '@/components/student/modules/detail'
 import { ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -19,6 +19,14 @@ interface MaterialFile {
   path?: string
 }
 
+interface ReviewExercise {
+  id: string
+  title?: string
+  description?: string
+  questionCount?: number
+  status?: string
+}
+
 interface TransformedLesson {
   id: string
   name: string
@@ -33,10 +41,13 @@ interface TransformedLesson {
     title: string
     files: MaterialFile[]
   }
+  reviewExercises?: ReviewExercise[]
 }
 
 const transformLessonResponse = (apiLesson: Record<string, unknown>): TransformedLesson => {
   const materials = apiLesson.materials as Array<Record<string, unknown>> | undefined
+  const reviewedExercises = apiLesson.reviewed_exercises as Array<Record<string, unknown>> | undefined
+
   return {
     id: String(apiLesson.lesson_id),
     name: String(apiLesson.lesson_name),
@@ -58,6 +69,16 @@ const transformLessonResponse = (apiLesson: Record<string, unknown>): Transforme
               path: String(m.material_path || '')
             }))
           }
+        : undefined,
+    reviewExercises:
+      reviewedExercises && reviewedExercises.length > 0
+        ? reviewedExercises.map((ex) => ({
+            id: String(ex.reviewed_exercise_id || ''),
+            title: undefined, // Will be fetched separately
+            description: undefined, // Will be fetched separately
+            questionCount: undefined, // Will be fetched separately
+            status: ex.status ? String(ex.status) : undefined
+          }))
         : undefined
   }
 }
@@ -68,6 +89,7 @@ export default function LessonPage() {
   const lessonId = params.lessonId as string
   const setBreadcrumbItems = useSetBreadcrumbItems()
   const { role } = useRoleContext()
+  const [enrichedReviewExercises, setEnrichedReviewExercises] = useState<ReviewExercise[]>([])
 
   const { data: apiLesson, isLoading } = useLessonDetail(lessonId)
   const { data: moduleData } = useModuleLessons(moduleId)
@@ -81,6 +103,35 @@ export default function LessonPage() {
       ])
     }
   }, [apiLesson?.data?.lesson_name, moduleData?.module_name, moduleId, lessonId, role, setBreadcrumbItems])
+
+  // Fetch details for all exercises when lesson data changes
+  useEffect(() => {
+    const fetchAllExerciseDetails = async () => {
+      const reviewedExercises = (apiLesson?.data?.reviewed_exercises || []) as Record<string, unknown>[]
+
+      if (reviewedExercises.length === 0) {
+        setEnrichedReviewExercises([])
+        return
+      }
+
+      try {
+        // For now, create exercises with available data
+        // Full details would require fetching each exercise individually
+        const enriched: ReviewExercise[] = reviewedExercises.map((ex) => ({
+          id: String(ex.reviewed_exercise_id || ''),
+          title: undefined,
+          description: undefined,
+          questionCount: undefined,
+          status: ex.status ? String(ex.status) : undefined
+        }))
+        setEnrichedReviewExercises(enriched)
+      } catch (error) {
+        console.error('Error fetching exercise details:', error)
+      }
+    }
+
+    fetchAllExerciseDetails()
+  }, [apiLesson?.data?.reviewed_exercises])
 
   const lesson = apiLesson?.data ? transformLessonResponse(apiLesson.data as Record<string, unknown>) : null
 
@@ -110,9 +161,15 @@ export default function LessonPage() {
     )
   }
 
+  // Merge enriched exercises with lesson data
+  const lessonWithEnrichedExercises = {
+    ...lesson,
+    reviewExercises: enrichedReviewExercises.length > 0 ? enrichedReviewExercises : lesson.reviewExercises
+  }
+
   return (
     <div className='flex flex-col h-full w-full'>
-      <LessonContentViewer lesson={lesson} />
+      <LessonContentViewer lesson={lessonWithEnrichedExercises} />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { API_CONFIG } from '@/lib/constants/config'
+import { reviewedExerciseSummarySchema } from '@/lib/validations/lecturer/exams/reviewed-exercise'
 
 const BANNER_URL_BASES = (() => {
   const bases = new Set<string>()
@@ -177,7 +178,11 @@ export const lessonSchema = z.object({
   created_at: z.string().min(1),
   updated_at: z.string().min(1),
   materials: z.array(materialSchema).optional(),
-  is_completed: z.preprocess((val) => (val === null ? false : val), z.boolean().optional())
+  is_completed: z.preprocess((val) => (val === null ? false : val), z.boolean().optional()),
+  reviewed_exercises: z
+    .preprocess((val) => val, z.array(reviewedExerciseSummarySchema))
+    .catch(() => [])
+    .default([])
 })
 
 export const lessonResponseSchema = z.object({
