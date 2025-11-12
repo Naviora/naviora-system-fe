@@ -68,7 +68,7 @@ export default function WebRTCRoom({ signalingUrl, initialRoomId }: Props) {
         localVideoRef.current.srcObject = null
       }
     }
-  }, [isScreenSharing, screenShareStream])
+  }, [isScreenSharing, screenShareStream, localStreamRef])
 
   // Separate effect to watch for stream changes - use interval to check
   useEffect(() => {
@@ -98,7 +98,7 @@ export default function WebRTCRoom({ signalingUrl, initialRoomId }: Props) {
     const interval = setInterval(checkAndUpdateStream, 500)
 
     return () => clearInterval(interval)
-  }, [isScreenSharing, isVideoEnabled])
+  }, [isScreenSharing, isVideoEnabled, localStreamRef])
 
   // Debug remote streams
   useEffect(() => {
@@ -310,7 +310,7 @@ export default function WebRTCRoom({ signalingUrl, initialRoomId }: Props) {
 
             {/* No Video Placeholder */}
             {!isVideoEnabled && (
-              <div className='absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600'>
+              <div className='absolute inset-0 flex items-center justify-center  bg-linear-to-br from-blue-500 to-purple-600'>
                 <Avatar className='size-16'>
                   <AvatarFallback className='bg-white/20 text-white text-2xl'>You</AvatarFallback>
                 </Avatar>
@@ -320,7 +320,7 @@ export default function WebRTCRoom({ signalingUrl, initialRoomId }: Props) {
 
           {/* Remote Videos Waiting State */}
           {Object.entries(remoteStreams).length === 0 && connectedPeers.length > 0 && (
-            <div className='relative bg-gradient-to-br from-pink-500 to-red-500 rounded-lg overflow-hidden flex items-center justify-center min-h-[400px] border-2 border-dashed border-white/30'>
+            <div className='relative bg-linear-to-br from-pink-500 to-red-500 rounded-lg overflow-hidden flex items-center justify-center min-h-[400px] border-2 border-dashed border-white/30'>
               <div className='flex flex-col items-center gap-4 text-white'>
                 <div className='animate-pulse text-6xl'>⏳</div>
                 <div className='text-lg font-semibold'>Waiting for remote video...</div>
