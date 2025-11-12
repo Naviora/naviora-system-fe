@@ -54,10 +54,52 @@ export default function WebRTCRoom({ signalingUrl, initialRoomId }: Props) {
 
       if (streamToShow) {
         console.log('🎥 Setting local video stream:', streamToShow)
-        localVideoRef.current.srcObject = streamToShow
+        const video = localVideoRef.current
+        if (video.srcObject !== streamToShow) {
+          video.srcObject = streamToShow
+          // Ensure video plays
+          video.play().catch((error) => {
+            if (error.name !== 'AbortError') {
+              console.warn('⚠️ Could not play local video:', error)
+            }
+          })
+        }
+      } else if (localVideoRef.current.srcObject) {
+        // Clear video if no stream
+        localVideoRef.current.srcObject = null
       }
     }
-  }, [localStreamRef, isScreenSharing, screenShareStream])
+  }, [isScreenSharing, screenShareStream])
+
+  // Separate effect to watch for stream changes - use interval to check
+  useEffect(() => {
+    if (!localVideoRef.current || isScreenSharing) return
+
+    const checkAndUpdateStream = () => {
+      if (localVideoRef.current && localStreamRef.current) {
+        const video = localVideoRef.current
+        const stream = localStreamRef.current
+
+        if (video.srcObject !== stream) {
+          console.log('🎥 Updating local video stream')
+          video.srcObject = stream
+          video.play().catch((error) => {
+            if (error.name !== 'AbortError') {
+              console.warn('⚠️ Could not play local video:', error)
+            }
+          })
+        }
+      }
+    }
+
+    // Check immediately
+    checkAndUpdateStream()
+
+    // Check periodically (in case stream is set asynchronously)
+    const interval = setInterval(checkAndUpdateStream, 500)
+
+    return () => clearInterval(interval)
+  }, [isScreenSharing, isVideoEnabled])
 
   // Debug remote streams
   useEffect(() => {
@@ -81,6 +123,15 @@ export default function WebRTCRoom({ signalingUrl, initialRoomId }: Props) {
     await joinRoom()
     setJoined(true)
     console.log('Socket after join:', socket?.current?.id)
+
+    // Auto-start media if already available (from waiting room)
+    if (localStreamRef.current) {
+      setStarted(true)
+      // Auto-call existing peers
+      for (const peerId of connectedPeers) {
+        await startCallWith(peerId)
+      }
+    }
   }
 
   const handleStartMedia = async () => {
@@ -226,6 +277,47 @@ export default function WebRTCRoom({ signalingUrl, initialRoomId }: Props) {
           onToggleAudio={toggleAudio}
           onToggleVideo={toggleVideo}
           localVideoRef={localVideoRef as React.RefObject<HTMLVideoElement>}
+          onRequestMedia={async () => {
+            try {
+              if (localStreamRef.current) {
+                localStreamRef.current.getTracks().forEach((track) => track.stop())
+                localStreamRef.current = null
+              }
+              const stream = await startLocalMedia({
+                audio: isAudioEnabled,
+                video: isVideoEnabled
+              })
+              if (localVideoRef.current && stream) {
+                localVideoRef.current.srcObject = stream
+                localVideoRef.current.play().catch((error) => {
+                  if (error.name !== 'AbortError') {
+                    console.warn('⚠️ Could not autoplay video:', error)
+                  }
+                })
+              }
+            } catch (error: unknown) {
+              console.error('❌ Error requesting media:', error)
+              let errorMessage = 'Không thể truy cập camera/microphone'
+              if (error instanceof DOMException) {
+                switch (error.name) {
+                  case 'NotReadableError':
+                    errorMessage =
+                      'Camera/microphone đang được sử dụng bởi ứng dụng khác. Vui lòng đóng các ứng dụng khác và thử lại.'
+                    break
+                  case 'NotAllowedError':
+                    errorMessage =
+                      'Bạn đã từ chối quyền truy cập camera/microphone. Vui lòng cấp quyền trong cài đặt trình duyệt.'
+                    break
+                  case 'NotFoundError':
+                    errorMessage = 'Không tìm thấy camera/microphone. Vui lòng kiểm tra thiết bị của bạn.'
+                    break
+                  default:
+                    errorMessage = `Lỗi: ${error.message || 'Không thể truy cập thiết bị'}`
+                }
+              }
+              toast.error(errorMessage, { duration: 5000 })
+            }
+          }}
         />
       )}
 
