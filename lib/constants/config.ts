@@ -34,6 +34,26 @@ export const QUERY_KEYS = {
   CLASSES: ['classes'] as const,
   CLASS_LIST: (filters?: Record<string, unknown>) => ['classes', 'list', filters] as const,
 
+  // Entry Tests
+  ENTRY_TESTS: ['entry-tests'] as const,
+  ENTRY_TEST_LIST: (filters?: Record<string, unknown>) => ['entry-tests', 'list', filters] as const,
+  ENTRY_TEST_DETAIL: (entryTestId: string) => ['entry-tests', 'detail', entryTestId] as const,
+  ENTRY_TEST_SCORE_SPECTRUM: (entryTestId: string) => ['entry-tests', 'score-spectrum', entryTestId] as const,
+  ENTRY_TEST_SUBMISSIONS: (entryTestId: string, filters?: Record<string, unknown>) =>
+    ['entry-tests', 'submissions', entryTestId, filters] as const,
+  ENTRY_TEST_STUDENT_GRADES: (entryTestId: string, filters?: Record<string, unknown>) =>
+    ['entry-tests', 'student-grades', entryTestId, filters] as const,
+
+  // Final Exams
+  FINAL_EXAMS: ['final-exams'] as const,
+  FINAL_EXAM_LIST: (filters?: Record<string, unknown>) => ['final-exams', 'list', filters] as const,
+  FINAL_EXAM_DETAIL: (finalExamId: string) => ['final-exams', 'detail', finalExamId] as const,
+  FINAL_EXAM_SCORE_SPECTRUM: (finalExamId: string) => ['final-exams', 'score-spectrum', finalExamId] as const,
+  FINAL_EXAM_SUBMISSIONS: (finalExamId: string, filters?: Record<string, unknown>) =>
+    ['final-exams', 'submissions', finalExamId, filters] as const,
+  FINAL_EXAM_STUDENT_GRADES: (finalExamId: string, filters?: Record<string, unknown>) =>
+    ['final-exams', 'student-grades', finalExamId, filters] as const,
+
   // Users
   USERS: ['users'] as const,
   USER_LIST: (filters?: Record<string, unknown>) => ['users', 'list', filters] as const,

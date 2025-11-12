@@ -1,22 +1,23 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react'
+import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { FaRegEdit } from 'react-icons/fa'
-import { MdDeleteOutline } from 'react-icons/md'
+import { MdDeleteOutline, MdOutlineRemoveRedEye } from 'react-icons/md'
 import { formatDateTime, timeAgo } from '@/lib/utils'
 import { getEntryTestStatus } from '@/lib/constants/exams'
 import { EntryTest } from '@/lib/validations/lecturer/exams/entry-test'
+import EntryTestModal from './entry-test-modal'
 
 interface EntryTestCardProps {
   entryTest: EntryTest
   index: number
-  onEdit: (data: any) => void
+  onEdit: (data: EntryTest) => void
   onDelete: (id: string) => void
 }
 
 export const EntryTestCard = ({ entryTest: et, index, onEdit, onDelete }: EntryTestCardProps) => {
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = useState(false)
+  const [viewModalOpen, setViewModalOpen] = useState(false)
 
   return (
     <div className='bg-greyscale-0 rounded shadow-sm border p-4 hover:shadow-md transition-all'>
@@ -42,15 +43,38 @@ export const EntryTestCard = ({ entryTest: et, index, onEdit, onDelete }: EntryT
           <strong className='text-primary'>{getEntryTestStatus(et.status)}</strong> | Đã cập nhật: {timeAgo(et.updated_at)}
         </span>
         <div className='flex gap-2'>
-          <Button
-            variant='ghost'
-            size='sm'
-            className='text-greyscale-500 hover:text-primary flex items-center gap-1'
-            onClick={() => onEdit(et)}
-          >
-            <FaRegEdit />
-            <span>Sửa</span>
-          </Button>
+          {et.status === 'ACTIVE' ? (
+            <>
+              <Button
+                variant='ghost'
+                size='sm'
+                className='text-greyscale-500 hover:text-primary flex items-center gap-1'
+                onClick={() => setViewModalOpen(true)}
+              >
+                <MdOutlineRemoveRedEye />
+                <span>Xem</span>
+              </Button>
+              <EntryTestModal
+                open={viewModalOpen}
+                onOpenChange={setViewModalOpen}
+                initialData={et}
+                onSubmit={undefined}
+                readOnly
+              />
+            </>
+          ) : (
+            <>
+              <Button
+                variant='ghost'
+                size='sm'
+                className='text-greyscale-500 hover:text-primary flex items-center gap-1'
+                onClick={() => onEdit(et)}
+              >
+                <FaRegEdit />
+                <span>Sửa</span>
+              </Button>
+            </>
+          )}
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button

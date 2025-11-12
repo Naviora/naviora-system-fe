@@ -12,10 +12,8 @@ import { LoadingSpinner } from '@/components/ui'
 import { toast } from 'sonner'
 import { QuestionSetModal } from './question-set-modal'
 import { Question } from '@/lib/validations/lecturer/exams/question'
-import { Pagination } from '@/components/ui/pagination'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { SearchRequest } from '@/types/api/common'
+import { ExamToolBar } from '@/components/lecturer/exams/exam-toolbar'
 
 export default function ManageQuestionSet() {
   const [editId, setEditId] = useState<string | null>(null)
@@ -39,8 +37,8 @@ export default function ManageQuestionSet() {
   const totalPages = questionSetData?.pagiantion?.total_pages ?? 0
 
   const sortedSets = [...questionSets].sort((a, b) => {
-    const dateA = new Date(a.created_at)
-    const dateB = new Date(b.created_at)
+    const dateA = new Date(a.updated_at)
+    const dateB = new Date(b.updated_at)
     return sortNewest ? dateB.getTime() - dateA.getTime() : dateA.getTime() - dateB.getTime()
   })
 
@@ -119,52 +117,20 @@ export default function ManageQuestionSet() {
   return (
     <div className='rounded-lg shadow p-4'>
       <div className='mb-2 text-lg font-semibold'>Danh sách bộ câu hỏi</div>
-      <div className='mb-4 flex items-end justify-between'>
-        <div className='flex gap-2'>
-          <button
-            className={`text-sm px-2 py-1 rounded border ${sortNewest ? 'bg-success-0 text-success-200 border-success-200' : 'bg-greyscale-25 text-greyscale-700 border-greyscale-200'}`}
-            onClick={() => {
-              setSortNewest(true)
-              setCurrentPage(1)
-            }}
-          >
-            Mới nhất ↑
-          </button>
-          <button
-            className={`text-sm px-2 py-1 rounded border ${!sortNewest ? 'bg-success-0 text-success-200 border-success-200' : 'bg-greyscale-25 text-greyscale-700 border-greyscale-200'}`}
-            onClick={() => {
-              setSortNewest(false)
-              setCurrentPage(1)
-            }}
-          >
-            Cũ nhất ↓
-          </button>
-        </div>
-        <div className='text-sm text-greyscale-600'>
-          Tổng cộng <span className='font-semibold'>{questionSets.length}</span> bộ câu hỏi
-        </div>
-      </div>
-
-      <div className='flex items-center justify-between mb-4'>
-        {/* Search input */}
-        <div className='flex gap-2 items-center'>
-          <Input
-            placeholder='Tìm kiếm bộ câu hỏi...'
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSearch()
-            }}
-            className='w-xs h-8'
-          />
-          <Button variant='default' size='sm' onClick={handleSearch}>
-            Tìm kiếm
-          </Button>
-        </div>
-        <div>
-          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
-        </div>
-      </div>
+      <ExamToolBar
+        searchPlaceholder='Tìm kiếm bộ câu hỏi...'
+        search={search}
+        setSearch={setSearch}
+        onSearch={handleSearch}
+        sortNewest={sortNewest}
+        setSortNewest={setSortNewest}
+        totalLabel='Tổng cộng'
+        totalCount={questionSets.length}
+        totalLabel2='bộ câu hỏi'
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
 
       <div className='space-y-6'>
         {isLoading && (

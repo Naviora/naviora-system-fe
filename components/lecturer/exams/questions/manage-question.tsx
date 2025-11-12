@@ -5,10 +5,8 @@ import { useGetQuestions } from '@/hooks/api/lecturer/exams/use-question'
 import { QuestionCard } from '@/components/lecturer/exams/questions/question-card'
 import { LoadingSpinner } from '@/components/ui'
 import { NEmpty } from '@/components/ui/NEmpty'
-import { Pagination } from '@/components/ui/pagination'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { SearchRequest } from '@/types/api/common'
+import { ExamToolBar } from '@/components/lecturer/exams/exam-toolbar'
 
 interface ManageQuestionProps {
   onEdit: (data: any) => void
@@ -53,7 +51,7 @@ export default function ManageQuestion({ onEdit }: ManageQuestionProps) {
 
   return (
     <div className='rounded-lg shadow p-4'>
-      <div className='flex flex-col gap-2 mb-4'>
+      <div className='flex flex-col'>
         <div className='flex gap-4 flex-wrap items-center'>
           <span className='font-medium text-sm'>Loại câu hỏi</span>
           {QUESTION_TYPES.map((type) => (
@@ -66,7 +64,7 @@ export default function ManageQuestion({ onEdit }: ManageQuestionProps) {
             </button>
           ))}
         </div>
-        <div className='flex gap-4 flex-wrap items-center'>
+        <div className='flex gap-4 flex-wrap items-center mb-2'>
           <span className='font-medium text-sm'>Độ khó</span>
           {DIFFICULTY_LEVELS.map((level) => (
             <button
@@ -78,46 +76,21 @@ export default function ManageQuestion({ onEdit }: ManageQuestionProps) {
             </button>
           ))}
         </div>
-        <div className='flex items-end justify-between'>
-          <div className='flex gap-4 items-center mt-2'>
-            <button
-              className={`text-sm px-2 py-1 rounded border ${sortNewest ? 'bg-success-0 text-success-200 border-success-200' : 'bg-greyscale-25 text-greyscale-700 border-greyscale-200'}`}
-              onClick={() => setSortNewest(true)}
-            >
-              Mới nhất ↑
-            </button>
-            <button
-              className={`text-sm px-2 py-1 rounded border ${!sortNewest ? 'bg-success-0 text-success-200 border-success-200' : 'bg-greyscale-25 text-greyscale-700 border-greyscale-200'}`}
-              onClick={() => setSortNewest(false)}
-            >
-              Cũ nhất ↓
-            </button>
-          </div>
-          <div className='text-sm text-greyscale-600'>
-            Tổng cộng <span className='font-semibold'>{questions.length}</span> câu
-          </div>
-        </div>
-      </div>
 
-      <div className='flex items-center justify-between mb-4'>
-        {/* Search input */}
-        <div className='flex gap-2 items-center'>
-          <Input
-            placeholder='Tìm kiếm câu hỏi...'
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSearch()
-            }}
-            className='w-xs h-8'
-          />
-          <Button variant='default' size='sm' onClick={handleSearch}>
-            Tìm kiếm
-          </Button>
-        </div>
-        <div>
-          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
-        </div>
+        <ExamToolBar
+          searchPlaceholder="Tìm kiếm câu hỏi..."
+          search={search}
+          setSearch={setSearch}
+          onSearch={handleSearch}
+          sortNewest={sortNewest}
+          setSortNewest={setSortNewest}
+          totalLabel="Tổng cộng"
+          totalCount={questions.length}
+          totalLabel2="câu"
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </div>
 
       {/* Questions List */}

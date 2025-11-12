@@ -2,25 +2,47 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { DatePicker } from '@/components/ui/date-picker'
 import QuestionSetDrawer from '../question-set-drawer'
 import { MdDeleteOutline } from 'react-icons/md'
 
-export default function EntryTestModal({
-  open,
-  onOpenChange,
-  onSubmit
-}: {
+interface EntryTestModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSubmit?: (data: any) => void
-}) {
+  initialData?: any
+  readOnly?: boolean
+}
+
+export default function EntryTestModal({
+  open,
+  onOpenChange,
+  onSubmit,
+  initialData,
+  readOnly = false
+}: EntryTestModalProps) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [startTime, setStartTime] = useState<Date | null>(null)
   const [endTime, setEndTime] = useState<Date | null>(null)
   const [selectedQuestionSets, setSelectedQuestionSets] = useState<any[]>([])
+
+  useEffect(() => {
+    if (initialData) {
+      setTitle(initialData.title || '')
+      setDescription(initialData.description || '')
+      setStartTime(initialData.start_time ? new Date(initialData.start_time) : null)
+      setEndTime(initialData.end_time ? new Date(initialData.end_time) : null)
+      setSelectedQuestionSets(initialData.question_sets || [])
+    } else {
+      setTitle('')
+      setDescription('')
+      setStartTime(null)
+      setEndTime(null)
+      setSelectedQuestionSets([])
+    }
+  }, [initialData, open])
 
   const handleSubmit = () => {
     if (onSubmit) {
@@ -41,9 +63,11 @@ export default function EntryTestModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='!max-w-[800px] w-full bg-greyscale-0'>
+      <DialogContent className='max-w-[800px]! w-full bg-greyscale-0'>
         <DialogHeader>
-          <DialogTitle>Tạo bài kiểm tra đầu vào mới</DialogTitle>
+          <DialogTitle>
+            {readOnly ? 'Xem chi tiết bài kiểm tra đầu vào' : (initialData ? 'Chỉnh sửa bài kiểm tra đầu vào' : 'Tạo bài kiểm tra đầu vào mới')}
+          </DialogTitle>
         </DialogHeader>
         <div className='space-y-4 bg-greyscale-25 rounded-lg p-6 border min-h-[50vh] max-h-[70vh] overflow-y-auto'>
           <div>
@@ -52,6 +76,7 @@ export default function EntryTestModal({
               placeholder='Tên bài kiểm tra'
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              disabled={readOnly}
             />
           </div>
           <div>
@@ -60,6 +85,7 @@ export default function EntryTestModal({
               placeholder='Mô tả'
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              disabled={readOnly}
             />
           </div>
 
@@ -71,6 +97,7 @@ export default function EntryTestModal({
                 showTimeSelect
                 placeholder='Thời gian bắt đầu'
                 className='w-full'
+                disabled={readOnly}
               />
             </div>
             <div className='w-full'>
@@ -80,14 +107,17 @@ export default function EntryTestModal({
                 showTimeSelect
                 placeholder='Thời gian kết thúc'
                 className='w-full'
+                disabled={readOnly}
               />
             </div>
           </div>
 
-          <QuestionSetDrawer
-            onApply={(selected) => setSelectedQuestionSets(selected)}
-            selectedIds={selectedQuestionSets.map((set: any) => set.question_set_id)}
-          />
+          {!readOnly && (
+            <QuestionSetDrawer
+              onApply={(selected) => setSelectedQuestionSets(selected)}
+              selectedIds={selectedQuestionSets.map((set: any) => set.question_set_id)}
+            />
+          )}
 
           {selectedQuestionSets.length > 0 && (
             <div className='mt-4'>
@@ -105,14 +135,16 @@ export default function EntryTestModal({
                       <div className='text-xs text-gray-400'>
                         {set.total_questions ? `${set.total_questions} câu` : null}
                       </div>
-                      <Button
-                        variant='ghost'
-                        className='text-error hover:text-error-600 !p-0 !h-[20px]'
-                        onClick={() => handleRemoveQuestionSet(set.question_set_id)}
-                        title='Xóa bộ câu hỏi này'
-                      >
-                        <MdDeleteOutline/>
-                      </Button>
+                      {!readOnly && (
+                        <Button
+                          variant='ghost'
+                          className='text-error hover:text-error-600 p-0! h-5!'
+                          onClick={() => handleRemoveQuestionSet(set.question_set_id)}
+                          title='Xóa bộ câu hỏi này'
+                        >
+                          <MdDeleteOutline/>
+                        </Button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -122,9 +154,13 @@ export default function EntryTestModal({
         </div>
         <DialogFooter className='flex justify-between'>
           <DialogClose asChild>
-            <Button variant='outline'>Hủy</Button>
+            <Button variant='outline'>Đóng</Button>
           </DialogClose>
-          <Button onClick={handleSubmit}>Tạo mới</Button>
+          {!readOnly && (
+            <Button onClick={handleSubmit}>
+              {initialData ? 'Cập nhật' : 'Tạo mới'}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

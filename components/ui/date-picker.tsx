@@ -54,7 +54,6 @@ export function DatePicker({
       onChange?.(date)
     }
 
-    // Chỉ tự đóng popover khi không có chọn giờ
     if (!showTimeSelect) setOpen(false)
   }
 
@@ -92,6 +91,8 @@ export function DatePicker({
               'justify-start text-left font-normal hover:bg-accent hover:text-accent-foreground transition-colors',
               !value && 'text-muted-foreground'
             )}
+            disabled={disabled}
+            tabIndex={disabled ? -1 : 0}
           >
             <CalendarIcon className='mr-2 h-4 w-4 opacity-70' />
             {formattedDate ? (
@@ -122,8 +123,10 @@ export function DatePicker({
                 value={time}
                 onChange={handleTimeChange}
                 className={cn(
-                  'flex-1 rounded-md border border-input bg-background px-2 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition'
+                  'flex-1 rounded-md border border-input bg-background px-2 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition',
+                  disabled && 'bg-muted text-muted-foreground cursor-not-allowed'
                 )}
+                disabled={disabled}
               />
               <Button size='sm' variant='secondary' onClick={() => setOpen(false)} className='text-xs px-3'>
                 OK
