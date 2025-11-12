@@ -69,16 +69,24 @@ export function DatePicker({
 
   const formattedDate = value ? format(value, 'PPP') : null
 
-  const computedDisabled = React.useMemo(() => {
-    const rules: NonNullable<React.ComponentProps<typeof Calendar>['disabled']> extends any[] ? any[] : any[] = []
-    if (disabled) {
-      if (Array.isArray(disabled)) rules.push(...disabled)
-      else rules.push(disabled)
+  // Check if disabled is a boolean (for Button/input) or a Matcher/Matcher[] (for Calendar)
+  const isDisabled = typeof disabled === 'boolean' ? disabled : false
+
+  const computedDisabled = React.useMemo((): React.ComponentProps<typeof Calendar>['disabled'] => {
+    const rules: Array<React.ComponentProps<typeof Calendar>['disabled']> = []
+    if (disabled && typeof disabled !== 'boolean') {
+      if (Array.isArray(disabled)) {
+        rules.push(...disabled)
+      } else {
+        rules.push(disabled)
+      }
     }
     if (minDate) {
       rules.push({ before: startOfDay(minDate) })
     }
-    return rules.length > 0 ? rules : undefined
+    if (rules.length === 0) return undefined
+    if (rules.length === 1) return rules[0]
+    return rules as React.ComponentProps<typeof Calendar>['disabled']
   }, [disabled, minDate])
 
   return (
@@ -91,8 +99,8 @@ export function DatePicker({
               'justify-start text-left font-normal hover:bg-accent hover:text-accent-foreground transition-colors',
               !value && 'text-muted-foreground'
             )}
-            disabled={disabled}
-            tabIndex={disabled ? -1 : 0}
+            disabled={isDisabled}
+            tabIndex={isDisabled ? -1 : 0}
           >
             <CalendarIcon className='mr-2 h-4 w-4 opacity-70' />
             {formattedDate ? (
@@ -124,9 +132,9 @@ export function DatePicker({
                 onChange={handleTimeChange}
                 className={cn(
                   'flex-1 rounded-md border border-input bg-background px-2 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition',
-                  disabled && 'bg-muted text-muted-foreground cursor-not-allowed'
+                  isDisabled && 'bg-muted text-muted-foreground cursor-not-allowed'
                 )}
-                disabled={disabled}
+                disabled={isDisabled}
               />
               <Button size='sm' variant='secondary' onClick={() => setOpen(false)} className='text-xs px-3'>
                 OK
