@@ -9,7 +9,7 @@ import { LecturerClassesTable } from '@/components/lecturer/classes/lecturer-cla
 import { LecturerClassTableToolbar } from '@/components/lecturer/classes/lecturer-class-table-toolbar'
 import { createLecturerClassColumns } from '@/components/lecturer/classes/lecturer-class-columns'
 import { Button } from '@/components/ui/button'
-import { useAssignedClasses } from '@/hooks/api/use-classes'
+import { useGetAssignedClasses } from '@/hooks/api/use-classes'
 import type { ClassType } from '@/types/api/class'
 
 function useDebounce<T>(value: T, delay = 400) {
@@ -46,7 +46,7 @@ export function LecturerClassesPageClient() {
     [debouncedSearch, pagination.pageIndex, pagination.pageSize, selectedClassType]
   )
 
-  const classesQuery = useAssignedClasses(queryParams)
+  const classesQuery = useGetAssignedClasses(queryParams)
 
   const classes = classesQuery.data?.classes ?? []
   const paginationData = classesQuery.data?.pagination

@@ -7,13 +7,15 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Monitor, MicOff, VideoOff } from 'lucide-react'
+import { toast } from 'sonner'
 
 type Props = {
   signalingUrl: string
+  initialRoomId?: string
 }
 
-export default function WebRTCRoom({ signalingUrl }: Props) {
-  const [roomId, setRoomId] = useState('demo-room')
+export default function WebRTCRoom({ signalingUrl, initialRoomId }: Props) {
+  const [roomId, setRoomId] = useState(() => initialRoomId || 'demo-room')
   const [userId, setUserId] = useState(() => `user-${Math.random().toString(36).slice(2, 8)}`)
   const [joined, setJoined] = useState(false)
   const [started, setStarted] = useState(false)
@@ -51,10 +53,52 @@ export default function WebRTCRoom({ signalingUrl }: Props) {
 
       if (streamToShow) {
         console.log('🎥 Setting local video stream:', streamToShow)
-        localVideoRef.current.srcObject = streamToShow
+        const video = localVideoRef.current
+        if (video.srcObject !== streamToShow) {
+          video.srcObject = streamToShow
+          // Ensure video plays
+          video.play().catch((error) => {
+            if (error.name !== 'AbortError') {
+              console.warn('⚠️ Could not play local video:', error)
+            }
+          })
+        }
+      } else if (localVideoRef.current.srcObject) {
+        // Clear video if no stream
+        localVideoRef.current.srcObject = null
       }
     }
-  }, [localStreamRef, isScreenSharing, screenShareStream])
+  }, [isScreenSharing, screenShareStream, localStreamRef])
+
+  // Separate effect to watch for stream changes - use interval to check
+  useEffect(() => {
+    if (!localVideoRef.current || isScreenSharing) return
+
+    const checkAndUpdateStream = () => {
+      if (localVideoRef.current && localStreamRef.current) {
+        const video = localVideoRef.current
+        const stream = localStreamRef.current
+
+        if (video.srcObject !== stream) {
+          console.log('🎥 Updating local video stream')
+          video.srcObject = stream
+          video.play().catch((error) => {
+            if (error.name !== 'AbortError') {
+              console.warn('⚠️ Could not play local video:', error)
+            }
+          })
+        }
+      }
+    }
+
+    // Check immediately
+    checkAndUpdateStream()
+
+    // Check periodically (in case stream is set asynchronously)
+    const interval = setInterval(checkAndUpdateStream, 500)
+
+    return () => clearInterval(interval)
+  }, [isScreenSharing, isVideoEnabled, localStreamRef])
 
   // Debug remote streams
   useEffect(() => {
@@ -78,39 +122,22 @@ export default function WebRTCRoom({ signalingUrl }: Props) {
     await joinRoom()
     setJoined(true)
     console.log('Socket after join:', socket?.current?.id)
-  }
 
-  const handleStartMedia = async () => {
-    console.log('🎥 Starting local media...')
-    const stream = await startLocalMedia()
-    console.log('🎥 Local stream obtained:', stream)
-    console.log('🎥 Stream tracks:', stream.getTracks())
-
-    // Ensure local video is set up immediately
-    if (localVideoRef.current && stream) {
-      console.log('🎥 Setting local video immediately')
-      localVideoRef.current.srcObject = stream
-      // autoPlay attribute on video element will handle playback
-      // Only call play() if autoPlay fails due to user gesture requirement
-      localVideoRef.current.play().catch((error) => {
-        // Silently handle AbortError - it's a race condition when updating srcObject
-        if (error.name !== 'AbortError') {
-          console.warn('⚠️ Could not autoplay local video immediately:', error)
-        }
-      })
-    }
-
+    // Auto-start if already have media from waiting room
+    // If no media, still set started=true to show meeting UI (user can toggle audio/video in controls)
     setStarted(true)
 
-    // Auto-call existing peers
-    for (const peerId of connectedPeers) {
-      await startCallWith(peerId)
-    }
-  }
-
-  const handleCallAll = async () => {
-    for (const peerId of connectedPeers) {
-      await startCallWith(peerId)
+    // Auto-call existing peers if we have media
+    if (localStreamRef.current) {
+      setTimeout(async () => {
+        for (const peerId of connectedPeers) {
+          try {
+            await startCallWith(peerId)
+          } catch (error) {
+            console.error(`❌ Error calling peer ${peerId}:`, error)
+          }
+        }
+      }, 500) // Small delay to ensure socket events are processed
     }
   }
 
@@ -172,34 +199,48 @@ export default function WebRTCRoom({ signalingUrl }: Props) {
           onToggleAudio={toggleAudio}
           onToggleVideo={toggleVideo}
           localVideoRef={localVideoRef as React.RefObject<HTMLVideoElement>}
+          onRequestMedia={async () => {
+            try {
+              if (localStreamRef.current) {
+                localStreamRef.current.getTracks().forEach((track) => track.stop())
+                localStreamRef.current = null
+              }
+              const stream = await startLocalMedia({
+                audio: isAudioEnabled,
+                video: isVideoEnabled
+              })
+              if (localVideoRef.current && stream) {
+                localVideoRef.current.srcObject = stream
+                localVideoRef.current.play().catch((error) => {
+                  if (error.name !== 'AbortError') {
+                    console.warn('⚠️ Could not autoplay video:', error)
+                  }
+                })
+              }
+            } catch (error: unknown) {
+              console.error('❌ Error requesting media:', error)
+              let errorMessage = 'Không thể truy cập camera/microphone'
+              if (error instanceof DOMException) {
+                switch (error.name) {
+                  case 'NotReadableError':
+                    errorMessage =
+                      'Camera/microphone đang được sử dụng bởi ứng dụng khác. Vui lòng đóng các ứng dụng khác và thử lại.'
+                    break
+                  case 'NotAllowedError':
+                    errorMessage =
+                      'Bạn đã từ chối quyền truy cập camera/microphone. Vui lòng cấp quyền trong cài đặt trình duyệt.'
+                    break
+                  case 'NotFoundError':
+                    errorMessage = 'Không tìm thấy camera/microphone. Vui lòng kiểm tra thiết bị của bạn.'
+                    break
+                  default:
+                    errorMessage = `Lỗi: ${error.message || 'Không thể truy cập thiết bị'}`
+                }
+              }
+              toast.error(errorMessage, { duration: 5000 })
+            }
+          }}
         />
-      )}
-
-      {/* Meeting Controls */}
-      {joined && (
-        <div className='absolute top-4 right-4 z-30'>
-          <Button onClick={handleLeave} variant='destructive' size='sm'>
-            Leave
-          </Button>
-        </div>
-      )}
-
-      {/* Start Media Button */}
-      {joined && !started && (
-        <div className='absolute top-4 left-4 z-30'>
-          <Button onClick={handleStartMedia} variant='default'>
-            Start Camera
-          </Button>
-        </div>
-      )}
-
-      {/* Call Peers Button */}
-      {joined && started && connectedPeers.length > 0 && (
-        <div className='absolute top-16 right-4 z-30'>
-          <Button onClick={handleCallAll} variant='secondary' size='sm'>
-            Call Peers
-          </Button>
-        </div>
       )}
 
       {/* Video Grid - Google Meet Style */}
@@ -269,7 +310,7 @@ export default function WebRTCRoom({ signalingUrl }: Props) {
 
             {/* No Video Placeholder */}
             {!isVideoEnabled && (
-              <div className='absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600'>
+              <div className='absolute inset-0 flex items-center justify-center  bg-linear-to-br from-blue-500 to-purple-600'>
                 <Avatar className='size-16'>
                   <AvatarFallback className='bg-white/20 text-white text-2xl'>You</AvatarFallback>
                 </Avatar>
@@ -279,7 +320,7 @@ export default function WebRTCRoom({ signalingUrl }: Props) {
 
           {/* Remote Videos Waiting State */}
           {Object.entries(remoteStreams).length === 0 && connectedPeers.length > 0 && (
-            <div className='relative bg-gradient-to-br from-pink-500 to-red-500 rounded-lg overflow-hidden flex items-center justify-center min-h-[400px] border-2 border-dashed border-white/30'>
+            <div className='relative bg-linear-to-br from-pink-500 to-red-500 rounded-lg overflow-hidden flex items-center justify-center min-h-[400px] border-2 border-dashed border-white/30'>
               <div className='flex flex-col items-center gap-4 text-white'>
                 <div className='animate-pulse text-6xl'>⏳</div>
                 <div className='text-lg font-semibold'>Waiting for remote video...</div>
@@ -369,6 +410,7 @@ export default function WebRTCRoom({ signalingUrl }: Props) {
           isVideoEnabled={isVideoEnabled}
           onToggleAudio={toggleAudio}
           onToggleVideo={toggleVideo}
+          onLeave={handleLeave}
         />
       )}
 

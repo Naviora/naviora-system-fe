@@ -39,11 +39,13 @@ const COMMON_MAIN_NAVIGATION = navigationItemsSchema.parse([
 
 const STUDENT_MAIN_NAVIGATION = navigationItemsSchema.parse([
   { name: 'Tổng quan', href: '/student/dashboard', icon: RiHome5Fill },
+  { name: 'Lịch', href: '/calendar', icon: RiCalendarFill },
   { name: 'Chuyên đề', href: '/student/modules', icon: RiBook2Fill }
 ])
 
 const LECTURER_MAIN_NAVIGATION = navigationItemsSchema.parse([
   { name: 'Tổng quan', href: '/lecturer/dashboard', icon: RiHome5Fill },
+  { name: 'Lịch', href: '/calendar', icon: RiCalendarFill },
   { name: 'Quản lý chuyên đề', href: '/lecturer/modules', icon: RiBook2Fill },
   { name: 'Quản lý lớp', href: '/lecturer/classes', icon: RiGroupFill },
   { name: 'Quản lý đề thi', href: '/lecturer/exams', icon: PiExamFill }
@@ -58,6 +60,7 @@ const PRINCIPAL_MAIN_NAVIGATION = navigationItemsSchema.parse([
 
 const ADMIN_MAIN_NAVIGATION = navigationItemsSchema.parse([
   { name: 'Tổng quan', href: '/admin/dashboard', icon: RiHome5Fill },
+  { name: 'Lịch', href: '/calendar', icon: RiCalendarFill },
   { name: 'Quản lý chuyên đề', href: '/admin/modules', icon: RiBook2Fill }
 ])
 
