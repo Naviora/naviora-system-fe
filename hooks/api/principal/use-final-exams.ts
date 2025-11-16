@@ -67,7 +67,7 @@ export interface FinalExamsQueryParams {
   status?: string
 }
 
-interface FinalExamsResponse {
+export interface FinalExamsResponse {
   status_code: number
   message: string
   data: {

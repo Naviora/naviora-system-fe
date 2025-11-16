@@ -50,3 +50,86 @@ export function timeAgo(dateString: string) {
   return `Vừa xong`
 }
 
+export type ExamCountdownPhase = 'UPCOMING' | 'ONGOING' | 'ENDED'
+
+export interface ExamCountdownState {
+  phase: ExamCountdownPhase
+  secondsRemaining: number
+  label: string
+}
+
+export function formatDurationShort(totalSeconds: number) {
+  const seconds = Math.max(0, Math.floor(totalSeconds))
+  const days = Math.floor(seconds / 86400)
+  const hours = Math.floor((seconds % 86400) / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  const secs = seconds % 60
+
+  if (seconds === 0) {
+    return '00:00'
+  }
+
+  if (days > 0) {
+    return `${days}d ${hours}h`
+  }
+
+  if (hours > 0) {
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs
+      .toString()
+      .padStart(2, '0')}`
+  }
+
+  return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+}
+
+export function getCountdownParts(totalSeconds: number) {
+  const seconds = Math.max(0, Math.floor(totalSeconds))
+  const days = Math.floor(seconds / 86400)
+  const hours = Math.floor((seconds % 86400) / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  const secs = seconds % 60
+
+  return { days, hours, minutes, seconds: secs }
+}
+
+export function getExamCountdownState(
+  startTime: string | number | Date,
+  endTime: string | number | Date,
+  nowInput?: number | Date
+): ExamCountdownState {
+  const start = new Date(startTime).getTime()
+  const end = new Date(endTime).getTime()
+  const now = typeof nowInput === 'number' ? nowInput : nowInput ? new Date(nowInput).getTime() : Date.now()
+
+  if (Number.isNaN(start) || Number.isNaN(end)) {
+    return {
+      phase: 'ENDED',
+      secondsRemaining: 0,
+      label: 'Không xác định'
+    }
+  }
+
+  if (now < start) {
+    const secondsRemaining = Math.max(0, Math.floor((start - now) / 1000))
+    return {
+      phase: 'UPCOMING',
+      secondsRemaining,
+      label: `Bắt đầu trong ${formatDurationShort(secondsRemaining)}`
+    }
+  }
+
+  if (now >= start && now <= end) {
+    const secondsRemaining = Math.max(0, Math.floor((end - now) / 1000))
+    return {
+      phase: 'ONGOING',
+      secondsRemaining,
+      label: `Còn lại ${formatDurationShort(secondsRemaining)}`
+    }
+  }
+
+  return {
+    phase: 'ENDED',
+    secondsRemaining: 0,
+    label: 'Đã kết thúc'
+  }
+}
