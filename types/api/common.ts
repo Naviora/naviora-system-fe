@@ -74,6 +74,7 @@ export interface SearchRequest {
   page?: number
   limit?: number
   sortBy?: string
+  isInUse?: boolean
   sortOrder?: 'asc' | 'desc' | 'ASC' | 'DESC'
 }
 
