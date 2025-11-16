@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import { useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import type { PaginationState } from '@tanstack/react-table'
 import { useQueryClient } from '@tanstack/react-query'
 import { Plus, Loader2 } from 'lucide-react'
@@ -58,14 +59,17 @@ function useDebounce<T>(value: T, delay = 400) {
 }
 
 export function PrincipalClassesPageClient() {
+  const router = useRouter()
   const queryClient = useQueryClient()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isToggleDialogOpen, setIsToggleDialogOpen] = useState(false)
+  const [isModulePromptOpen, setIsModulePromptOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedClassType, setSelectedClassType] = useState<ClassType | null>(null)
   const [editingClass, setEditingClass] = useState<PrincipalClassRow | null>(null)
   const [togglingClass, setTogglingClass] = useState<PrincipalClassRow | null>(null)
+  const [recentlyCreatedClass, setRecentlyCreatedClass] = useState<ClassDto | null>(null)
   const [pagination, setPagination] = useState<PaginationState>(() => ({
     pageIndex: 0,
     pageSize: CLASS_QUERY_DEFAULTS.limit
@@ -86,10 +90,12 @@ export function PrincipalClassesPageClient() {
   const classesQuery = useClasses(classesQueryParams)
 
   const createClassMutation = useCreateClass({
-    onSuccess: async () => {
+    onSuccess: async (response) => {
       await queryClient.invalidateQueries({ queryKey: ['classes', 'list'] })
       toast.success('Tạo lớp thành công')
       setIsDialogOpen(false)
+      setRecentlyCreatedClass(response.data)
+      setIsModulePromptOpen(true)
     },
     onError: (error: unknown) => {
       toast.error(ErrorHandler.getErrorMessage(error))
@@ -159,6 +165,24 @@ export function PrincipalClassesPageClient() {
     if (!open) {
       setTogglingClass(null)
     }
+  }
+
+  const handleModulePromptChange = (open: boolean) => {
+    setIsModulePromptOpen(open)
+    if (!open) {
+      setRecentlyCreatedClass(null)
+    }
+  }
+
+  const handleNavigateToModules = () => {
+    const targetClassId = recentlyCreatedClass?.class_id
+    const query = targetClassId ? `?classId=${targetClassId}` : ''
+    router.push(`/principal/modules${query}`)
+    handleModulePromptChange(false)
+  }
+
+  const handleStayOnClasses = () => {
+    handleModulePromptChange(false)
   }
 
   const renderContent = () => {
@@ -288,6 +312,26 @@ export function PrincipalClassesPageClient() {
                 'Kích hoạt'
               )}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Prompt to add modules */}
+      <Dialog open={isModulePromptOpen} onOpenChange={handleModulePromptChange}>
+        <DialogContent className='max-w-md'>
+          <DialogHeader>
+            <DialogTitle>Thêm chuyên đề cho lớp mới?</DialogTitle>
+            <DialogDescription>
+              {recentlyCreatedClass
+                ? `Bạn vừa tạo lớp "${recentlyCreatedClass.class_name}". Bạn có muốn chuyển sang trang Chuyên đề để thêm module cho lớp này không?`
+                : 'Bạn có muốn chuyển sang trang Chuyên đề để thêm module cho lớp vừa tạo không?'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant='outline' onClick={handleStayOnClasses}>
+              Ở lại trang lớp
+            </Button>
+            <Button onClick={handleNavigateToModules}>Chuyển tới trang chuyên đề</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
