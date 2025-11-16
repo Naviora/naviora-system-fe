@@ -12,17 +12,43 @@ import { LoadingSpinner } from '@/components/ui'
 import { toast } from 'sonner'
 import { QuestionSetModal } from './question-set-modal'
 import { Question } from '@/lib/validations/lecturer/exams/question'
+import { SearchRequest } from '@/types/api/common'
+import { ExamToolBar } from '@/components/lecturer/exams/exam-toolbar'
 
 export default function ManageQuestionSet() {
   const [editId, setEditId] = useState<string | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [sortNewest, setSortNewest] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [search, setSearch] = useState('')
+  const [searchValue, setSearchValue] = useState('')
+  const pageSize = 5
+
+  const queryParams: SearchRequest = {
+    limit: pageSize,
+    page: currentPage
+  }
+  if (searchValue.trim() !== '') {
+    queryParams.q = searchValue
+  }
+
+  const { data: questionSetData, isLoading, isError } = useGetQuestionSets(queryParams)
+  const questionSets = questionSetData?.question_sets || []
+  const totalPages = questionSetData?.pagiantion?.total_pages ?? 0
+
+  const sortedSets = [...questionSets].sort((a, b) => {
+    const dateA = new Date(a.updated_at)
+    const dateB = new Date(b.updated_at)
+    return sortNewest ? dateB.getTime() - dateA.getTime() : dateA.getTime() - dateB.getTime()
+  })
+
+  const handleSearch = () => {
+    setSearchValue(search)
+    setCurrentPage(1)
+  }
+
   const deleteMutation = useDeleteQuestionSet()
   const updateMutation = useUpdateQuestionSet()
-  const { data: questionSetData, isLoading, isError } = useGetQuestionSets({ limit: 50, page: 1 })
-  const questionSets = questionSetData?.question_sets || []
-
-  // Lấy detail khi có editId
   const { data: editDetail, isLoading: isEditLoading } = useGetQuestionSetDetail(editId ?? '')
 
   const handleEdit = (data: any) => {
@@ -88,34 +114,24 @@ export default function ManageQuestionSet() {
     )
   }
 
-  const sortedSets = [...questionSets].sort((a, b) => {
-    const dateA = new Date(a.created_at)
-    const dateB = new Date(b.created_at)
-    return sortNewest ? dateB.getTime() - dateA.getTime() : dateA.getTime() - dateB.getTime()
-  })
-
   return (
     <div className='rounded-lg shadow p-4'>
       <div className='mb-2 text-lg font-semibold'>Danh sách bộ câu hỏi</div>
-      <div className='mb-4 flex items-center justify-between'>
-        <div className='flex gap-2'>
-          <button
-            className={`text-sm px-2 py-1 rounded border ${sortNewest ? 'bg-success-0 text-success-200 border-success-200' : 'bg-greyscale-25 text-greyscale-700 border-greyscale-200'}`}
-            onClick={() => setSortNewest(true)}
-          >
-            Mới nhất ↑
-          </button>
-          <button
-            className={`text-sm px-2 py-1 rounded border ${!sortNewest ? 'bg-success-0 text-success-200 border-success-200' : 'bg-greyscale-25 text-greyscale-700 border-greyscale-200'}`}
-            onClick={() => setSortNewest(false)}
-          >
-            Cũ nhất ↓
-          </button>
-        </div>
-        <div className='text-sm text-greyscale-600'>
-          Tổng cộng <span className='font-semibold'>{questionSets.length}</span> bộ câu hỏi
-        </div>
-      </div>
+      <ExamToolBar
+        searchPlaceholder='Tìm kiếm bộ câu hỏi...'
+        search={search}
+        setSearch={setSearch}
+        onSearch={handleSearch}
+        sortNewest={sortNewest}
+        setSortNewest={setSortNewest}
+        totalLabel='Tổng cộng'
+        totalCount={questionSets.length}
+        totalLabel2='bộ câu hỏi'
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
+
       <div className='space-y-6'>
         {isLoading && (
           <div className='text-center text-greyscale-400 py-8'>

@@ -63,6 +63,29 @@ export interface CreateClassResponse {
   data: Class
 }
 
+export interface AssignedClassesQueryParams {
+  limit?: number
+  page?: number
+  q?: string
+  order?: 'ASC' | 'DESC'
+  class_type?: ClassType
+  sort_by?: string
+}
+
+export interface AssignedClassesListResponse {
+  status_code: number
+  message: string
+  data: {
+    classes: Class[]
+    pagination: {
+      limit: number
+      current_page: number
+      total_records: number
+      total_pages: number
+    }
+  }
+}
+
 export const CLASS_TYPE_LABELS: Record<ClassType, string> = {
   school: 'Cấp trường',
   city: 'Cấp thành phố',

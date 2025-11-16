@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Switch } from '@/components/ui/switch'
 import { DIFFICULTY_LEVELS, QUESTION_TYPES } from '@/lib/constants/exams'
 import React, { useState } from 'react'
 import { useGetQuestions } from '@/hooks/api/lecturer/exams/use-question'
 import { QuestionCard } from '@/components/lecturer/exams/questions/question-card'
 import { LoadingSpinner } from '@/components/ui'
 import { NEmpty } from '@/components/ui/NEmpty'
+import { SearchRequest } from '@/types/api/common'
+import { ExamToolBar } from '@/components/lecturer/exams/exam-toolbar'
 
 interface ManageQuestionProps {
   onEdit: (data: any) => void
@@ -15,19 +16,23 @@ export default function ManageQuestion({ onEdit }: ManageQuestionProps) {
   const [selectedType, setSelectedType] = useState('ALL')
   const [selectedDifficulty, setSelectedDifficulty] = useState('ALL')
   const [sortNewest, setSortNewest] = useState(true)
-  const [showAnswers, setShowAnswers] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [search, setSearch] = useState('')
+  const [searchValue, setSearchValue] = useState('')
+  const pageSize = 25
 
-  const {
-    data: questionsData,
-    isLoading,
-    isError
-  } = useGetQuestions({
-    limit: 200,
-    page: 1
-  })
-  console.log('Check questions data: ', questionsData)
+  const queryParams: SearchRequest = {
+    limit: pageSize,
+    page: currentPage
+  }
+  if (searchValue.trim() !== '') {
+    queryParams.q = searchValue
+  }
+
+  const { data: questionsData, isLoading, isError } = useGetQuestions(queryParams)
+
   const questions = questionsData?.questions || []
-  console.log('Check question:', questions)
+  const totalPages = questionsData?.pagination.total_pages ?? 0
 
   const filteredQuestions = questions
     .filter((q) => selectedType === 'ALL' || q.type === selectedType)
@@ -39,11 +44,14 @@ export default function ManageQuestion({ onEdit }: ManageQuestionProps) {
     return sortNewest ? dateB.getTime() - dateA.getTime() : dateA.getTime() - dateB.getTime()
   })
 
-  console.log('Check sort question: ', sortedQuestions)
+  const handleSearch = () => {
+    setSearchValue(search)
+    setCurrentPage(1)
+  }
 
   return (
     <div className='rounded-lg shadow p-4'>
-      <div className='flex flex-col gap-2 mb-4'>
+      <div className='flex flex-col'>
         <div className='flex gap-4 flex-wrap items-center'>
           <span className='font-medium text-sm'>Loại câu hỏi</span>
           {QUESTION_TYPES.map((type) => (
@@ -56,7 +64,7 @@ export default function ManageQuestion({ onEdit }: ManageQuestionProps) {
             </button>
           ))}
         </div>
-        <div className='flex gap-4 flex-wrap items-center'>
+        <div className='flex gap-4 flex-wrap items-center mb-2'>
           <span className='font-medium text-sm'>Độ khó</span>
           {DIFFICULTY_LEVELS.map((level) => (
             <button
@@ -68,35 +76,21 @@ export default function ManageQuestion({ onEdit }: ManageQuestionProps) {
             </button>
           ))}
         </div>
-      </div>
 
-      {/* Sort & Total & Toggle Answer */}
-      <div className='flex items-center justify-between mb-4'>
-        <div className='flex gap-4 items-center'>
-          <button
-            className={`text-sm px-2 py-1 rounded border ${sortNewest ? 'bg-success-0 text-success-200 border-success-200' : 'bg-greyscale-25 text-greyscale-700 border-greyscale-200'}`}
-            onClick={() => setSortNewest(true)}
-          >
-            Mới nhất ↑
-          </button>
-          <button
-            className={`text-sm px-2 py-1 rounded border ${!sortNewest ? 'bg-success-0 text-success-200 border-success-200' : 'bg-greyscale-25 text-greyscale-700 border-greyscale-200'}`}
-            onClick={() => setSortNewest(false)}
-          >
-            Cũ nhất ↓
-          </button>
-        </div>
-        <div className='flex gap-4 items-center'>
-          <div className='text-sm text-greyscale-600'>
-            Tổng cộng <span className='font-semibold'>{questions.length}</span> câu
-          </div>
-          <div className='flex items-center gap-2'>
-            <label htmlFor='showAnswers' className='text-sm text-greyscale-700 cursor-pointer'>
-              Hiển thị đáp án
-            </label>
-            <Switch id='showAnswers' checked={showAnswers} onCheckedChange={setShowAnswers} />
-          </div>
-        </div>
+        <ExamToolBar
+          searchPlaceholder="Tìm kiếm câu hỏi..."
+          search={search}
+          setSearch={setSearch}
+          onSearch={handleSearch}
+          sortNewest={sortNewest}
+          setSortNewest={setSortNewest}
+          totalLabel="Tổng cộng"
+          totalCount={questions.length}
+          totalLabel2="câu"
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </div>
 
       {/* Questions List */}
@@ -110,7 +104,7 @@ export default function ManageQuestion({ onEdit }: ManageQuestionProps) {
         {!isLoading &&
           !isError &&
           sortedQuestions.map((q, idx) => (
-            <QuestionCard key={q.question_id} question={q} index={idx} showAnswers={showAnswers} onEdit={onEdit} />
+            <QuestionCard key={q.question_id} question={q} index={idx} onEdit={onEdit} />
           ))}
         {!isLoading && !isError && sortedQuestions.length === 0 && (
           <NEmpty

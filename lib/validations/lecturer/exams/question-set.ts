@@ -14,6 +14,7 @@ export const questionSetSchema = z.object({
   description: z.string(),
   total_questions: z.number(),
   duration_minutes: z.number(),
+  is_in_use: z.boolean(),
   lecturer: lecturerSchema,
   created_at: z.string(),
   updated_at: z.string()

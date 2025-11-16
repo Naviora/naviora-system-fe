@@ -77,7 +77,7 @@ export function QuestionSetModal({ open, onOpenChange, initialData, onSubmit }: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='!max-w-[1200px] w-full'>
+      <DialogContent className='max-w-[1200px]! w-full'>
         <DialogHeader>
           <DialogTitle className='pb-2'>Tạo bộ câu hỏi mới</DialogTitle>
         </DialogHeader>
@@ -123,7 +123,7 @@ export function QuestionSetModal({ open, onOpenChange, initialData, onSubmit }: 
                   </div>
                   <Button
                     variant='ghost'
-                    className='text-error hover:text-error-600 !p-0 !h-[20px]'
+                    className='text-error hover:text-error-600 p-0! h-5!'
                     onClick={() => handleRemoveQuestion(q.question_id)}
                     title='Xóa câu hỏi này'
                   >

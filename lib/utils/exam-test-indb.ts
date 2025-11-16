@@ -28,3 +28,27 @@ export async function loadQuestionSet() {
 export async function clearQuestionSet() {
   await del(QUESTION_SET_KEY)
 }
+
+const REVIEWED_EXERCISE_SESSION_KEY = 'reviewed-exercise-session'
+
+export type ReviewedExerciseSessionPayload = {
+  reviewed_exercise_id: string
+  question_set_id: string
+  reviewed_exercise_submission_id: string
+  attempt_status: 'IN_PROGRESS' | 'SUBMITTED' | 'GRADED' | 'CANCELLED'
+  student_id?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export async function saveReviewedExerciseSession(data: ReviewedExerciseSessionPayload) {
+  await set(REVIEWED_EXERCISE_SESSION_KEY, data)
+}
+
+export async function loadReviewedExerciseSession(): Promise<ReviewedExerciseSessionPayload | undefined> {
+  return await get(REVIEWED_EXERCISE_SESSION_KEY)
+}
+
+export async function clearReviewedExerciseSession() {
+  await del(REVIEWED_EXERCISE_SESSION_KEY)
+}

@@ -1,13 +1,90 @@
 import { ERROR_CODES, ERROR_MESSAGES, SUCCESS_MESSAGES, type ApiError } from '@/lib/constants'
 
 /**
+ * Backend validation error detail structure
+ */
+interface ValidationErrorDetail {
+  property: string
+  code: string
+  message: string
+}
+
+/**
  * Error handler utility functions
  */
 export class ErrorHandler {
   /**
+   * Extract validation error details from API response
+   * Backend always returns errors in format:
+   * {
+   *   statusCode: 422,
+   *   error: "Unprocessable Entity",
+   *   message: "Validation failed",
+   *   details: [{ property, code, message }, ...]
+   * }
+   */
+  static getValidationDetails(error: unknown): ValidationErrorDetail[] {
+    const httpError = error as Record<string, unknown>
+
+    // Priority 1: Check response.data.details (Axios error with original response)
+    if (
+      httpError?.response &&
+      typeof httpError.response === 'object' &&
+      (httpError.response as Record<string, unknown>)?.data &&
+      typeof (httpError.response as Record<string, unknown>).data === 'object'
+    ) {
+      const data = (httpError.response as Record<string, unknown>).data as Record<string, unknown>
+      if (data?.details && Array.isArray(data.details)) {
+        return data.details as ValidationErrorDetail[]
+      }
+    }
+
+    // Priority 2: Check direct details property (transformed error object)
+    if (httpError?.details && Array.isArray(httpError.details)) {
+      return httpError.details as ValidationErrorDetail[]
+    }
+
+    return []
+  }
+
+  /**
+   * Check if error has validation details
+   */
+  static hasValidationDetails(error: unknown): boolean {
+    return this.getValidationDetails(error).length > 0
+  }
+
+  /**
+   * Get first validation error message formatted as "property: message"
+   */
+  static getFirstValidationError(error: unknown): string | null {
+    const details = this.getValidationDetails(error)
+    if (details.length > 0) {
+      const firstError = details[0]
+      return `${firstError.property}: ${firstError.message}`
+    }
+    return null
+  }
+
+  /**
+   * Get all validation error messages formatted as array
+   */
+  static getAllValidationErrors(error: unknown): string[] {
+    return this.getValidationDetails(error).map((detail) => `${detail.property}: ${detail.message}`)
+  }
+
+  /**
    * Get user-friendly error message
+   * Priority: validation details > API error message > generic fallback
    */
   static getErrorMessage(error: unknown): string {
+    // Priority 1: Check for validation details from backend
+    const firstValidationError = this.getFirstValidationError(error)
+    if (firstValidationError) {
+      return firstValidationError
+    }
+
+    // Priority 2: Check standard API error
     if (this.isApiError(error)) {
       // Check if we have a custom message for this error code
       const customMessage = ERROR_MESSAGES[error.code as keyof typeof ERROR_MESSAGES]
@@ -19,14 +96,17 @@ export class ErrorHandler {
       return error.message || 'An unexpected error occurred'
     }
 
+    // Priority 3: Standard JS Error
     if (error instanceof Error) {
       return error.message
     }
 
+    // Priority 4: String error
     if (typeof error === 'string') {
       return error
     }
 
+    // Priority 5: Generic fallback
     return 'An unexpected error occurred'
   }
 

@@ -137,3 +137,73 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           target: development
+
+  # Production Deployment Job
+  deploy-prod:
+    name: Deploy (Production)
+    runs-on: ubuntu-24.04
+    needs: docker-build-prod
+    if: github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.base_ref == 'main')
+
+    steps:
+      - name: SSH and deploy to production
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            docker pull ${{ env.PROD_IMAGE_NAME }}:latest
+            cd naviora
+            docker compose up -d
+
+  # Development Deployment Job
+  deploy-dev:
+    name: Deploy (Development)
+    runs-on: ubuntu-24.04
+    needs: docker-build-dev
+    if: github.ref == 'refs/heads/develop' || (github.event_name == 'pull_request' && github.base_ref == 'develop')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect entity changes
+        id: detect-entity-changes
+        run: |
+          PREV_SHA=$(git rev-parse HEAD^ || echo "")
+          if [ -z "$PREV_SHA" ]; then
+            echo "entity_changed=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          CHANGED=$(git diff --name-only "$PREV_SHA" HEAD || true)
+          if echo "$CHANGED" | grep -E '^src/.+\\.entity\\.ts$' >/dev/null 2>&1; then
+            echo "entity_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "entity_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set Docker image tag
+        id: set-tag
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]] && \
+             [[ "${{ github.base_ref }}" == "develop" ]]; then
+            echo "TAG_FE=pr-${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+          else
+            echo "TAG_FE=develop" >> $GITHUB_ENV
+          fi
+
+      - name: SSH and deploy to development
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            docker pull ${{ env.NON_PROD_IMAGE_NAME }}:${{ env.TAG_FE }}
+            cd be-non-prod
+            TAG_FE=${{ env.TAG_FE }} docker compose up -d

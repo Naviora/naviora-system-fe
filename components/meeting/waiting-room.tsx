@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Mic, MicOff, Video, VideoOff } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 interface Props {
   roomId: string
@@ -16,6 +17,7 @@ interface Props {
   onToggleAudio: () => void
   onToggleVideo: () => void
   localVideoRef: React.RefObject<HTMLVideoElement>
+  onRequestMedia: () => Promise<void>
 }
 
 export default function WaitingRoom({
@@ -28,8 +30,58 @@ export default function WaitingRoom({
   isVideoEnabled,
   onToggleAudio,
   onToggleVideo,
-  localVideoRef
+  localVideoRef,
+  onRequestMedia
 }: Props) {
+  const [mediaRequested, setMediaRequested] = useState(false)
+
+  // Request media permission when component mounts
+  useEffect(() => {
+    if (!mediaRequested) {
+      setMediaRequested(true)
+      onRequestMedia().catch((error) => {
+        console.error('Failed to request media on mount:', error)
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Update video element when stream changes
+  useEffect(() => {
+    if (!localVideoRef.current || !isVideoEnabled) return
+
+    const video = localVideoRef.current
+
+    // Check periodically if video needs to play
+    const checkVideo = () => {
+      if (video.srcObject && video.paused && video.readyState >= 2) {
+        video.play().catch((error) => {
+          if (error.name !== 'AbortError') {
+            console.warn('⚠️ Could not play video:', error)
+          }
+        })
+      }
+    }
+
+    checkVideo()
+    const interval = setInterval(checkVideo, 500)
+
+    return () => clearInterval(interval)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVideoEnabled])
+
+  const handleToggleAudio = async () => {
+    onToggleAudio()
+    // Re-request media with updated audio state
+    await onRequestMedia()
+  }
+
+  const handleToggleVideo = async () => {
+    onToggleVideo()
+    // Re-request media with updated video state
+    await onRequestMedia()
+  }
+
   return (
     <div className='absolute inset-0 bg-white flex items-center justify-center p-8'>
       <div className='flex gap-8 max-w-7xl w-full'>
@@ -69,7 +121,7 @@ export default function WaitingRoom({
               <Card className='bg-[#2d2e30] border border-gray-600 px-3 py-2 rounded-full'>
                 <div className='flex items-center gap-3'>
                   <Button
-                    onClick={onToggleAudio}
+                    onClick={handleToggleAudio}
                     className={`rounded-full size-12 transition-all ${
                       isAudioEnabled
                         ? 'bg-white hover:bg-gray-100 text-gray-700'
@@ -81,7 +133,7 @@ export default function WaitingRoom({
                   </Button>
 
                   <Button
-                    onClick={onToggleVideo}
+                    onClick={handleToggleVideo}
                     className={`rounded-full size-12 transition-all ${
                       isVideoEnabled
                         ? 'bg-white hover:bg-gray-100 text-gray-700'

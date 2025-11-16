@@ -51,6 +51,16 @@ export function QuestionBankDrawer({
     setSearchValue(search)
   }
 
+  // Select all filtered questions
+  const handleSelectAll = () => {
+    setSelectedIds(filteredQuestions.map(q => q.question_id))
+  }
+
+  // Deselect all
+  const handleDeselectAll = () => {
+    setSelectedIds([])
+  }
+
   useEffect(() => {
     if (open) {
       setSelectedIds(externalSelectedIds ?? [])
@@ -64,7 +74,7 @@ export function QuestionBankDrawer({
         Thêm câu hỏi từ ngân hàng
       </Button>
       <Drawer open={open} onOpenChange={setOpen} direction='right'>
-        <DrawerContent className='!max-w-3xl w-full'>
+        <DrawerContent className='max-w-3xl! w-full'>
           <DrawerHeader>
             <DrawerTitle>Chọn câu hỏi từ ngân hàng</DrawerTitle>
             <DrawerClose asChild>
@@ -111,6 +121,24 @@ export function QuestionBankDrawer({
             />
             <Button variant='outline' onClick={handleSearch}>
               Tìm kiếm
+            </Button>
+          </div>
+          <div className='flex gap-2 px-4 py-2'>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={handleSelectAll}
+              disabled={filteredQuestions.length === 0 || selectedIds.length === filteredQuestions.length}
+            >
+              Chọn tất cả
+            </Button>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={handleDeselectAll}
+              disabled={selectedIds.length === 0}
+            >
+              Bỏ chọn tất cả
             </Button>
           </div>
           <div className='p-4 mt-1 overflow-y-auto' style={{ maxHeight: '70vh' }}>
