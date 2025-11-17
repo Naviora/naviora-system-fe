@@ -63,8 +63,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 USER nextjs
 
-EXPOSE 3000
-ENV PORT 3000
+EXPOSE 3002
+ENV PORT 3002
 
 # Choose runtime based on APP_ENV
 CMD ["sh", "-c", "if [ \"$APP_ENV\" = \"production\" ]; then node server.js; else npm run dev; fi"]
