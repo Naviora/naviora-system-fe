@@ -1,6 +1,24 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { io, Socket } from 'socket.io-client'
 
+const envIceServerUrls =
+  process.env.NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_URLS?.split(',')
+    .map((url) => url.trim())
+    .filter(Boolean) ?? null
+
+const managedEnvIceServer =
+  envIceServerUrls && envIceServerUrls.length > 0
+    ? ({
+        urls: envIceServerUrls,
+        ...(process.env.NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_USERNAME
+          ? { username: process.env.NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_USERNAME }
+          : {}),
+        ...(process.env.NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_CREDENTIAL
+          ? { credential: process.env.NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_CREDENTIAL }
+          : {})
+      } satisfies RTCIceServer)
+    : null
+
 type PeerId = string
 
 type UseWebRTCOptions = {
@@ -65,15 +83,19 @@ export function useWebRTC(roomId: string, userId: string, options: UseWebRTCOpti
         //   username: 'ce7e305ee5978a6e226b86c8',
         //   credential: 'hWphRx79NhBy3EXy'
         // },
-        {
-          urls: [
-            'stun:103.200.20.196:3478',
-            'turn:103.200.20.196:3478?transport=udp',
-            'turn:103.200.20.196:3478?transport=tcp'
-          ],
-          username: 'naviora',
-          credential: 'strongturnpassword123'
-        },
+        ...(managedEnvIceServer
+          ? [managedEnvIceServer]
+          : [
+              {
+                urls: [
+                  'stun:103.200.20.196:3478',
+                  'turn:103.200.20.196:3478?transport=udp',
+                  'turn:103.200.20.196:3478?transport=tcp'
+                ],
+                username: 'naviora',
+                credential: 'strongturnpassword123'
+              }
+            ]),
         {
           urls: 'turns:sg.relay.metered.ca:443?transport=tcp',
           username: 'ce7e305ee5978a6e226b86c8',
