@@ -67,4 +67,4 @@ EXPOSE 3002
 ENV PORT 3002
 
 # Choose runtime based on APP_ENV
-CMD ["npm", "run", "start"]
+CMD ["node", "server.js"]
