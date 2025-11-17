@@ -152,11 +152,10 @@ export default function DashboardPage() {
       <section className='rounded-2xl border border-primary/15 bg-linear-to-r from-primary/15 via-primary/5 to-primary/10 p-8'>
         <div className='max-w-3xl'>
           <p className='mb-2 text-sm font-semibold uppercase tracking-wide text-primary'>{formattedDate}</p>
-          <h1 className='mb-3 text-3xl font-bold text-greyscale-900 dark:text-greyscale-0'>
-            {greeting}, Thầy/Cô! 👋
-          </h1>
+          <h1 className='mb-3 text-3xl font-bold text-greyscale-900 dark:text-greyscale-0'>{greeting}, Thầy/Cô! 👋</h1>
           <p className='mb-6 text-base text-greyscale-600 dark:text-greyscale-400'>
-            Theo dõi tiến độ lớp học, bài nộp và những cập nhật quan trọng trong ngày để duy trì chất lượng giảng dạy tốt nhất.
+            Theo dõi tiến độ lớp học, bài nộp và những cập nhật quan trọng trong ngày để duy trì chất lượng giảng dạy
+            tốt nhất.
           </p>
           <Button
             onClick={() => router.push('/lecturer/calendar')}
