@@ -155,7 +155,7 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             docker pull ${{ env.PROD_IMAGE_NAME }}:latest
-            cd naviora
+            cd naviora-prod
             docker compose up -d
 
   # Development Deployment Job
