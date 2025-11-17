@@ -47,12 +47,12 @@ CMD ["npm", "run", "dev"]
 
 # Production stage
 FROM base AS production
-ARG NEXT_PUBLIC_API_URL="https://naviora-api.cookie-candy.id.vn/api/v1"
-ARG NEXT_PUBLIC_SIGNALING_URL="https://naviora-api.cookie-candy.id.vn"
-ARG NEXT_PUBLIC_TINYMCE_API_KEY="sq92x7sj6jmc1kmnbsu2lon6r99c12l1rozj95leg50nuksr"
-ARG NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_URLS="stun:103.200.20.196:3479,turn:103.200.20.196:3478?transport=udp,turn:103.200.20.196:3478?transport=tcp"
-ARG NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_USERNAME="naviora"
-ARG NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_CREDENTIAL="strongturnpassword123"
+ARG NEXT_PUBLIC_API_URL=https://naviora-api.cookie-candy.id.vn/api/v1
+ARG NEXT_PUBLIC_SIGNALING_URL=https://naviora-api.cookie-candy.id.vn
+ARG NEXT_PUBLIC_TINYMCE_API_KEY=sq92x7sj6jmc1kmnbsu2lon6r99c12l1rozj95leg50nuksr
+ARG NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_URLS=stun:103.200.20.196:3479,turn:103.200.20.196:3478?transport=udp,turn:103.200.20.196:3478?transport=tcp
+ARG NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_USERNAME=naviora
+ARG NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_CREDENTIAL=strongturnpassword123
 WORKDIR /app
 
 ENV NODE_ENV production
