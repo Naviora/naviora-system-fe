@@ -193,7 +193,10 @@ Create a `.env.local` file based on `.env.example`:
 # API Configuration
 NEXT_PUBLIC_API_URL=http://localhost:3000/api
 
-# Add other environment variables as needed
+# WebRTC ICE servers (comma-separated list)
+NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_URLS=stun:103.200.20.196:3478,turn:103.200.20.196:3478?transport=udp,turn:103.200.20.196:3478?transport=tcp
+NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_USERNAME=naviora
+NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_CREDENTIAL=strongturnpassword123
 ```
 
 ## 🚀 Deployment

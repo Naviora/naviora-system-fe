@@ -178,7 +178,7 @@ export class ErrorHandler {
    * Log error for debugging (in development)
    */
   static logError(error: unknown, context?: string): void {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.APP_ENV === 'development') {
       console.group(`🚨 Error ${context ? `in ${context}` : ''}`)
       console.error('Error details:', error)
 
@@ -230,7 +230,7 @@ export class SuccessHandler {
    * Log success for debugging (in development)
    */
   static logSuccess(message: string, data?: unknown): void {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.APP_ENV === 'development') {
       console.log(`✅ ${message}`, data)
     }
   }
