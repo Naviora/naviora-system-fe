@@ -168,6 +168,7 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           port: ${{ secrets.VPS_PORT }}
           script: |
+            docker system prune -a
             docker pull ${{ env.PROD_IMAGE_NAME }}:latest
             cd naviora-prod
             docker compose up -d
@@ -218,6 +219,7 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           port: ${{ secrets.VPS_PORT }}
           script: |
+            docker system prune -a
             docker pull ${{ env.NON_PROD_IMAGE_NAME }}:${{ env.TAG_FE }}
             cd be-non-prod
             TAG_FE=${{ env.TAG_FE }} docker compose up -d
