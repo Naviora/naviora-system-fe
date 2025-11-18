@@ -55,8 +55,8 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-EXPOSE 3000
-ENV PORT 3000
+EXPOSE 3001
+ENV PORT 3001
 
 # Start the development server
 CMD ["npm", "run", "dev"]
