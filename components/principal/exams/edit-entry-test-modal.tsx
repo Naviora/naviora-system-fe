@@ -71,8 +71,8 @@ export function EditEntryTestModal({ open, onOpenChange, entryTest, onSuccess }:
       title: formData.title,
       description: formData.description,
       status: formData.status as 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED',
-      start_time: new Date(formData.start_time).toISOString(),
-      end_time: new Date(formData.end_time).toISOString()
+      startTime: new Date(formData.start_time).toISOString(),
+      endTime: new Date(formData.end_time).toISOString()
     }
 
     updateMutation.mutate({

@@ -7,6 +7,7 @@ import type {
   ReviewedExercise
 } from '@/lib/validations/lecturer/exams/reviewed-exercise'
 import type { SearchRequest } from '@/types/api/common'
+import { camelToSnakeCase } from '@/lib/utils'
 
 export const useGetReviewedExercises = (params?: SearchRequest) => {
   return useQuery({
@@ -34,7 +35,10 @@ export const useGetReviewedExercise = (id: string) => {
 export const useCreateReviewedExercise = (lessonId?: string) => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: CreateReviewedExerciseRequest) => apiClient.post('/reviewed-exercise', data),
+    mutationFn: (data: CreateReviewedExerciseRequest) => {
+      const snakeCaseData = camelToSnakeCase(data as unknown as Record<string, unknown>)
+      return apiClient.post('/reviewed-exercise', snakeCaseData)
+    },
     onSuccess: () => {
       // Invalidate reviewed exercises queries
       queryClient.invalidateQueries({ queryKey: ['reviewed-exercises'] })
@@ -51,8 +55,10 @@ export const useCreateReviewedExercise = (lessonId?: string) => {
 export const useUpdateReviewedExercise = (lessonId?: string) => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<CreateReviewedExerciseRequest> }) =>
-      apiClient.patch(`/reviewed-exercise/${id}`, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateReviewedExerciseRequest> }) => {
+      const snakeCaseData = camelToSnakeCase(data as unknown as Record<string, unknown>)
+      return apiClient.patch(`/reviewed-exercise/${id}`, snakeCaseData)
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reviewed-exercises'] })
       // Invalidate lesson detail to refetch exercises

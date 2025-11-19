@@ -133,3 +133,17 @@ export function getExamCountdownState(
     label: 'Đã kết thúc'
   }
 }
+
+/**
+ * Convert camelCase object keys to snake_case
+ */
+export function camelToSnakeCase(obj: Record<string, unknown>): Record<string, unknown> {
+  const snakeCase: Record<string, unknown> = {}
+
+  for (const [key, value] of Object.entries(obj)) {
+    const snakeKey = key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)
+    snakeCase[snakeKey] = value
+  }
+
+  return snakeCase
+}

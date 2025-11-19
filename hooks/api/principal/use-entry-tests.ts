@@ -2,6 +2,7 @@ import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
 import { axios_instance } from '@/lib/api/client'
 import { QUERY_KEYS } from '@/lib/constants/config'
 import { useMutation, type UseMutationOptions } from '@tanstack/react-query'
+import { camelToSnakeCase } from '@/lib/utils'
 
 export interface CreatedByUser {
   id: string
@@ -252,8 +253,8 @@ export interface UpdateEntryTestPayload {
   title: string
   description: string
   status: 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED'
-  start_time: string
-  end_time: string
+  startTime: string
+  endTime: string
 }
 
 export interface UpdateEntryTestResponse {
@@ -267,7 +268,11 @@ export function useUpdateEntryTest(
 ) {
   return useMutation<UpdateEntryTestResponse, Error, { id: string; payload: UpdateEntryTestPayload }>({
     mutationFn: async ({ id, payload }) => {
-      const response = await axios_instance.patch<UpdateEntryTestResponse>(`${ENTRY_TEST_API_ENDPOINT}/${id}`, payload)
+      const snakeCasePayload = camelToSnakeCase(payload as unknown as Record<string, unknown>)
+      const response = await axios_instance.patch<UpdateEntryTestResponse>(
+        `${ENTRY_TEST_API_ENDPOINT}/${id}`,
+        snakeCasePayload
+      )
       return response.data
     },
     ...options

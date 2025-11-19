@@ -36,6 +36,19 @@ export function EditFinalExamModal({ open, onOpenChange, finalExam, onSuccess }:
     end_time: format(new Date(finalExam.end_time), "yyyy-MM-dd'T'HH:mm")
   })
 
+  // Reset form data khi modal mở hoặc finalExam thay đổi
+  React.useEffect(() => {
+    if (open && finalExam) {
+      setFormData({
+        title: finalExam.title,
+        description: finalExam.description,
+        status: finalExam.status,
+        start_time: format(new Date(finalExam.start_time), "yyyy-MM-dd'T'HH:mm"),
+        end_time: format(new Date(finalExam.end_time), "yyyy-MM-dd'T'HH:mm")
+      })
+    }
+  }, [open, finalExam])
+
   const updateMutation = useUpdateFinalExam({
     onSuccess: () => {
       toast.success('Bài thi đã được cập nhật thành công', {
@@ -78,8 +91,8 @@ export function EditFinalExamModal({ open, onOpenChange, finalExam, onSuccess }:
         title: formData.title,
         description: formData.description,
         status: formData.status as 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED',
-        start_time: startTime.toISOString(),
-        end_time: endTime.toISOString()
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString()
       }
     })
   }
