@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api/client'
 import type { SearchRequest } from '@/types/api/common'
 import { CreateFinalExamRequest, GetFinalExamsResponse } from '@/lib/validations/lecturer/exams/final-exam'
-import { camelToSnakeCase } from '@/lib/utils'
 
 export const useGetFinalExams = (params?: SearchRequest) => {
   return useQuery({
@@ -14,10 +13,7 @@ export const useGetFinalExams = (params?: SearchRequest) => {
 export const useCreateFinalExam = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: CreateFinalExamRequest) => {
-      const snakeCaseData = camelToSnakeCase(data as unknown as Record<string, unknown>)
-      return apiClient.post('/final-exam', snakeCaseData)
-    },
+    mutationFn: (data: CreateFinalExamRequest) => apiClient.post('/final-exam', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['final-exams'] })
     }
@@ -27,10 +23,8 @@ export const useCreateFinalExam = () => {
 export const useUpdateFinalExam = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ finalExamId, data }: { finalExamId: string; data: Partial<CreateFinalExamRequest> }) => {
-      const snakeCaseData = camelToSnakeCase(data as unknown as Record<string, unknown>)
-      return apiClient.patch(`/final-exam/${finalExamId}`, snakeCaseData)
-    },
+    mutationFn: ({ finalExamId, data }: { finalExamId: string; data: Partial<CreateFinalExamRequest> }) =>
+      apiClient.patch(`/final-exam/${finalExamId}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['final-exams'] })
     }

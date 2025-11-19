@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { ExamQuestionCard } from '@/components/exam-test/exam-question-card'
 import { ExamQuestionSidebar } from '@/components/exam-test/exam-question-sidebar'
 import { ExamTestHeader } from '@/components/exam-test/exam-test-header'
@@ -46,6 +46,7 @@ export function ManageFinalExam({ finalExamId, examTitle = 'Bài thi cuối kỳ
   const [initializationError, setInitializationError] = useState<string | null>(null)
   const [questions, setQuestions] = useState<Question[]>([])
   const endTimestampRef = useRef<number | null>(null)
+  const submissionInProgressRef = useRef(false)
 
   const startMutation = useStartFinalExam({ retry: 0 })
   const submitMutation = useSubmitFinalExam()
@@ -197,13 +198,22 @@ export function ManageFinalExam({ finalExamId, examTitle = 'Bài thi cuối kỳ
 
   const totalQuestions = questions.length
   const answeredCount = Object.keys(selected).length
-  const countdownEnabled = isLoaded && initialSeconds !== null && !isSubmitted && !submitMutation.isPending
-  const { secondsLeft, formatTime } = useCountdown(initialSeconds ?? 10 * 60, handleSubmit, {
+  
+  // Initialize countdown first to get secondsLeft
+  const [countdownRef] = useState<{ handleSubmit?: () => void }>({})
+  
+  // Temporary countdown without handleSubmit first
+  const countdownEnabled = isLoaded && initialSeconds !== null && !isSubmitted && !submitMutation.isPending && !submissionInProgressRef.current
+  const { secondsLeft, formatTime } = useCountdown(initialSeconds ?? 10 * 60, () => {
+    countdownRef.handleSubmit?.()
+  }, {
     enabled: countdownEnabled
   })
+  
+  const handleSubmit = useCallback(() => {
+    if (!questionSetId || !finalExamId || submitMutation.isPending || isSubmitted || submissionInProgressRef.current) return
 
-  function handleSubmit() {
-    if (!questionSetId || !finalExamId || submitMutation.isPending || isSubmitted) return
+    submissionInProgressRef.current = true
 
     const answered = Object.entries(selected)
       .map(([key, idx]) => {
@@ -234,12 +244,17 @@ export function ManageFinalExam({ finalExamId, examTitle = 'Bài thi cuối kỳ
           }
         },
         onError: (error) => {
+          submissionInProgressRef.current = false
           const message = error instanceof Error ? error.message : 'Nộp bài thi cuối kỳ thất bại. Vui lòng thử lại.'
           toast.error(message)
         }
       }
     )
-  }
+  }, [questionSetId, finalExamId, selected, questions, submitMutation, isSubmitted, onShowResult, router, queryClient, initialSeconds, secondsLeft])
+
+  useEffect(() => {
+    countdownRef.handleSubmit = handleSubmit
+  }, [handleSubmit, countdownRef])
 
   if (initializationError) {
     return (

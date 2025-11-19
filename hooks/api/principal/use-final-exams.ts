@@ -2,7 +2,6 @@ import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
 import { axios_instance } from '@/lib/api/client'
 import { QUERY_KEYS } from '@/lib/constants/config'
 import { useMutation, type UseMutationOptions } from '@tanstack/react-query'
-import { camelToSnakeCase } from '@/lib/utils'
 
 export interface CreatedByUser {
   id: string
@@ -268,11 +267,7 @@ export function useUpdateFinalExam(
 ) {
   return useMutation<UpdateFinalExamResponse, Error, { id: string; payload: UpdateFinalExamPayload }>({
     mutationFn: async ({ id, payload }) => {
-      const snakeCasePayload = camelToSnakeCase(payload as unknown as Record<string, unknown>)
-      const response = await axios_instance.patch<UpdateFinalExamResponse>(
-        `${FINAL_EXAM_API_ENDPOINT}/${id}`,
-        snakeCasePayload
-      )
+      const response = await axios_instance.patch<UpdateFinalExamResponse>(`${FINAL_EXAM_API_ENDPOINT}/${id}`, payload)
       return response.data
     },
     ...options

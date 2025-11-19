@@ -9,7 +9,6 @@ import type {
   SubmitEntryTestResponse
 } from '@/lib/validations/lecturer/exams/entry-test'
 import type { SearchRequest } from '@/types/api/common'
-import { camelToSnakeCase } from '@/lib/utils'
 
 export const useGetEntryTests = (params?: SearchRequest) => {
   return useQuery({
@@ -46,10 +45,7 @@ export const useSubmitEntryTest = () => {
 export const useCreateEntryTest = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: CreateEntryTestRequest) => {
-      const snakeCaseData = camelToSnakeCase(data as unknown as Record<string, unknown>)
-      return apiClient.post('/entry-test', snakeCaseData)
-    },
+    mutationFn: (data: CreateEntryTestRequest) => apiClient.post('/entry-test', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['entry-tests'] })
     }
@@ -69,10 +65,8 @@ export const useStartEntryTest = () => {
 export const useUpdateEntryTest = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ entryTestId, data }: { entryTestId: string; data: Partial<CreateEntryTestRequest> }) => {
-      const snakeCaseData = camelToSnakeCase(data as unknown as Record<string, unknown>)
-      return apiClient.patch(`/entry-test/${entryTestId}`, snakeCaseData)
-    },
+    mutationFn: ({ entryTestId, data }: { entryTestId: string; data: Partial<CreateEntryTestRequest> }) =>
+      apiClient.patch(`/entry-test/${entryTestId}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['entry-tests'] })
     }
