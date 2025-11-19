@@ -5,7 +5,6 @@ import { AlertCircle, ArrowLeft, Clock, FileText, ShieldCheck } from 'lucide-rea
 import { useRouter } from 'next/navigation'
 import {
   type StudentFinalExamDetailResponse,
-  type StudentFinalExamDto,
   useStudentFinalExamDetail
 } from '@/hooks/api/student/use-final-exams'
 import { Button } from '@/components/ui/button'
@@ -27,8 +26,6 @@ interface StudentFinalExamDetailPageClientProps {
   finalExamId: string
 }
 
-type QuestionSet = StudentFinalExamDto['question_sets'] extends Array<infer Q> ? Q : never
-
 function CountdownSegment({ label, value }: { label: string; value: number }) {
   return (
     <div className='flex flex-col items-center rounded-lg border border-greyscale-100 bg-greyscale-0 px-4 py-2 text-center'>
@@ -43,28 +40,6 @@ function InfoItem({ label, value }: { label: string; value: string }) {
     <div>
       <p className='text-xs font-semibold uppercase tracking-wide text-greyscale-500'>{label}</p>
       <p className='mt-1 text-sm font-semibold text-greyscale-900'>{value}</p>
-    </div>
-  )
-}
-
-function QuestionSetCard({ questionSet }: { questionSet: QuestionSet }) {
-  if (typeof questionSet === 'string') {
-    return (
-      <div className='rounded-lg border border-dashed border-greyscale-200 bg-greyscale-25 p-4'>
-        <p className='text-sm font-medium text-greyscale-800'>Bộ câu hỏi #{questionSet}</p>
-        <p className='text-xs text-greyscale-500'>Chi tiết sẽ được cung cấp khi bắt đầu bài thi.</p>
-      </div>
-    )
-  }
-
-  return (
-    <div className='rounded-lg border border-greyscale-100 bg-greyscale-0 p-4 shadow-xs'>
-      <p className='text-sm font-semibold text-greyscale-900'>{questionSet.title}</p>
-      <p className='text-xs text-greyscale-500'>{questionSet.description}</p>
-      <div className='mt-3 flex flex-wrap gap-4 text-xs text-greyscale-600'>
-        <span>{questionSet.total_questions} câu hỏi</span>
-        <span>{questionSet.duration_minutes} phút</span>
-      </div>
     </div>
   )
 }
@@ -150,7 +125,6 @@ export function StudentFinalExamDetailPageClient({ finalExamId }: StudentFinalEx
     router.push(`/student/final-exams/${finalExamId}/play`)
   }
 
-  const questionSets = (exam?.question_sets ?? []) as QuestionSet[]
   const statusBadge = exam ? (STATUS_BADGES[exam.status] ?? STATUS_BADGES.DRAFT) : null
   const durationLabel = exam
     ? formatDurationShort(
@@ -260,7 +234,6 @@ export function StudentFinalExamDetailPageClient({ finalExamId }: StudentFinalEx
               <InfoItem label='Bắt đầu' value={formatDateTime(exam.start_time)} />
               <InfoItem label='Kết thúc' value={formatDateTime(exam.end_time)} />
               <InfoItem label='Thời lượng' value={durationLabel || 'Đang cập nhật'} />
-              <InfoItem label='Số bộ câu hỏi' value={String(questionSets.length)} />
             </CardContent>
           </Card>
         </div>
@@ -273,22 +246,7 @@ export function StudentFinalExamDetailPageClient({ finalExamId }: StudentFinalEx
         </div>
       </section>
 
-      <section className='grid gap-4 lg:grid-cols-[2fr,1fr]'>
-        <Card>
-          <CardHeader>
-            <CardTitle>Các bộ câu hỏi</CardTitle>
-            <CardDescription>Mỗi bộ câu hỏi sẽ được gán cho thí sinh khi bài thi bắt đầu.</CardDescription>
-          </CardHeader>
-          <CardContent className='space-y-3'>
-            {questionSets.length > 0 ? (
-              questionSets.map((questionSet, index) => <QuestionSetCard key={index} questionSet={questionSet} />)
-            ) : (
-              <p className='text-sm text-greyscale-500'>Bộ câu hỏi đang được cập nhật.</p>
-            )}
-          </CardContent>
-        </Card>
-
-        <div className='space-y-4'>
+      <div className='space-y-4'>
           <Card>
             <CardHeader>
               <CardTitle>Hướng dẫn ôn tập</CardTitle>
@@ -337,7 +295,6 @@ export function StudentFinalExamDetailPageClient({ finalExamId }: StudentFinalEx
             </CardContent>
           </Card>
         </div>
-      </section>
     </div>
   )
 }
