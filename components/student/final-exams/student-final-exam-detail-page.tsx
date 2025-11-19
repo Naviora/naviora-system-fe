@@ -3,10 +3,7 @@
 import { useEffect, useMemo } from 'react'
 import { AlertCircle, ArrowLeft, Clock, FileText, ShieldCheck } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import {
-  type StudentFinalExamDetailResponse,
-  useStudentFinalExamDetail
-} from '@/hooks/api/student/use-final-exams'
+import { type StudentFinalExamDetailResponse, useStudentFinalExamDetail } from '@/hooks/api/student/use-final-exams'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -175,14 +172,6 @@ export function StudentFinalExamDetailPageClient({ finalExamId }: StudentFinalEx
   return (
     <div className='space-y-6 px-4 pb-10 pt-4 sm:px-6 lg:px-8'>
       <div className='flex flex-wrap items-center justify-between gap-3'>
-        <Button
-          variant='ghost'
-          size='sm'
-          className='text-greyscale-600'
-          onClick={() => router.push('/student/final-exams')}
-        >
-          <ArrowLeft className='mr-2 size-4' /> Quay lại danh sách
-        </Button>
         <div className='flex flex-wrap items-center gap-2'>
           {statusBadge ? (
             <span className={`rounded-full px-3 py-0.5 text-xs font-semibold ${statusBadge.className}`}>
@@ -199,7 +188,6 @@ export function StudentFinalExamDetailPageClient({ finalExamId }: StudentFinalEx
 
       <section className='rounded-xl border border-greyscale-100 bg-greyscale-0 p-6 shadow-sm'>
         <div className='space-y-2'>
-          <p className='text-sm font-semibold text-primary'>Final Exam #{exam.final_exam_id}</p>
           <h1 className='text-3xl font-semibold text-greyscale-900'>{exam.title}</h1>
           <p className='text-sm text-greyscale-600'>{exam.description}</p>
         </div>
@@ -247,54 +235,54 @@ export function StudentFinalExamDetailPageClient({ finalExamId }: StudentFinalEx
       </section>
 
       <div className='space-y-4'>
-          <Card>
-            <CardHeader>
-              <CardTitle>Hướng dẫn ôn tập</CardTitle>
-              <CardDescription>Để hoàn thành bài thi tốt nhất, hãy đảm bảo:</CardDescription>
-            </CardHeader>
-            <CardContent className='space-y-3 text-sm text-greyscale-600'>
-              <p className='flex items-start gap-2'>
-                <ShieldCheck className='mt-0.5 size-4 text-green-600' />
-                Kết nối mạng ổn định và tránh làm mới trang khi đang thi.
-              </p>
-              <p className='flex items-start gap-2'>
-                <FileText className='mt-0.5 size-4 text-blue-600' />
-                Chuẩn bị giấy nháp, máy tính và các tài liệu được cho phép.
-              </p>
-              <p className='flex items-start gap-2'>
-                <Clock className='mt-0.5 size-4 text-amber-600' />
-                Canh thời gian hợp lý, tính toán thời gian cho từng câu hỏi.
-              </p>
-            </CardContent>
-          </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Hướng dẫn ôn tập</CardTitle>
+            <CardDescription>Để hoàn thành bài thi tốt nhất, hãy đảm bảo:</CardDescription>
+          </CardHeader>
+          <CardContent className='space-y-3 text-sm text-greyscale-600'>
+            <p className='flex items-start gap-2'>
+              <ShieldCheck className='mt-0.5 size-4 text-green-600' />
+              Kết nối mạng ổn định và tránh làm mới trang khi đang thi.
+            </p>
+            <p className='flex items-start gap-2'>
+              <FileText className='mt-0.5 size-4 text-blue-600' />
+              Chuẩn bị giấy nháp, máy tính và các tài liệu được cho phép.
+            </p>
+            <p className='flex items-start gap-2'>
+              <Clock className='mt-0.5 size-4 text-amber-600' />
+              Canh thời gian hợp lý, tính toán thời gian cho từng câu hỏi.
+            </p>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Lộ trình bài thi</CardTitle>
-              <CardDescription>Tham khảo các mốc thời gian quan trọng.</CardDescription>
-            </CardHeader>
-            <CardContent className='space-y-3 text-sm text-greyscale-600'>
-              <div>
-                <p className='font-semibold text-greyscale-900'>1. Chuẩn bị</p>
-                <p className='text-xs text-greyscale-500'>Kiểm tra tài khoản, thiết bị và đề cương ôn tập.</p>
-              </div>
-              <div>
-                <p className='font-semibold text-greyscale-900'>2. Đếm ngược mở đề</p>
-                <p className='text-xs text-greyscale-500'>Quay lại phòng thi khi đếm ngược kết thúc.</p>
-              </div>
-              <div>
-                <p className='font-semibold text-greyscale-900'>3. Làm bài</p>
-                <p className='text-xs text-greyscale-500'>
-                  Giữ tập trung, đánh dấu câu cần xem lại giống luồng reviewed-exercise.
-                </p>
-              </div>
-              <div>
-                <p className='font-semibold text-greyscale-900'>4. Nộp bài & xem kết quả</p>
-                <p className='text-xs text-greyscale-500'>Chờ thông báo từ hệ thống hoặc giáo viên phụ trách.</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Lộ trình bài thi</CardTitle>
+            <CardDescription>Tham khảo các mốc thời gian quan trọng.</CardDescription>
+          </CardHeader>
+          <CardContent className='space-y-3 text-sm text-greyscale-600'>
+            <div>
+              <p className='font-semibold text-greyscale-900'>1. Chuẩn bị</p>
+              <p className='text-xs text-greyscale-500'>Kiểm tra tài khoản, thiết bị và đề cương ôn tập.</p>
+            </div>
+            <div>
+              <p className='font-semibold text-greyscale-900'>2. Đếm ngược mở đề</p>
+              <p className='text-xs text-greyscale-500'>Quay lại phòng thi khi đếm ngược kết thúc.</p>
+            </div>
+            <div>
+              <p className='font-semibold text-greyscale-900'>3. Làm bài</p>
+              <p className='text-xs text-greyscale-500'>
+                Giữ tập trung, đánh dấu câu cần xem lại giống luồng reviewed-exercise.
+              </p>
+            </div>
+            <div>
+              <p className='font-semibold text-greyscale-900'>4. Nộp bài & xem kết quả</p>
+              <p className='text-xs text-greyscale-500'>Chờ thông báo từ hệ thống hoặc giáo viên phụ trách.</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

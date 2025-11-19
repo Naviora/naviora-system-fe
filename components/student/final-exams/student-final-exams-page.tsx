@@ -118,7 +118,6 @@ export function StudentFinalExamsPageClient() {
     <div className='flex flex-col-reverse gap-6 px-4 pb-10 pt-4 sm:px-6 lg:flex-row lg:px-8'>
       <div className='flex-1 space-y-6'>
         <header className='space-y-2'>
-          <p className='text-sm font-semibold text-primary'>Final Exam Center</p>
           <div>
             <h1 className='text-2xl font-semibold text-greyscale-900 sm:text-3xl'>Danh sách bài thi cuối kỳ</h1>
             <p className='text-sm text-greyscale-500'>
