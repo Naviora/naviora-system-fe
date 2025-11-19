@@ -177,8 +177,8 @@ export default function LessonPage() {
 
   // Debug log
   useEffect(() => {
-    console.log('API Lesson Data:', apiLesson?.data)
-  }, [apiLesson?.data])
+    console.log('Full apiLesson object:', apiLesson)
+  }, [apiLesson])
 
   if (isLoading) {
     return (
@@ -191,7 +191,8 @@ export default function LessonPage() {
   }
 
   // Check if lesson data exists
-  if (!apiLesson?.data) {
+  const lessonData = apiLesson?.data as unknown as { data?: Record<string, unknown> } | undefined
+  if (!lessonData?.data) {
     return (
       <div className='flex flex-col h-full items-center justify-center p-8'>
         <div className='text-center'>
@@ -207,7 +208,7 @@ export default function LessonPage() {
     )
   }
 
-  const lesson = transformLessonResponse(apiLesson.data as Record<string, unknown>)
+  const lesson = transformLessonResponse(lessonData.data)
 
   // Merge enriched exercises with lesson data
   const lessonWithEnrichedExercises = {

@@ -79,7 +79,7 @@ export const useLessonDetail = (
     queryKey: QUERY_KEYS.LESSON_DETAIL(lessonId || 'unknown'),
     queryFn: () => getLessonDetailRequest(lessonId || ''),
     enabled: !!lessonId,
-    staleTime: 60 * 1000, // 60 seconds
+    staleTime: 0, // Always consider data as stale to force fresh data
     gcTime: 5 * 60 * 1000, // 5 minutes (formerly cacheTime)
     ...options
   })
