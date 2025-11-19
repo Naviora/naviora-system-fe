@@ -198,20 +198,26 @@ export function ManageFinalExam({ finalExamId, examTitle = 'Bài thi cuối kỳ
 
   const totalQuestions = questions.length
   const answeredCount = Object.keys(selected).length
-  
+
   // Initialize countdown first to get secondsLeft
   const [countdownRef] = useState<{ handleSubmit?: () => void }>({})
-  
+
   // Temporary countdown without handleSubmit first
-  const countdownEnabled = isLoaded && initialSeconds !== null && !isSubmitted && !submitMutation.isPending && !submissionInProgressRef.current
-  const { secondsLeft, formatTime } = useCountdown(initialSeconds ?? 10 * 60, () => {
-    countdownRef.handleSubmit?.()
-  }, {
-    enabled: countdownEnabled
-  })
-  
+  const countdownEnabled =
+    isLoaded && initialSeconds !== null && !isSubmitted && !submitMutation.isPending && !submissionInProgressRef.current
+  const { secondsLeft, formatTime } = useCountdown(
+    initialSeconds ?? 10 * 60,
+    () => {
+      countdownRef.handleSubmit?.()
+    },
+    {
+      enabled: countdownEnabled
+    }
+  )
+
   const handleSubmit = useCallback(() => {
-    if (!questionSetId || !finalExamId || submitMutation.isPending || isSubmitted || submissionInProgressRef.current) return
+    if (!questionSetId || !finalExamId || submitMutation.isPending || isSubmitted || submissionInProgressRef.current)
+      return
 
     submissionInProgressRef.current = true
 
@@ -250,7 +256,19 @@ export function ManageFinalExam({ finalExamId, examTitle = 'Bài thi cuối kỳ
         }
       }
     )
-  }, [questionSetId, finalExamId, selected, questions, submitMutation, isSubmitted, onShowResult, router, queryClient, initialSeconds, secondsLeft])
+  }, [
+    questionSetId,
+    finalExamId,
+    selected,
+    questions,
+    submitMutation,
+    isSubmitted,
+    onShowResult,
+    router,
+    queryClient,
+    initialSeconds,
+    secondsLeft
+  ])
 
   useEffect(() => {
     countdownRef.handleSubmit = handleSubmit
