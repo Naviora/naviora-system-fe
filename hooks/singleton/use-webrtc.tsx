@@ -1,6 +1,24 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { io, Socket } from 'socket.io-client'
 
+const envIceServerUrls =
+  process.env.NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_URLS?.split(',')
+    .map((url) => url.trim())
+    .filter(Boolean) ?? null
+
+const managedEnvIceServer =
+  envIceServerUrls && envIceServerUrls.length > 0
+    ? ({
+        urls: envIceServerUrls,
+        ...(process.env.NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_USERNAME
+          ? { username: process.env.NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_USERNAME }
+          : {}),
+        ...(process.env.NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_CREDENTIAL
+          ? { credential: process.env.NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_CREDENTIAL }
+          : {})
+      } satisfies RTCIceServer)
+    : null
+
 type PeerId = string
 
 type UseWebRTCOptions = {
@@ -50,21 +68,34 @@ export function useWebRTC(roomId: string, userId: string, options: UseWebRTCOpti
         {
           urls: 'stun:stun.relay.metered.ca:80'
         },
-        {
-          urls: 'turn:sg.relay.metered.ca:80',
-          username: 'ce7e305ee5978a6e226b86c8',
-          credential: 'hWphRx79NhBy3EXy'
-        },
-        {
-          urls: 'turn:sg.relay.metered.ca:80?transport=tcp',
-          username: 'ce7e305ee5978a6e226b86c8',
-          credential: 'hWphRx79NhBy3EXy'
-        },
-        {
-          urls: 'turn:sg.relay.metered.ca:443',
-          username: 'ce7e305ee5978a6e226b86c8',
-          credential: 'hWphRx79NhBy3EXy'
-        },
+        // {
+        //   urls: 'turn:sg.relay.metered.ca:80',
+        //   username: 'ce7e305ee5978a6e226b86c8',
+        //   credential: 'hWphRx79NhBy3EXy'
+        // },
+        // {
+        //   urls: 'turn:sg.relay.metered.ca:80?transport=tcp',
+        //   username: 'ce7e305ee5978a6e226b86c8',
+        //   credential: 'hWphRx79NhBy3EXy'
+        // },
+        // {
+        //   urls: 'turn:sg.relay.metered.ca:443',
+        //   username: 'ce7e305ee5978a6e226b86c8',
+        //   credential: 'hWphRx79NhBy3EXy'
+        // },
+        ...(managedEnvIceServer
+          ? [managedEnvIceServer]
+          : [
+              {
+                urls: [
+                  'stun:103.200.20.196:3478',
+                  'turn:103.200.20.196:3478?transport=udp',
+                  'turn:103.200.20.196:3478?transport=tcp'
+                ],
+                username: 'naviora',
+                credential: 'strongturnpassword123'
+              }
+            ]),
         {
           urls: 'turns:sg.relay.metered.ca:443?transport=tcp',
           username: 'ce7e305ee5978a6e226b86c8',
@@ -147,7 +178,21 @@ export function useWebRTC(roomId: string, userId: string, options: UseWebRTCOpti
       }
 
       pc.oniceconnectionstatechange = () => {
-        console.log(`🧊 ICE connection state with ${peerUserId}:`, pc.iceConnectionState)
+        const state = pc.iceConnectionState
+        console.log(`🧊 ICE connection state with ${peerUserId}:`, state)
+
+        // Log warnings for failed connections
+        if (state === 'failed') {
+          console.error(`❌ ICE connection failed with ${peerUserId}. This might be due to network issues or firewall.`)
+        } else if (state === 'disconnected') {
+          console.warn(`⚠️ ICE connection disconnected with ${peerUserId}`)
+        } else if (state === 'connected') {
+          console.log(`✅ ICE connection established with ${peerUserId}`)
+        }
+      }
+
+      pc.onicegatheringstatechange = () => {
+        console.log(`🧊 ICE gathering state with ${peerUserId}:`, pc.iceGatheringState)
       }
 
       pcRef.current.set(peerUserId, pc)
@@ -174,11 +219,18 @@ export function useWebRTC(roomId: string, userId: string, options: UseWebRTCOpti
 
   const startLocalMedia = useCallback(async (constraints: MediaStreamConstraints = { audio: true, video: true }) => {
     console.log('🎥 Requesting local media with constraints:', constraints)
-    const stream = await navigator.mediaDevices.getUserMedia(constraints)
-    console.log('🎥 Local media obtained:', stream)
-    console.log('🎥 Local stream tracks:', stream.getTracks())
-    localStreamRef.current = stream
-    return stream
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia(constraints)
+      console.log('🎥 Local media obtained:', stream)
+      console.log('🎥 Local stream tracks:', stream.getTracks())
+      localStreamRef.current = stream
+      return stream
+    } catch (error) {
+      console.error('❌ Error getting user media:', error)
+      // Re-throw to let the caller handle it
+      throw error
+    }
   }, [])
 
   const startCallWith = useCallback(
@@ -273,12 +325,26 @@ export function useWebRTC(roomId: string, userId: string, options: UseWebRTCOpti
     }
     const onUserJoined = async (payload: { userId: string; socketId: string }) => {
       console.log('👋 New user joined:', payload)
-      setConnectedPeers((prev) => (prev.includes(payload.userId) ? prev : [...prev, payload.userId]))
+      setConnectedPeers((prev) => {
+        if (prev.includes(payload.userId)) {
+          console.log(`ℹ️ User ${payload.userId} already in connected peers list`)
+          return prev
+        }
+        return [...prev, payload.userId]
+      })
 
       // Auto-start call if we have local media
+      // Add small delay to avoid race condition when both users join simultaneously
       if (localStreamRef.current) {
         console.log(`📞 Auto-calling new user: ${payload.userId}`)
-        await startCallWith(payload.userId)
+        // Small delay to ensure peer connection is ready
+        setTimeout(async () => {
+          try {
+            await startCallWith(payload.userId)
+          } catch (error) {
+            console.error(`❌ Error auto-calling ${payload.userId}:`, error)
+          }
+        }, 100)
       } else {
         console.log(`⏳ Waiting for local media to call ${payload.userId}`)
       }

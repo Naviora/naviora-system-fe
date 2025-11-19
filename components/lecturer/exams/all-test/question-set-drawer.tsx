@@ -22,11 +22,11 @@ export default function QuestionSetDrawer({
   const [searchValue, setSearchValue] = useState<string | null>(null)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
 
-  const params: SearchRequest = { limit: 100, page: 1 }
+  const params: SearchRequest = { limit: 100, page: 1, isInUse: false }
   if (searchValue && searchValue.trim() !== '') params.q = searchValue
 
   const { data, isLoading } = useGetQuestionSets(params)
-  const sets = data?.question_sets || data?.question_sets || []
+  const sets = data?.question_sets || []
 
   const handleToggle = (id: string) => {
     setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))

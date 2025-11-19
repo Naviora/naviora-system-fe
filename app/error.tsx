@@ -45,7 +45,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
         </motion.div>
 
         {/* Error Details (Development Only) */}
-        {process.env.NODE_ENV === 'development' && (
+        {process.env.APP_ENV === 'development' && (
           <motion.div
             className='bg-error-0 border border-error-50 rounded-lg p-4 text-left'
             initial={{ opacity: 0, height: 0 }}

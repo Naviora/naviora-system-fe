@@ -78,7 +78,7 @@ function DefaultErrorFallback({ error, onReset }: DefaultErrorFallbackProps) {
           </p>
 
           {/* Error Message in Development */}
-          {process.env.NODE_ENV === 'development' && error && (
+          {process.env.APP_ENV === 'development' && error && (
             <motion.div
               className='bg-error-0 border border-error-50 rounded-lg p-3 text-left mt-4'
               initial={{ opacity: 0 }}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Mic, MicOff, Video, VideoOff, Monitor, MonitorOff, Hand, Square } from 'lucide-react'
+import { Mic, MicOff, Video, VideoOff, Monitor, MonitorOff, Hand, Square, PhoneOff } from 'lucide-react'
 
 interface Props {
   roomId: string
@@ -18,6 +18,7 @@ interface Props {
   isVideoEnabled: boolean
   onToggleAudio: () => void
   onToggleVideo: () => void
+  onLeave: () => void
 }
 
 export default function MeetingControls({
@@ -34,7 +35,8 @@ export default function MeetingControls({
   isAudioEnabled,
   isVideoEnabled,
   onToggleAudio,
-  onToggleVideo
+  onToggleVideo,
+  onLeave
 }: Props) {
   const [raisedHands, setRaisedHands] = useState<string[]>([])
 
@@ -179,6 +181,15 @@ export default function MeetingControls({
               title={isRecording ? 'Stop Recording' : 'Start Recording'}
             >
               <Square className='size-4 fill-white' />
+            </Button>
+
+            {/* Leave Call Button */}
+            <Button
+              onClick={onLeave}
+              className='rounded-full size-12 bg-red-600 hover:bg-red-700 text-white transition-all'
+              title='End Call'
+            >
+              <PhoneOff className='size-5' />
             </Button>
           </div>
         </Card>

@@ -14,7 +14,7 @@ interface LogContext {
 }
 
 class Logger {
-  private isDevelopment = process.env.NODE_ENV === 'development'
+  private isDevelopment = process.env.APP_ENV === 'development'
   private isClient = typeof window !== 'undefined'
 
   /**

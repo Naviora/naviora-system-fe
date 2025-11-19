@@ -95,6 +95,13 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           target: production
+          build-args: |
+            NEXT_PUBLIC_API_URL=https://naviora-api.cookie-candy.id.vn/api/v1
+            NEXT_PUBLIC_SIGNALING_URL=https://naviora-api.cookie-candy.id.vn
+            NEXT_PUBLIC_TINYMCE_API_KEY=sq92x7sj6jmc1kmnbsu2lon6r99c12l1rozj95leg50nuksr
+            NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_URLS=stun:103.200.20.196:3479,turn:103.200.20.196:3478?transport=udp,turn:103.200.20.196:3478?transport=tcp
+            NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_USERNAME=naviora
+            NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_CREDENTIAL=strongturnpassword123
 
   # Non-Production Docker Build and Push Job (runs on all other branches)
   docker-build-dev:
@@ -137,6 +144,13 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           target: development
+          build-args: |
+            NEXT_PUBLIC_API_URL=https://naviora-non-prod-api.cookie-candy.id.vn/api/v1
+            NEXT_PUBLIC_SIGNALING_URL=https://naviora-non-prod-api.cookie-candy.id.vn
+            NEXT_PUBLIC_TINYMCE_API_KEY=sq92x7sj6jmc1kmnbsu2lon6r99c12l1rozj95leg50nuksr
+            NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_URLS=stun:103.200.20.196:3478,turn:103.200.20.196:3478?transport=udp,turn:103.200.20.196:3478?transport=tcp
+            NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_USERNAME=naviora
+            NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_CREDENTIAL=strongturnpassword123
 
   # Production Deployment Job
   deploy-prod:
@@ -154,8 +168,9 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           port: ${{ secrets.VPS_PORT }}
           script: |
+            docker system prune -a
             docker pull ${{ env.PROD_IMAGE_NAME }}:latest
-            cd naviora
+            cd naviora-prod
             docker compose up -d
 
   # Development Deployment Job
@@ -204,6 +219,7 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           port: ${{ secrets.VPS_PORT }}
           script: |
+            docker system prune -a
             docker pull ${{ env.NON_PROD_IMAGE_NAME }}:${{ env.TAG_FE }}
             cd be-non-prod
             TAG_FE=${{ env.TAG_FE }} docker compose up -d
