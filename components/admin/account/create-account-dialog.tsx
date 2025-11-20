@@ -46,9 +46,7 @@ export function CreateAccountDialog({ children, roleOptions, onSubmit, onImport 
 
   const importMutation = useImportAccounts({
     onSuccess: (data) => {
-      toast.success(
-        `Import thành công: ${data.success} tài khoản. ${data.failed > 0 ? `Thất bại: ${data.failed}` : ''}`
-      )
+      toast.success(`Import thành công`)
       if (data.errors && data.errors.length > 0) {
         const errorMessages = data.errors.map((e) => `Dòng ${e.row}: ${e.error}`).join('\n')
         toast.error(`Lỗi chi tiết:\n${errorMessages}`)
