@@ -6,7 +6,7 @@ import type { OnChangeFn, PaginationState } from '@tanstack/react-table'
 import { useQueryClient } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 import { CreateModuleForm } from '@/components/principal/modules/create-module-form'
 import { PrincipalModulesTable } from '@/components/principal/modules/principal-modules-table'
@@ -56,6 +56,7 @@ function useDebounce<T>(value: T, delay = 400) {
 export function PrincipalModulesPageClient() {
   const queryClient = useQueryClient()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -63,10 +64,26 @@ export function PrincipalModulesPageClient() {
   const [deletingModuleId, setDeletingModuleId] = useState<string | null>(null)
   const [modulePendingDeletion, setModulePendingDeletion] = useState<PrincipalModuleRow | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [prefilledClassId, setPrefilledClassId] = useState<string | null>(null)
   const [pagination, setPagination] = useState<PaginationState>(() => ({
     pageIndex: 0,
     pageSize: MODULE_QUERY_DEFAULTS.limit
   }))
+
+  React.useEffect(() => {
+    const classId = searchParams.get('classId')
+    if (!classId) {
+      return
+    }
+
+    setPrefilledClassId(classId)
+    setIsDialogOpen(true)
+
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete('classId')
+    const nextQuery = params.toString()
+    router.replace(nextQuery ? `/principal/modules?${nextQuery}` : '/principal/modules')
+  }, [router, searchParams])
 
   const debouncedSearch = useDebounce(searchTerm)
   const pageSizeOptions = useMemo(() => {
@@ -86,11 +103,18 @@ export function PrincipalModulesPageClient() {
   const modulesQuery = useModules(modulesQueryParams)
   const classesQuery = useClasses({ limit: 100 })
 
+  const handleCreateDialogChange = (open: boolean) => {
+    setIsDialogOpen(open)
+    if (!open) {
+      setPrefilledClassId(null)
+    }
+  }
+
   const createModuleMutation = useCreateModule({
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MODULES })
       toast.success('Tạo chuyên đề thành công')
-      setIsDialogOpen(false)
+      handleCreateDialogChange(false)
     },
     onError: (error) => {
       toast.error(ErrorHandler.getErrorMessage(error))
@@ -314,7 +338,7 @@ export function PrincipalModulesPageClient() {
 
       <section className='space-y-4'>{renderContent()}</section>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isDialogOpen} onOpenChange={handleCreateDialogChange}>
         <DialogContent className='max-w-xl'>
           <DialogHeader>
             <DialogTitle>Tạo chuyên đề mới</DialogTitle>
@@ -341,6 +365,7 @@ export function PrincipalModulesPageClient() {
               onSubmit={handleCreateModule}
               submitLabel='Tạo chuyên đề'
               pendingLabel='Đang tạo...'
+              defaultValues={prefilledClassId ? { class_id: prefilledClassId } : undefined}
             />
           )}
         </DialogContent>

@@ -74,7 +74,8 @@ export interface SearchRequest {
   page?: number
   limit?: number
   sortBy?: string
-  sortOrder?: 'asc' | 'desc'
+  isInUse?: boolean
+  sortOrder?: 'asc' | 'desc' | 'ASC' | 'DESC'
 }
 
 export interface SearchResponse<T> {

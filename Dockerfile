@@ -14,6 +14,22 @@ RUN npm ci --only=production && npm cache clean --force
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
+
+# Accept env vars before build (IMPORTANT)
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_SIGNALING_URL
+ARG NEXT_PUBLIC_TINYMCE_API_KEY
+ARG NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_URLS
+ARG NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_USERNAME
+ARG NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_CREDENTIAL
+
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_SIGNALING_URL=$NEXT_PUBLIC_SIGNALING_URL
+ENV NEXT_PUBLIC_TINYMCE_API_KEY=$NEXT_PUBLIC_TINYMCE_API_KEY
+ENV NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_URLS=$NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_URLS
+ENV NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_USERNAME=$NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_USERNAME
+ENV NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_CREDENTIAL=$NEXT_PUBLIC_WEBRTC_CUSTOM_ICE_CREDENTIAL
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
@@ -39,8 +55,8 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-EXPOSE 3000
-ENV PORT 3000
+EXPOSE 3001
+ENV PORT 3001
 
 # Start the development server
 CMD ["npm", "run", "dev"]
@@ -49,28 +65,20 @@ CMD ["npm", "run", "dev"]
 FROM base AS production
 WORKDIR /app
 
-ENV NODE_ENV production
+ENV APP_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
-
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy the public folder
-COPY --from=builder /app/public ./public
-
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
+# Copy build artifacts using standalone output
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 USER nextjs
 
-EXPOSE 3000
-ENV PORT 3000
+EXPOSE 3002
+ENV PORT 3002
 
-# Start the production server
+# Choose runtime based on APP_ENV
 CMD ["node", "server.js"]

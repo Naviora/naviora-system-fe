@@ -30,6 +30,7 @@ import {
 } from 'date-fns'
 import { enUS } from 'date-fns/locale/en-US'
 import { ReactNode, createContext, forwardRef, useCallback, useContext, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useHotkeys } from 'react-hotkeys-hook'
 
 const monthEventVariants = cva('size-2 rounded-full', {
@@ -88,6 +89,7 @@ export type CalendarEvent = {
   end: Date
   title: string
   description?: string
+  meetingCode?: string
   host?: {
     name: string
     avatar?: string | null
@@ -432,6 +434,7 @@ const CalendarMonthView = () => {
 
 const EventDetailDialog = () => {
   const { selectedEvent, setSelectedEvent, locale } = useCalendar()
+  const router = useRouter()
 
   if (!selectedEvent) return null
 
@@ -464,6 +467,21 @@ const EventDetailDialog = () => {
                     <AvatarFallback>{selectedEvent.host.name.charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <span className='text-sm'>{selectedEvent.host.name}</span>
+                </div>
+              )}
+              {selectedEvent.meetingCode && (
+                <div className='flex items-center justify-between mt-3'>
+                  <div className='text-xs text-muted-foreground'>
+                    Mã cuộc họp: <span className='font-mono text-foreground'>{selectedEvent.meetingCode}</span>
+                  </div>
+                  <Button
+                    size='sm'
+                    onClick={() => {
+                      router.push(`/meeting/${selectedEvent.meetingCode}`)
+                    }}
+                  >
+                    Vào phòng họp
+                  </Button>
                 </div>
               )}
             </div>

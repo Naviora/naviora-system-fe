@@ -173,7 +173,7 @@ class ApiClient {
           }
         }
 
-        // Transform error to standardized format
+        // Transform error to standardized format, but preserve original error for validation details
         const apiError: ApiError = {
           code: error.response?.data?.code || ERROR_CODES.INTERNAL_ERROR,
           message:
@@ -185,7 +185,16 @@ class ApiClient {
           timestamp: new Date().toISOString()
         }
 
-        return Promise.reject(apiError)
+        // Preserve original axios error with response data (for validation details)
+        const errorWithContext = Object.assign(new Error(apiError.message), {
+          code: apiError.code,
+          message: apiError.message,
+          details: apiError.details,
+          timestamp: apiError.timestamp,
+          response: error.response // Keep original response for ErrorHandler to access details array
+        })
+
+        return Promise.reject(errorWithContext)
       }
     )
   }

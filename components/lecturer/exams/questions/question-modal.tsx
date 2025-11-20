@@ -67,7 +67,7 @@ export function QuestionDialog({ open, onOpenChange, initialData, onSubmit }: Qu
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='!max-w-[800px]'>
+      <DialogContent className='max-w-[800px]!'>
         <DialogHeader>
           <DialogTitle>{initialData ? 'Chỉnh sửa câu hỏi' : 'Thêm câu hỏi mới'}</DialogTitle>
         </DialogHeader>

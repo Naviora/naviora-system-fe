@@ -58,6 +58,17 @@ export const useStartEntryTest = () => {
   })
 }
 
+export const useUpdateEntryTest = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ entryTestId, data }: { entryTestId: string; data: Partial<CreateEntryTestRequest> }) =>
+      apiClient.patch(`/entry-test/${entryTestId}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['entry-tests'] })
+    }
+  })
+}
+
 export const useDeleteEntryTest = () => {
   const queryClient = useQueryClient()
   return useMutation({

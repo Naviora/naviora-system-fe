@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button'
 import { ThemeToggleSimple } from '@/components/ui/theme-toggle'
 import { NotificationBell } from './notification-bell'
 import { AvatarDropdown } from './avatar-dropdown'
-import { useBreadcrumbLabel } from '@/lib/context/breadcrumb-context'
+import { useBreadcrumbLabel, useBreadcrumbItems } from '@/lib/context/breadcrumb-context'
 import { getSegmentTranslation } from '@/lib/constants/breadcrumb-translations'
 import { useRoleContext } from '@/providers/role-provider'
 
@@ -25,6 +25,7 @@ export function Navbar() {
   const router = useRouter()
   const pathname = usePathname()
   const breadcrumbLabel = useBreadcrumbLabel()
+  const customBreadcrumbItems = useBreadcrumbItems()
   const segments = pathname.split('/').filter(Boolean)
   const { role } = useRoleContext()
 
@@ -34,19 +35,24 @@ export function Navbar() {
   // Filter out role segment (first segment if it's a role)
   const filteredSegments = segments[0] && roleSegments.includes(segments[0]) ? segments.slice(1) : segments
 
-  const breadcrumbs = filteredSegments
-    .map((segment, index) => {
-      const isLastSegment = index === filteredSegments.length - 1
-      const isDynamicSegment = /^[a-f0-9\-]+$/i.test(segment) || /^[0-9]+$/.test(segment)
+  const breadcrumbs =
+    customBreadcrumbItems.length > 0
+      ? customBreadcrumbItems
+      : filteredSegments
+          .map((segment, index) => {
+            const isLastSegment = index === filteredSegments.length - 1
+            const isDynamicSegment = /^[a-f0-9\-]+$/i.test(segment) || /^[0-9]+$/.test(segment)
 
-      return {
-        href: `/${segments.slice(0, index + 2).join('/')}`, // +2 because we filtered out role
-        label:
-          isLastSegment && isDynamicSegment && breadcrumbLabel ? breadcrumbLabel : getSegmentTranslation(segment, role),
-        isId: isDynamicSegment
-      }
-    })
-    .filter((b) => b.label) // Filter out empty labels
+            return {
+              href: `/${segments.slice(0, index + 2).join('/')}`, // +2 because we filtered out role
+              label:
+                isLastSegment && isDynamicSegment && breadcrumbLabel
+                  ? breadcrumbLabel
+                  : getSegmentTranslation(segment, role),
+              isId: isDynamicSegment
+            }
+          })
+          .filter((b) => b.label) // Filter out empty labels
 
   return (
     <nav className='flex h-16 min-h-16 items-center justify-between rounded-t-lg border-b border-border bg-greyscale-0 px-4'>

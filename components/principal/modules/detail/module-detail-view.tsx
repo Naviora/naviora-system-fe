@@ -38,6 +38,7 @@ import { MaterialDialog } from './material-dialog'
 import { ErrorHandler } from '@/lib/utils/error-handler'
 import { cn } from '@/lib/utils'
 import type { LessonDto, ModuleDetailDto, MaterialDto } from '@/lib/validations/modules'
+import { ReviewedExerciseList } from '@/components/lecturer/exams/reviewed-exercise'
 
 interface ModuleDetailViewProps {
   module: ModuleDetailDto
@@ -77,6 +78,7 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
   const [lessonMaterials, setLessonMaterials] = useState<Record<string, MaterialDto[] | undefined>>({})
 
   const lessonDetailQuery = useLessonDetail(expandedLessonId)
+  const activeLessonDetail = lessonDetailQuery.data?.data
 
   const stats = useMemo(
     () => [
@@ -377,6 +379,11 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
                   const isExpanded = expandedLessonId === lesson.lesson_id
                   const isDeletingLesson = deleteLessonMutation.isPending && deletingLessonId === lesson.lesson_id
 
+                  const resolvedReviewedExercises =
+                    lesson.lesson_id === activeLessonDetail?.lesson_id
+                      ? (activeLessonDetail.reviewed_exercises ?? [])
+                      : (lesson.reviewed_exercises ?? [])
+
                   return (
                     <li
                       key={lesson.lesson_id}
@@ -472,7 +479,7 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
                                     className='flex items-center justify-between gap-3 rounded-md border border-greyscale-100 bg-greyscale-25 p-3'
                                   >
                                     <div className='flex items-center gap-3 flex-1 min-w-0'>
-                                      <span className='flex-shrink-0 text-greyscale-400'>
+                                      <span className='shrink-0 text-greyscale-400'>
                                         <FileText className='h-4 w-4' aria-hidden='true' />
                                       </span>
                                       <div className='min-w-0 flex-1'>
@@ -482,7 +489,7 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
                                         <p className='text-xs text-greyscale-500'>{material.material_type}</p>
                                       </div>
                                     </div>
-                                    <div className='flex items-center gap-2 flex-shrink-0'>
+                                    <div className='flex items-center gap-2 shrink-0'>
                                       <Button
                                         type='button'
                                         variant='ghost'
@@ -510,6 +517,13 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
                                 <p className='text-xs text-greyscale-500'>Chưa có tài liệu nào cho bài học này</p>
                               </div>
                             )}
+
+                            {/* Reviewed Exercises Section */}
+                            <ReviewedExerciseList
+                              lessonId={lesson.lesson_id}
+                              lessonName={lesson.lesson_name}
+                              exercises={resolvedReviewedExercises}
+                            />
                           </div>
                         </div>
                       </div>
