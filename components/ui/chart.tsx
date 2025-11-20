@@ -41,7 +41,11 @@ export function ChartTooltip({ content, ...props }: ChartTooltipProps) {
   return <Tooltip {...props} content={content ?? <ChartTooltipContent />} />
 }
 
-type ChartTooltipContentProps = TooltipProps<number, string>
+type ChartTooltipContentProps = TooltipProps<number, string> & {
+  active?: boolean
+  payload?: Payload<number, string>[]
+  label?: string
+}
 
 export function ChartTooltipContent({ active, payload, label }: ChartTooltipContentProps) {
   const config = React.useContext(ChartContext)
