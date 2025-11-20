@@ -23,9 +23,9 @@ import {
 } from '@/lib/utils/exam-test-indb'
 import type { Question } from '@/lib/validations/lecturer/exams/question'
 import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import { QUERY_KEYS } from '@/lib/constants/config'
+import { FinalExamResult } from './final-exam-result'
 
 interface ManageFinalExamProps {
   finalExamId: string
@@ -34,7 +34,6 @@ interface ManageFinalExamProps {
 }
 
 export function ManageFinalExam({ finalExamId, examTitle = 'Bài thi cuối kỳ', onShowResult }: ManageFinalExamProps) {
-  const router = useRouter()
   const queryClient = useQueryClient()
   const [questionSetId, setQuestionSetId] = useState<string | null>(null)
   const [current, setCurrent] = useState(0)
@@ -45,11 +44,13 @@ export function ManageFinalExam({ finalExamId, examTitle = 'Bài thi cuối kỳ
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [initializationError, setInitializationError] = useState<string | null>(null)
   const [questions, setQuestions] = useState<Question[]>([])
+  const [submissionResult, setSubmissionResult] = useState<SubmitFinalExamResponse | null>(null)
+  const [duration, setDuration] = useState<number>(0)
   const endTimestampRef = useRef<number | null>(null)
   const submissionInProgressRef = useRef(false)
 
   const startMutation = useStartFinalExam({ retry: 0 })
-  const submitMutation = useSubmitFinalExam()
+  const submitMutation = useSubmitFinalExam({ retry: 0 })
 
   const {
     data: questionSetDetail,
@@ -243,10 +244,12 @@ export function ManageFinalExam({ finalExamId, examTitle = 'Bài thi cuối kỳ
           await Promise.all([clearEXAMTestProgress(), clearFinalExamSession()])
           await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FINAL_EXAM_DETAIL(finalExamId) })
           toast.success('Nộp bài thi cuối kỳ thành công!')
+          const examDuration = Math.round((initialSeconds ?? 0) - secondsLeft)
           if (onShowResult) {
-            onShowResult(response, Math.round((initialSeconds ?? 0) - secondsLeft))
+            onShowResult(response, examDuration)
           } else {
-            router.replace(`/student/final-exams/${finalExamId}`)
+            setSubmissionResult(response)
+            setDuration(examDuration)
           }
         },
         onError: (error) => {
@@ -264,7 +267,6 @@ export function ManageFinalExam({ finalExamId, examTitle = 'Bài thi cuối kỳ
     submitMutation,
     isSubmitted,
     onShowResult,
-    router,
     queryClient,
     initialSeconds,
     secondsLeft
@@ -280,6 +282,10 @@ export function ManageFinalExam({ finalExamId, examTitle = 'Bài thi cuối kỳ
         {initializationError}
       </div>
     )
+  }
+
+  if (submissionResult) {
+    return <FinalExamResult result={submissionResult} duration={duration} finalExamId={finalExamId} />
   }
 
   if (startMutation.isPending || !questionSetId || isQuestionSetLoading || !isLoaded) {
