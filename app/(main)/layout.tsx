@@ -27,7 +27,9 @@ export default function MainLayout({
             <div className='w-full py-2 pr-2 bg-greyscale-25'>
               <div className='flex flex-col h-full rounded-md border bg-greyscale-0'>
                 <Navbar />
-                {children}
+                <EntryTestGuard>
+                  {children}
+                </EntryTestGuard>
               </div>
             </div>
           </SidebarProvider>
