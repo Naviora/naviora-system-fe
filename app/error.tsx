@@ -12,7 +12,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
   }, [error])
 
   return (
-    <div className='min-h-screen bg-background flex items-center justify-center p-4'>
+    <div className='min-h-screen w-full bg-background flex items-center justify-center p-4'>
       <motion.div
         className='max-w-lg w-full text-center space-y-8'
         initial={{ opacity: 0, y: 20 }}
@@ -45,7 +45,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
         </motion.div>
 
         {/* Error Details (Development Only) */}
-        {process.env.NODE_ENV === 'development' && (
+        {process.env.APP_ENV === 'development' && (
           <motion.div
             className='bg-error-0 border border-error-50 rounded-lg p-4 text-left'
             initial={{ opacity: 0, height: 0 }}

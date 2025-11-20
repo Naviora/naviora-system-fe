@@ -1,114 +1,98 @@
-import { createEntityHooks } from './use-entity'
-import { User } from '@/lib/validations/auth'
-import type { LoginFormData, RegisterFormData, ProfileUpdateFormData } from '@/lib/validations/auth'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+'use client'
+import type { LoginFormData, LoginResponse, RefreshTokenFormData, RefreshTokenResponse } from '@/lib/validations/auth'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api/client'
+import {
+  AUTH_STORAGE_KEYS,
+  clearStoredAuthTokens,
+  clearStoredUserRole,
+  getStoredAccessToken,
+  setStoredAuthTokens,
+  setStoredUserRole,
+  setStoredHasParticipatedEntryTest,
+  clearStoredHasParticipatedEntryTest
+} from '@/lib/utils/auth-storage'
+import { useRouter } from 'next/navigation'
 
-// User entity hooks
-export const {
-  useList: useUsers,
-  useDetail: useUser,
-  useCreate: useCreateUser,
-  useUpdate: useUpdateUser,
-  useDelete: useDeleteUser,
-  queryKeys: userQueryKeys
-} = createEntityHooks<User, Partial<User>>('users', '/users')
+export { getStoredUserRole, clearStoredUserRole } from '@/lib/utils/auth-storage'
 
 // Authentication hooks
 export const useLogin = () => {
-  const queryClient = useQueryClient()
-
+  const router = useRouter()
   return useMutation({
-    mutationFn: (data: LoginFormData) => apiClient.post<{ user: User; token: string }>('/auth/login', data),
-    onSuccess: (response) => {
-      // Store user in cache
-      queryClient.setQueryData(['auth', 'user'], response.user)
-      // Store token
+    mutationFn: (data: LoginFormData) => apiClient.post<LoginResponse>('/auth/login', data),
+    onSuccess: async (response) => {
       if (typeof window !== 'undefined') {
-        localStorage.setItem('auth-token', response.token)
+        setStoredAuthTokens(response.access_token, response.refresh_token)
+        setStoredUserRole(response.role)
+        if (response.role === 'Student') {
+          setStoredHasParticipatedEntryTest(!!response.has_participated_entry_test)
+        } else {
+          clearStoredHasParticipatedEntryTest()
+        }
+        // Also set secure HttpOnly cookies via Next.js route handler
+        await fetch('/api/auth/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ access_token: response.access_token, role: response.role })
+        }).catch(() => {})
+        router.push(`/${response.role.toLowerCase()}/dashboard`)
       }
+    },
+    onError: (error) => {
+      console.error('Login failed:', error)
     }
-  })
-}
-
-export const useRegister = () => {
-  return useMutation({
-    mutationFn: (data: RegisterFormData) => apiClient.post<{ user: User; token: string }>('/auth/register', data)
   })
 }
 
 export const useLogout = () => {
   const queryClient = useQueryClient()
-
+  const router = useRouter()
   return useMutation({
     mutationFn: () => apiClient.post('/auth/logout'),
-    onSuccess: () => {
-      // Clear user cache
+    onSuccess: async () => {
       queryClient.removeQueries({ queryKey: ['auth'] })
-      // Clear token
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('auth-token')
+        clearStoredAuthTokens()
+        clearStoredUserRole()
+        clearStoredHasParticipatedEntryTest()
+        localStorage.removeItem(AUTH_STORAGE_KEYS.rememberMe)
+        // Clear HttpOnly cookies on logout
+        await fetch('/api/auth/session', { method: 'DELETE' }).catch(() => {})
+        router.push('/login')
       }
     }
   })
 }
 
-export const useCurrentUser = () => {
-  return useQuery({
-    queryKey: ['auth', 'user'],
-    queryFn: () => apiClient.get<User>('/auth/me'),
-    retry: false,
-    staleTime: 5 * 60 * 1000 // 5 minutes
-  })
-}
-
-export const useUpdateProfile = () => {
-  const queryClient = useQueryClient()
-
+export const useRefreshToken = () => {
   return useMutation({
-    mutationFn: (data: ProfileUpdateFormData) => apiClient.put<User>('/auth/profile', data),
-    onSuccess: (user) => {
-      // Update user cache
-      queryClient.setQueryData(['auth', 'user'], user)
+    mutationFn: (data: RefreshTokenFormData) => apiClient.post<RefreshTokenResponse>('/auth/refresh', data),
+    onSuccess: async (response) => {
+      if (typeof window !== 'undefined') {
+        setStoredAuthTokens(response.access_token, response.refresh_token)
+        // Refresh HttpOnly cookie with new access token
+        await fetch('/api/auth/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ access_token: response.access_token })
+        }).catch(() => {})
+      }
+    },
+    onError: (error) => {
+      console.error('Token refresh failed:', error)
+      if (typeof window !== 'undefined') {
+        clearStoredAuthTokens()
+        clearStoredUserRole()
+      }
     }
   })
 }
 
-export const useChangePassword = () => {
-  return useMutation({
-    mutationFn: (data: { currentPassword: string; newPassword: string }) =>
-      apiClient.post('/auth/change-password', data)
-  })
-}
-
-export const useForgotPassword = () => {
-  return useMutation({
-    mutationFn: (email: string) => apiClient.post('/auth/forgot-password', { email })
-  })
-}
-
-export const useResetPassword = () => {
-  return useMutation({
-    mutationFn: (data: { token: string; password: string }) => apiClient.post('/auth/reset-password', data)
-  })
-}
-
-// User preferences hooks
-export const useUserPreferences = () => {
-  return useQuery({
-    queryKey: ['user', 'preferences'],
-    queryFn: () => apiClient.get('/user/preferences'),
-    staleTime: 10 * 60 * 1000 // 10 minutes
-  })
-}
-
-export const useUpdateUserPreferences = () => {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (preferences: Record<string, unknown>) => apiClient.put('/user/preferences', preferences),
-    onSuccess: (data) => {
-      queryClient.setQueryData(['user', 'preferences'], data)
-    }
-  })
+export const isLoggedIn = () => {
+  if (typeof window !== 'undefined') {
+    const token = getStoredAccessToken()
+    return !!token
+  }
+  return false
 }

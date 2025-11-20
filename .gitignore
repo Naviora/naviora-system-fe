@@ -39,3 +39,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/docs
+/.gemini
+GEMINI.md
+.cursor
+AGENTS.md
+
+/.github/commands
+.ai-devkit.json
+AGENTS.md
+/logs
+.cursor/
+AGENTS.md 

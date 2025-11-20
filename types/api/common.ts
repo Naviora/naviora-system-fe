@@ -68,12 +68,14 @@ export interface MultiFileUploadResponse {
 
 // Search types
 export interface SearchRequest {
-  query: string
+  q?: string
+  query?: string
   filters?: Record<string, unknown>
   page?: number
   limit?: number
   sortBy?: string
-  sortOrder?: 'asc' | 'desc'
+  isInUse?: boolean
+  sortOrder?: 'asc' | 'desc' | 'ASC' | 'DESC'
 }
 
 export interface SearchResponse<T> {

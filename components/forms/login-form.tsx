@@ -13,7 +13,13 @@ import { loginSchema, type LoginFormData } from '@/lib/validations/auth'
 import { useLogin } from '@/hooks/api/use-auth'
 import { FadeIn } from '@/components/animations/fade-slide-scale'
 import { ErrorHandler } from '@/lib/utils/error-handler'
+import { getDefaultRouteForRole } from '@/lib/constants/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Separator } from '@/components/ui/separator'
+import GoogleLoginButton from '@/components/forms/login-gg-btn'
+import { getStoredHasParticipatedEntryTest } from '@/lib/utils/auth-storage'
 
 interface LoginFormProps {
   onSuccess?: () => void
@@ -21,7 +27,7 @@ interface LoginFormProps {
   className?: string
 }
 
-export function LoginForm({ onSuccess, redirectTo = '/dashboard', className = '' }: LoginFormProps) {
+export function LoginForm({ onSuccess, redirectTo, className = '' }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
   const loginMutation = useLogin()
@@ -37,13 +43,20 @@ export function LoginForm({ onSuccess, redirectTo = '/dashboard', className = ''
 
   const handleSubmit = async (data: LoginFormData) => {
     try {
-      await loginMutation.mutateAsync(data)
-      toast.success('Welcome back!')
-
+      const response = await loginMutation.mutateAsync(data)
+      toast.success('Login successful!')
       if (onSuccess) {
         onSuccess()
       } else {
-        router.push(redirectTo)
+        if (
+          response.role === 'Student' &&
+          !getStoredHasParticipatedEntryTest()
+        ) {
+          router.push('/entry-test')
+        } else {
+          const targetRoute = redirectTo ?? getDefaultRouteForRole(response.role)
+          router.push(targetRoute)
+        }
       }
     } catch (error) {
       const errorMessage = ErrorHandler.getErrorMessage(error)
@@ -54,10 +67,11 @@ export function LoginForm({ onSuccess, redirectTo = '/dashboard', className = ''
 
   return (
     <FadeIn className={className}>
-      <div className='mx-auto max-w-sm space-y-6'>
-        <div className='text-center space-y-2'>
-          <h1 className='text-2xl font-bold'>Welcome back</h1>
-          <p className='text-muted-foreground'>Sign in to your account to continue</p>
+      <div className='mx-auto max-w-md space-y-6'>
+        <div className='flex flex-col gap-2 items-center'>
+          <Image width={60} height={60} src='/Naviora.png' alt='Logo' />
+          <h1 className='text-lg sm:text-xl md:text-2xl font-bold'>Chào mừng bạn đến với Naviora</h1>
+          <p className='text-muted-foreground'>Hãy đăng nhập để tiếp tục trải nghiệm</p>
         </div>
 
         <Form {...form}>
@@ -69,7 +83,7 @@ export function LoginForm({ onSuccess, redirectTo = '/dashboard', className = ''
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type='email' placeholder='Enter your email' {...field} />
+                    <Input type='email' placeholder='Email của bạn' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -81,10 +95,10 @@ export function LoginForm({ onSuccess, redirectTo = '/dashboard', className = ''
               name='password'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>Mật khẩu</FormLabel>
                   <FormControl>
                     <div className='relative'>
-                      <Input type={showPassword ? 'text' : 'password'} placeholder='Enter your password' {...field} />
+                      <Input type={showPassword ? 'text' : 'password'} placeholder='Nhập mật khẩu' {...field} />
                       <Button
                         type='button'
                         variant='ghost'
@@ -108,19 +122,19 @@ export function LoginForm({ onSuccess, redirectTo = '/dashboard', className = ''
                 control={form.control}
                 name='rememberMe'
                 render={({ field }) => (
-                  <FormItem className='flex flex-row items-start space-x-3 space-y-0'>
+                  <FormItem className='flex flex-row items-center space-x-0 space-y-0'>
                     <FormControl>
-                      <input type='checkbox' checked={field.value} onChange={field.onChange} className='mt-1' />
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                     <div className='space-y-1 leading-none'>
-                      <FormLabel className='text-sm font-normal'>Remember me</FormLabel>
+                      <FormLabel className='text-sm font-normal'>Ghi nhớ</FormLabel>
                     </div>
                   </FormItem>
                 )}
               />
 
               <Link href='/auth/forgot-password' className='text-sm text-primary hover:underline'>
-                Forgot password?
+                Quên mật khẩu?
               </Link>
             </div>
 
@@ -128,21 +142,14 @@ export function LoginForm({ onSuccess, redirectTo = '/dashboard', className = ''
               {loginMutation.isPending ? (
                 <>
                   <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                  Signing in...
+                  Đang đăng nhập...
                 </>
               ) : (
-                'Sign in'
+                'Đăng nhập'
               )}
             </Button>
           </form>
         </Form>
-
-        <div className='text-center text-sm'>
-          <span className='text-muted-foreground'>Don&apos;t have an account? </span>
-          <Link href='/auth/register' className='text-primary hover:underline'>
-            Sign up
-          </Link>
-        </div>
       </div>
     </FadeIn>
   )

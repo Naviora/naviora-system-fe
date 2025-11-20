@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 
 export default function Loading() {
   return (
-    <div className='min-h-screen bg-background flex items-center justify-center'>
+    <div className='h-full w-full flex items-center justify-center'>
       <div className='flex flex-col items-center space-y-8 p-8'>
         {/* Logo Loading Animation */}
         <motion.div
