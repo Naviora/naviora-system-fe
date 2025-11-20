@@ -14,14 +14,14 @@ import { useUpdateProfile } from '@/hooks/api/use-profile'
 import type { UserProfile } from '@/types/api/profile'
 
 const profileFormSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name must not exceed 100 characters'),
-  email: z.string().email('Invalid email address').readonly(),
-  phone: z.string().regex(/^[0-9]{10,11}$/, 'Phone must be 10-11 digits'),
-  address: z.string().max(200, 'Address must not exceed 200 characters'),
+  name: z.string().min(2, 'Họ tên phải có ít nhất 2 ký tự').max(100, 'Họ tên không vượt quá 100 ký tự'),
+  email: z.string().email('Email không hợp lệ').readonly(),
+  phone: z.string().regex(/^[0-9]{10,11}$/, 'Số điện thoại phải từ 10-11 số'),
+  address: z.string().max(200, 'Địa chỉ không vượt quá 200 ký tự'),
   dateOfBirth: z.string().refine((date) => {
     if (!date) return true
     return !isNaN(Date.parse(date))
-  }, 'Invalid date format'),
+  }, 'Định dạng ngày không hợp lệ'),
   gender: z.enum(['male', 'female', 'other'])
 })
 
@@ -66,9 +66,9 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         dateOfBirth: data.dateOfBirth,
         gender: data.gender
       })
-      toast.success('Profile updated successfully')
+      toast.success('Cập nhật thông tin thành công')
     } catch (error) {
-      toast.error('Failed to update profile')
+      toast.error('Cập nhật thất bại')
       console.error(error)
     }
   }
@@ -77,15 +77,15 @@ export function ProfileForm({ profile }: ProfileFormProps) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-          {/* Name */}
+          {/* Họ tên */}
           <FormField
             control={form.control}
             name='name'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Full Name</FormLabel>
+                <FormLabel>Họ và tên</FormLabel>
                 <FormControl>
-                  <Input placeholder='Enter your full name' {...field} />
+                  <Input placeholder='Nhập họ và tên' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -102,44 +102,44 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                 <FormControl>
                   <Input placeholder='Email' {...field} disabled />
                 </FormControl>
-                <FormDescription>Email cannot be changed</FormDescription>
+                <FormDescription>Email không thể thay đổi</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          {/* Phone */}
+          {/* Số điện thoại */}
           <FormField
             control={form.control}
             name='phone'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Phone Number</FormLabel>
+                <FormLabel>Số điện thoại</FormLabel>
                 <FormControl>
-                  <Input placeholder='Enter your phone number' {...field} />
+                  <Input placeholder='Nhập số điện thoại' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          {/* Gender */}
+          {/* Giới tính */}
           <FormField
             control={form.control}
             name='gender'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Gender</FormLabel>
+                <FormLabel>Giới tính</FormLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder='Select gender' />
+                      <SelectValue placeholder='Chọn giới tính' />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value='male'>Male</SelectItem>
-                    <SelectItem value='female'>Female</SelectItem>
-                    <SelectItem value='other'>Other</SelectItem>
+                    <SelectItem value='male'>Nam</SelectItem>
+                    <SelectItem value='female'>Nữ</SelectItem>
+                    <SelectItem value='other'>Khác</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -147,13 +147,13 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             )}
           />
 
-          {/* Date of Birth */}
+          {/* Ngày sinh */}
           <FormField
             control={form.control}
             name='dateOfBirth'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Date of Birth</FormLabel>
+                <FormLabel>Ngày sinh</FormLabel>
                 <FormControl>
                   <Input type='date' {...field} />
                 </FormControl>
@@ -162,15 +162,15 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             )}
           />
 
-          {/* Address */}
+          {/* Địa chỉ */}
           <FormField
             control={form.control}
             name='address'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Address</FormLabel>
+                <FormLabel>Địa chỉ</FormLabel>
                 <FormControl>
-                  <Input placeholder='Enter your address' {...field} />
+                  <Input placeholder='Nhập địa chỉ' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -178,14 +178,14 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           />
         </div>
 
-        {/* Submit Button */}
+        {/* Nút lưu */}
         <div className='flex gap-2 justify-end'>
           <Button type='button' variant='outline' onClick={() => form.reset()} disabled={updateMutation.isPending}>
-            Reset
+            Đặt lại
           </Button>
           <Button type='submit' disabled={updateMutation.isPending} className='gap-2'>
             {updateMutation.isPending && <Loader2 className='w-4 h-4 animate-spin' />}
-            {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+            {updateMutation.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
           </Button>
         </div>
       </form>
