@@ -4,26 +4,24 @@ import { useSearchParams } from 'next/navigation'
 
 import { DayStreak } from '@/components/common/day-streak'
 import {
-  BadgesCard,
-  CategoryPopularityCard,
-  CoursesCard,
   DashboardEmptyState,
   DashboardStatGrid,
   LearningHoursCard,
-  type BadgeCardConfig,
-  type CategoryConfig,
-  type CourseCardConfig,
   type EmptyStateSuggestion,
   type LearningDataPoint,
   type StatCardConfig
 } from '@/components/student/dashboard'
-import { Award, BookOpen, Compass, Flame, GraduationCap, Medal, MoveUpRight, Sparkles, Star } from 'lucide-react'
+import { Award, BookOpen, Compass, GraduationCap, MoveUpRight, Star } from 'lucide-react'
 
-const statCards: StatCardConfig[] = [
+const getStatCards = (
+  totalModules: number,
+  completedCount: number,
+  ongoingCount: number
+): StatCardConfig[] => [
   {
     id: 'ongoing',
     title: 'Khoá học đang học',
-    value: '5',
+    value: String(ongoingCount),
     icon: BookOpen,
     accent: 'bg-primary-25 text-primary-200',
     delta: {
@@ -35,7 +33,7 @@ const statCards: StatCardConfig[] = [
   {
     id: 'completed',
     title: 'Khoá học đã hoàn thành',
-    value: '12',
+    value: String(completedCount),
     icon: GraduationCap,
     accent: 'bg-primary-25 text-primary-200',
     delta: {
@@ -89,70 +87,6 @@ const learningHours: LearningDataPoint[] = [
   { day: 16, hours: 1.9 }
 ]
 
-const courses: CourseCardConfig[] = [
-  {
-    id: 'figma-wireframe',
-    moduleName: 'Nhập môn Wireframe',
-    classType: 'Thiết kế UI/UX',
-    class_name: 'Khoá học ngắn',
-    lecturerName: ['Figma Academy'],
-    progress: 52,
-    thumbnail:
-      'https://images.unsplash.com/photo-1587613864521-79b72106b1b0?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3'
-  },
-  {
-    id: 'google-mobile-app',
-    moduleName: 'Thiết kế UI cho ứng dụng di động',
-    classType: 'Thiết kế UI/UX',
-    class_name: 'Khoá học chuyên sâu',
-    lecturerName: ['Google Design'],
-    progress: 48,
-    thumbnail:
-      'https://images.unsplash.com/photo-1523475472560-d2df97ec485c?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3'
-  },
-  {
-    id: 'meta-web-ux',
-    moduleName: 'UX Web & Khả dụng',
-    classType: 'Thiết kế UI/UX',
-    class_name: 'Khoá học nâng cao',
-    lecturerName: ['Meta Learn'],
-    progress: 65,
-    thumbnail:
-      'https://images.unsplash.com/photo-1523476807043-022c00e602c0?q=80&w=640&auto=format&fit=crop&ixlib=rb-4.0.3'
-  }
-]
-
-const badges: BadgeCardConfig[] = [
-  {
-    id: 'streak-master',
-    title: 'Chuỗi ngày bền bỉ',
-    description: 'Duy trì chuỗi học 21 ngày liên tục.',
-    icon: Flame,
-    accent: 'bg-primary-25 text-primary-200'
-  },
-  {
-    id: 'design-hunter',
-    title: 'Nhà khám phá thiết kế',
-    description: 'Hoàn thành 5 học phần tư duy thiết kế.',
-    icon: Sparkles,
-    accent: 'bg-primary-25 text-primary-200'
-  },
-  {
-    id: 'quick-learner',
-    title: 'Học nhanh xuất sắc',
-    description: 'Hoàn tất một khoá học trong 3 ngày kể từ khi đăng ký.',
-    icon: Medal,
-    accent: 'bg-primary-25 text-primary-200'
-  }
-]
-
-const categoryPopularity: CategoryConfig[] = [
-  { id: 'uiux', label: 'UI/UX', percentage: 92 },
-  { id: 'design', label: 'Thiết kế', percentage: 78 },
-  { id: 'mobile', label: 'Di động', percentage: 62 },
-  { id: 'programming', label: 'Lập trình', percentage: 54 }
-]
-
 const emptyStateSuggestions: EmptyStateSuggestion[] = [
   {
     id: 'explore',
@@ -194,6 +128,8 @@ export default function DashboardPage() {
 }
 
 function DataStateDashboard() {
+  const statCards = getStatCards(5, 2, 3)
+
   return (
     <div className='flex flex-col gap-6'>
       <DashboardStatGrid stats={statCards} />
@@ -202,13 +138,7 @@ function DataStateDashboard() {
         <LearningHoursCard data={learningHours} />
         <div className='flex flex-col gap-6'>
           <DayStreak />
-          <BadgesCard badges={badges} />
         </div>
-      </section>
-
-      <section className='grid gap-6 2xl:grid-cols-[minmax(0,1fr)_420px]'>
-        <CoursesCard courses={courses} />
-        <CategoryPopularityCard categories={categoryPopularity} />
       </section>
     </div>
   )
