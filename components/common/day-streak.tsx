@@ -1,6 +1,8 @@
 
 import { CheckCircle2, Circle } from "lucide-react";
 import Image from "next/image";
+import { useGetStreak } from "@/hooks/api/use-streaks";
+import { startOfWeek, addDays, parseISO, subDays, startOfDay } from "date-fns";
 
 const DayCheckbox = ({ day, checked }: { day: string; checked: boolean }) => (
   <div className="flex flex-col items-center gap-1">
@@ -14,8 +16,28 @@ const DayCheckbox = ({ day, checked }: { day: string; checked: boolean }) => (
 );
 
 export const DayStreak = () => {
+  const { data: streakData } = useGetStreak();
   const days = ["S", "M", "T", "W", "T", "F", "S"];
-  const checkedDays = [true, true, true, true, false, false, false];
+  
+  const today = new Date();
+  const startOfCurrentWeek = startOfWeek(today, { weekStartsOn: 0 }); // Sunday
+
+  const checkedDays = days.map((_, index) => {
+    if (!streakData) return false;
+
+    const currentDay = startOfDay(addDays(startOfCurrentWeek, index));
+    const lastActivityDate = startOfDay(parseISO(streakData.last_activity_date));
+    
+    // If current streak is 0, no days are checked
+    if (streakData.current_streak <= 0) return false;
+
+    const streakStartDate = subDays(lastActivityDate, streakData.current_streak - 1);
+
+    // Check if currentDay is within [streakStartDate, lastActivityDate]
+    return currentDay >= streakStartDate && currentDay <= lastActivityDate;
+  });
+
+  const currentStreak = streakData?.current_streak ?? 0;
 
   return (
     <div className="flex flex-col gap-6 rounded-lg border border-gray-200 bg-white p-4 min-w-[300px]  w-full dark:bg-gray-800 dark:border-gray-700">
@@ -24,7 +46,7 @@ export const DayStreak = () => {
           <span className="text-base font-medium text-gray-900 dark:text-gray-100">
             Day Streak
           </span>
-          <span className="text-2xl font-medium text-gray-900 dark:text-gray-100">22 Day</span>
+          <span className="text-2xl font-medium text-gray-900 dark:text-gray-100">{currentStreak} Day</span>
         </div>
         <Image
           src="/icons/day-streak-icon.svg"
