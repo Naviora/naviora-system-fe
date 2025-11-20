@@ -12,7 +12,8 @@ import {
   Pencil,
   Plus,
   Trash2,
-  FileText
+  FileText,
+  Eye
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -76,6 +77,8 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
   const [isMaterialDialogOpen, setIsMaterialDialogOpen] = useState(false)
   const [selectedLessonForMaterial, setSelectedLessonForMaterial] = useState<LessonDto | null>(null)
   const [lessonMaterials, setLessonMaterials] = useState<Record<string, MaterialDto[] | undefined>>({})
+  const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false)
+  const [previewLesson, setPreviewLesson] = useState<LessonDto | null>(null)
 
   const lessonDetailQuery = useLessonDetail(expandedLessonId)
   const activeLessonDetail = lessonDetailQuery.data?.data
@@ -107,10 +110,14 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
 
     if (mode === 'edit' && lesson) {
       setSelectedLesson(lesson)
+
+      const content =
+        lesson.lesson_id === activeLessonDetail?.lesson_id ? activeLessonDetail.lesson_content : lesson.lesson_content
+
       setLessonForm({
         title: lesson.lesson_name,
         description: lesson.lesson_description ?? '',
-        content: lesson.lesson_content ?? ''
+        content: content ?? ''
       })
     } else {
       setSelectedLesson(null)
@@ -118,6 +125,14 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
     }
 
     setIsLessonDialogOpen(true)
+  }
+
+  const handlePreviewLesson = (lesson: LessonDto) => {
+    const content =
+      lesson.lesson_id === activeLessonDetail?.lesson_id ? activeLessonDetail.lesson_content : lesson.lesson_content
+
+    setPreviewLesson({ ...lesson, lesson_content: content })
+    setIsPreviewDialogOpen(true)
   }
 
   const closeLessonDialog = () => {
@@ -414,8 +429,24 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
                             variant='ghost'
                             size='icon'
                             className='h-9 w-9 rounded-full text-greyscale-500 hover:bg-greyscale-25 hover:text-greyscale-700'
+                            aria-label={`Xem trước bài học ${lesson.lesson_name}`}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handlePreviewLesson(lesson)
+                            }}
+                          >
+                            <Eye className='h-4 w-4' aria-hidden='true' />
+                          </Button>
+                          <Button
+                            type='button'
+                            variant='ghost'
+                            size='icon'
+                            className='h-9 w-9 rounded-full text-greyscale-500 hover:bg-greyscale-25 hover:text-greyscale-700'
                             aria-label={`Chỉnh sửa tài liệu của bài học ${lesson.lesson_name}`}
-                            onClick={() => openLessonDialog('edit', lesson)}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              openLessonDialog('edit', lesson)
+                            }}
                           >
                             <Pencil className='h-4 w-4' aria-hidden='true' />
                           </Button>
@@ -562,6 +593,21 @@ export function ModuleDetailView({ module, lessons, isLessonsLoading }: ModuleDe
         onSubmit={handleMaterialDialogSubmit}
         isSubmitting={createTeachingMaterialMutation.isPending}
       />
+      <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
+        <DialogContent className='w-full max-w-3xl max-h-[80vh] overflow-y-auto bg-greyscale-0'>
+          <DialogHeader>
+            <DialogTitle className='text-xl font-semibold text-greyscale-900'>{previewLesson?.lesson_name}</DialogTitle>
+            <DialogDescription>Xem trước nội dung bài học</DialogDescription>
+          </DialogHeader>
+          <div
+            className='mt-4 prose max-w-none'
+            dangerouslySetInnerHTML={{
+              __html:
+                previewLesson?.lesson_content || '<p class="text-greyscale-500 italic">Chưa có nội dung bài học</p>'
+            }}
+          />
+        </DialogContent>
+      </Dialog>
       <Dialog open={isLessonDialogOpen} onOpenChange={handleLessonDialogOpenChange}>
         <DialogContent className='w-full max-w-[520px] gap-0 overflow-hidden rounded-md border border-greyscale-200 bg-greyscale-0 p-0 shadow-2xl'>
           <form onSubmit={handleLessonDialogSubmit} className='flex flex-col gap-0'>
