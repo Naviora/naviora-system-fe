@@ -13,11 +13,7 @@ import {
 } from '@/components/student/dashboard'
 import { Award, BookOpen, Compass, GraduationCap, MoveUpRight, Star } from 'lucide-react'
 
-const getStatCards = (
-  totalModules: number,
-  completedCount: number,
-  ongoingCount: number
-): StatCardConfig[] => [
+const getStatCards = (totalModules: number, completedCount: number, ongoingCount: number): StatCardConfig[] => [
   {
     id: 'ongoing',
     title: 'Khoá học đang học',
