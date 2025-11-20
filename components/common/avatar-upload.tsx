@@ -23,13 +23,13 @@ export function AvatarUpload({ currentAvatar, userName = 'User' }: AvatarUploadP
     if (selectedFile) {
       // Validate file type
       if (!selectedFile.type.startsWith('image/')) {
-        toast.error('Please select an image file')
+        toast.error('Vui lòng chọn một tệp hình ảnh')
         return
       }
 
       // Validate file size (max 5MB)
       if (selectedFile.size > 5 * 1024 * 1024) {
-        toast.error('File size must be less than 5MB')
+        toast.error('Kích thước tệp phải nhỏ hơn 5MB')
         return
       }
 
@@ -46,16 +46,16 @@ export function AvatarUpload({ currentAvatar, userName = 'User' }: AvatarUploadP
 
   const handleUpload = async () => {
     if (!file) {
-      toast.error('Please select a file first')
+      toast.error('Vui lòng chọn tệp trước')
       return
     }
 
     try {
       await uploadMutation.mutateAsync(file)
-      toast.success('Avatar uploaded successfully')
+      toast.success('Tải ảnh đại diện thành công')
       setFile(null)
     } catch (error) {
-      toast.error('Failed to upload avatar')
+      toast.error('Tải ảnh đại diện thất bại')
       console.error(error)
     }
   }
@@ -75,7 +75,7 @@ export function AvatarUpload({ currentAvatar, userName = 'User' }: AvatarUploadP
               <Image src={preview} alt={userName} fill className='object-cover' priority />
             ) : (
               <div className='w-full h-full flex items-center justify-center text-greyscale-400'>
-                <span className='text-sm'>No image</span>
+                <span className='text-sm'>Chưa có ảnh</span>
               </div>
             )}
           </div>
@@ -84,12 +84,12 @@ export function AvatarUpload({ currentAvatar, userName = 'User' }: AvatarUploadP
         {/* File Input */}
         <div className='space-y-2'>
           <label htmlFor='avatar-input' className='text-sm font-medium text-greyscale-700'>
-            Upload new avatar
+            Tải ảnh đại diện mới
           </label>
           <div className='flex gap-2'>
             <Input id='avatar-input' type='file' accept='image/*' onChange={handleFileChange} className='flex-1' />
           </div>
-          <p className='text-xs text-greyscale-500'>Supported formats: JPG, PNG, GIF. Max size: 5MB</p>
+          <p className='text-xs text-greyscale-500'>Định dạng hỗ trợ: JPG, PNG, GIF. Dung lượng tối đa: 5MB</p>
         </div>
 
         {/* Action Buttons */}
@@ -98,11 +98,11 @@ export function AvatarUpload({ currentAvatar, userName = 'User' }: AvatarUploadP
             <>
               <Button onClick={handleUpload} disabled={uploadMutation.isPending} className='gap-2'>
                 <Upload className='w-4 h-4' />
-                {uploadMutation.isPending ? 'Uploading...' : 'Upload'}
+                {uploadMutation.isPending ? 'Đang tải lên...' : 'Tải lên'}
               </Button>
               <Button onClick={handleClear} variant='outline' className='gap-2'>
                 <X className='w-4 h-4' />
-                Cancel
+                Hủy
               </Button>
             </>
           )}

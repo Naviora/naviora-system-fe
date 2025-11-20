@@ -73,13 +73,13 @@ export function AvatarDropdown() {
         <DropdownMenuItem asChild>
           <Link href='/settings' className='flex cursor-pointer items-center gap-2'>
             <Settings className='h-4 w-4' />
-            <span>Settings</span>
+            <span>Cấu hình chung</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href='/help' className='flex cursor-pointer items-center gap-2'>
             <HelpCircle className='h-4 w-4' />
-            <span>Help & Support</span>
+            <span>Trợ giúp & Hỗ trợ</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -89,7 +89,7 @@ export function AvatarDropdown() {
           disabled={logoutMutation.isPending}
         >
           <LogOut className='mr-2 h-4 w-4' />
-          <span>{logoutMutation.isPending ? 'Logging out...' : 'Log out'}</span>
+          <span>{logoutMutation.isPending ? 'Đang đăng xuất...' : 'Đăng xuất'}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

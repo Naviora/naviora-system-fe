@@ -28,8 +28,8 @@ export const navigationConfigSchema = z.object({
 export type NavigationConfig = z.infer<typeof navigationConfigSchema>
 
 const COMMON_BOTTOM_NAVIGATION = navigationItemsSchema.parse([
-  { name: 'Settings', href: '/settings', icon: RiSettings2Fill },
-  { name: 'Help', href: '/help', icon: RiHeadphoneFill }
+  { name: 'Cấu hình chung', href: '/settings', icon: RiSettings2Fill },
+  { name: 'Trợ giúp & Hỗ trợ', href: '/help', icon: RiHeadphoneFill }
 ])
 
 const COMMON_MAIN_NAVIGATION = navigationItemsSchema.parse([
