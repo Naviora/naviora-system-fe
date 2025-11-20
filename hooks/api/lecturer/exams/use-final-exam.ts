@@ -13,8 +13,7 @@ export const useGetFinalExams = (params?: SearchRequest) => {
 export const useCreateFinalExam = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: CreateFinalExamRequest) =>
-      apiClient.post('/final-exam', data),
+    mutationFn: (data: CreateFinalExamRequest) => apiClient.post('/final-exam', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['final-exams'] })
     }
@@ -41,4 +40,3 @@ export const useDeleteFinalExam = () => {
     }
   })
 }
-

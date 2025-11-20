@@ -12,15 +12,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { IoFlag } from 'react-icons/io5'
 
-export function ExamQuestionSidebar({
-  totalQuestions,
-  selected,
-  flagged,
-  current,
-  onJump,
-  answeredCount,
-  onSubmit
-}: {
+interface ExamQuestionSidebarProps {
   totalQuestions: number
   selected: { [key: number]: number }
   flagged: number[]
@@ -28,7 +20,19 @@ export function ExamQuestionSidebar({
   onJump: (idx: number) => void
   answeredCount: number
   onSubmit: () => void
-}) {
+  isSubmitting?: boolean
+}
+
+export function ExamQuestionSidebar({
+  totalQuestions,
+  selected,
+  flagged,
+  current,
+  onJump,
+  answeredCount,
+  onSubmit,
+  isSubmitting
+}: ExamQuestionSidebarProps) {
   return (
     <div className='bg-greyscale-0 rounded-xl shadow p-6 col-span-4 flex flex-col'>
       <div className='font-semibold mb-4'>Danh sách câu hỏi</div>
@@ -61,7 +65,9 @@ export function ExamQuestionSidebar({
       </div>
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button className='w-full bg-success-200 hover:bg-green-700 text-white font-semibold'>Nộp bài</Button>
+          <Button className='w-full bg-success-200 hover:bg-green-700 text-white font-semibold' disabled={isSubmitting}>
+            {isSubmitting ? 'Đang nộp...' : 'Nộp bài'}
+          </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -73,7 +79,9 @@ export function ExamQuestionSidebar({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Hủy</AlertDialogCancel>
-            <AlertDialogAction onClick={onSubmit}>Xác nhận nộp</AlertDialogAction>
+            <AlertDialogAction onClick={onSubmit} disabled={isSubmitting}>
+              {isSubmitting ? 'Đang nộp...' : 'Xác nhận nộp'}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

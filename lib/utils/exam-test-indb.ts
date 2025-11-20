@@ -52,3 +52,27 @@ export async function loadReviewedExerciseSession(): Promise<ReviewedExerciseSes
 export async function clearReviewedExerciseSession() {
   await del(REVIEWED_EXERCISE_SESSION_KEY)
 }
+
+const FINAL_EXAM_SESSION_KEY = 'final-exam-session'
+
+export type FinalExamSessionPayload = {
+  final_exam_id: string
+  question_set_id: string
+  final_exam_submission_id: string
+  attempt_status: 'NOT_STARTED' | 'IN_PROGRESS' | 'SUBMITTED' | 'GRADED' | 'CANCELLED'
+  student_id?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export async function saveFinalExamSession(data: FinalExamSessionPayload) {
+  await set(FINAL_EXAM_SESSION_KEY, data)
+}
+
+export async function loadFinalExamSession(): Promise<FinalExamSessionPayload | undefined> {
+  return await get(FINAL_EXAM_SESSION_KEY)
+}
+
+export async function clearFinalExamSession() {
+  await del(FINAL_EXAM_SESSION_KEY)
+}

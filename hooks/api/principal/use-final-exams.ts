@@ -67,7 +67,7 @@ export interface FinalExamsQueryParams {
   status?: string
 }
 
-interface FinalExamsResponse {
+export interface FinalExamsResponse {
   status_code: number
   message: string
   data: {
@@ -252,8 +252,8 @@ export interface UpdateFinalExamPayload {
   title: string
   description: string
   status: 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED'
-  start_time: string
-  end_time: string
+  startTime: string
+  endTime: string
 }
 
 export interface UpdateFinalExamResponse {

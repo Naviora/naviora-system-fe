@@ -41,7 +41,15 @@ const deleteLessonRequest = async (lessonId: string): Promise<LessonResponseDto>
 
 const getLessonDetailRequest = async (lessonId: string): Promise<LessonResponseDto> => {
   const response = await axios_instance.get(`${LESSONS_API_ENDPOINT}/${lessonId}`)
-  return lessonResponseSchema.parse(response.data)
+  try {
+    const parsed = lessonResponseSchema.parse(response.data)
+    console.log('Parsed lesson response:', parsed)
+    return parsed
+  } catch (error) {
+    console.error('Lesson schema parsing error:', error)
+    console.error('Raw response data:', response.data)
+    throw error
+  }
 }
 
 export const useCreateLesson = (
@@ -79,7 +87,7 @@ export const useLessonDetail = (
     queryKey: QUERY_KEYS.LESSON_DETAIL(lessonId || 'unknown'),
     queryFn: () => getLessonDetailRequest(lessonId || ''),
     enabled: !!lessonId,
-    staleTime: 60 * 1000, // 60 seconds
+    staleTime: 0, // Always consider data as stale to force fresh data
     gcTime: 5 * 60 * 1000, // 5 minutes (formerly cacheTime)
     ...options
   })

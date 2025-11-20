@@ -152,10 +152,6 @@ export function FinalExamDetailPageClient({ finalExamId }: FinalExamDetailPageCl
             <div className='text-xs font-medium uppercase tracking-wide text-greyscale-600'>Người tạo</div>
             <div className='mt-1 text-sm font-medium text-greyscale-900'>{currentExam.created_by.name}</div>
           </div>
-          <div>
-            <div className='text-xs font-medium uppercase tracking-wide text-greyscale-600'>Số bộ câu hỏi</div>
-            <div className='mt-1 text-sm font-medium text-greyscale-900'>{currentExam.question_sets.length}</div>
-          </div>
         </div>
       </section>
 

@@ -117,7 +117,7 @@ export const materialSchema = z.object({
   lecturer_id: z.string().min(1),
   material_name: z.string().min(1),
   material_type: z.enum(['image', 'video', 'pdf', 'document', 'audio', 'other']),
-  material_path: z.string().url(),
+  material_path: z.string().min(1), // Accept both URLs and relative paths
   created_at: z.string().min(1).optional().nullable(),
   updated_at: z.string().min(1).optional().nullable(),
   deleted_at: z.string().nullable().optional(),

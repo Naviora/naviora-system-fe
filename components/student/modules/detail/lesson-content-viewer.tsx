@@ -130,9 +130,12 @@ export const LessonContentViewer = ({ lesson }: LessonContentViewerProps) => {
     try {
       await toggleCompletion.mutateAsync(lesson.id, {
         onSuccess: () => {
-          // Invalidate module lessons query to refresh sidebar
+          // Invalidate both module lessons query (sidebar) and lesson detail query (content)
           queryClient.invalidateQueries({
             queryKey: QUERY_KEYS.MODULE_LESSONS(moduleId)
+          })
+          queryClient.invalidateQueries({
+            queryKey: QUERY_KEYS.LESSON_DETAIL(lessonId)
           })
           toast.success('Cập nhật trạng thái bài học thành công')
         }

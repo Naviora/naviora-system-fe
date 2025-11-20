@@ -252,8 +252,8 @@ export interface UpdateEntryTestPayload {
   title: string
   description: string
   status: 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED'
-  start_time: string
-  end_time: string
+  startTime: string
+  endTime: string
 }
 
 export interface UpdateEntryTestResponse {

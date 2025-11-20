@@ -40,7 +40,8 @@ const COMMON_MAIN_NAVIGATION = navigationItemsSchema.parse([
 const STUDENT_MAIN_NAVIGATION = navigationItemsSchema.parse([
   { name: 'Tổng quan', href: '/student/dashboard', icon: RiHome5Fill },
   { name: 'Lịch', href: '/calendar', icon: RiCalendarFill },
-  { name: 'Chuyên đề', href: '/student/modules', icon: RiBook2Fill }
+  { name: 'Chuyên đề', href: '/student/modules', icon: RiBook2Fill },
+  { name: 'Bài thi cuối kỳ', href: '/student/final-exams', icon: PiExamFill }
 ])
 
 const LECTURER_MAIN_NAVIGATION = navigationItemsSchema.parse([
